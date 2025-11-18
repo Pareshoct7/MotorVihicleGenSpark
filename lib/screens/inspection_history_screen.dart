@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import '../models/inspection.dart';
 import '../services/database_service.dart';
 import '../services/pdf_service.dart';
+import '../services/word_pdf_service.dart';
 import 'inspection_form_screen.dart';
 
 class InspectionHistoryScreen extends StatefulWidget {
@@ -185,12 +186,113 @@ class _InspectionHistoryScreenState extends State<InspectionHistoryScreen> {
                     icon: const Icon(Icons.visibility),
                     label: const Text('View'),
                   ),
-                  TextButton.icon(
-                    onPressed: () async {
-                      await PdfService.shareInspection(inspection);
+                  PopupMenuButton<String>(
+                    icon: const Icon(Icons.share),
+                    tooltip: 'Share Options',
+                    itemBuilder: (context) => [
+                      const PopupMenuItem(
+                        value: 'pdf_simple',
+                        child: Row(
+                          children: [
+                            Icon(Icons.picture_as_pdf, color: Colors.red),
+                            SizedBox(width: 8),
+                            Text('Share PDF (Simple)'),
+                          ],
+                        ),
+                      ),
+                      const PopupMenuItem(
+                        value: 'word_pdf',
+                        child: Row(
+                          children: [
+                            Icon(Icons.description, color: Colors.blue),
+                            SizedBox(width: 8),
+                            Text('Share PDF (Word Template)'),
+                          ],
+                        ),
+                      ),
+                      const PopupMenuItem(
+                        value: 'word',
+                        child: Row(
+                          children: [
+                            Icon(Icons.article, color: Colors.blue),
+                            SizedBox(width: 8),
+                            Text('Export Word Document'),
+                          ],
+                        ),
+                      ),
+                    ],
+                    onSelected: (value) async {
+                      try {
+                        if (value == 'pdf_simple') {
+                          await PdfService.shareInspection(inspection);
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('PDF shared successfully')),
+                            );
+                          }
+                        } else if (value == 'word_pdf') {
+                          // Show loading indicator
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Row(
+                                  children: [
+                                    SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(strokeWidth: 2),
+                                    ),
+                                    SizedBox(width: 16),
+                                    Text('Generating PDF from Word template...'),
+                                  ],
+                                ),
+                                duration: Duration(seconds: 10),
+                              ),
+                            );
+                          }
+                          await WordPdfService.shareInspection(inspection);
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('PDF shared successfully')),
+                            );
+                          }
+                        } else if (value == 'word') {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Row(
+                                  children: [
+                                    SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(strokeWidth: 2),
+                                    ),
+                                    SizedBox(width: 16),
+                                    Text('Generating Word document...'),
+                                  ],
+                                ),
+                                duration: Duration(seconds: 5),
+                              ),
+                            );
+                          }
+                          final wordPath = await WordPdfService.generateWordDocument(inspection);
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Word document saved: $wordPath')),
+                            );
+                          }
+                        }
+                      } catch (e) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Error: $e'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      }
                     },
-                    icon: const Icon(Icons.picture_as_pdf),
-                    label: const Text('PDF'),
                   ),
                   PopupMenuButton(
                     itemBuilder: (context) => [
