@@ -263,3 +263,52 @@ Planned features for future versions:
 ---
 
 **Made with ❤️ using Flutter**
+
+---
+
+## 🆕 New Feature: Word Template PDF Generation
+
+The app now supports **dual PDF generation** methods:
+
+### **1. Simple PDF (Original)**
+- Fast Flutter-native generation (1-2 seconds)
+- Good layout and formatting
+- Best for quick exports
+
+### **2. Word Template PDF (NEW)** ✨
+- Uses your actual Word document as template
+- **Exact layout matching** with your .docx file
+- Professional output with company branding
+- Automatic checkbox checking based on inspection data
+- Converts to PDF using LibreOffice
+
+### **3. Word Document Export (NEW)** 📄
+- Generate editable .docx files
+- Offline editing capability
+- Same template-based system
+
+**How to Use:**
+1. Go to **Inspection History**
+2. Tap the **Share icon** (📤) on any inspection
+3. Choose your export format:
+   - **Share PDF (Simple)** - Quick export
+   - **Share PDF (Word Template)** - Exact template match
+   - **Export Word Document** - Editable file
+
+**Benefits:**
+- ✅ Exact layout matching with your Word template
+- ✅ Easy customization - just edit the Word template
+- ✅ Professional appearance with branding
+- ✅ Editable Word documents for offline work
+- ✅ High-quality PDF conversion
+
+**Technical Details:**
+- Python backend using `python-docx` for Word manipulation
+- LibreOffice for PDF conversion
+- Preserves all formatting, fonts, and layout
+- Automatic field population and checkbox management
+
+📖 **Full Documentation:** See [WORD_PDF_FEATURE.md](WORD_PDF_FEATURE.md) for complete technical details, customization guide, and troubleshooting.
+
+---
+
