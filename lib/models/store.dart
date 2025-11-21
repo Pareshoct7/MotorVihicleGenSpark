@@ -22,15 +22,27 @@ class Store extends HiveObject {
   @HiveField(5)
   DateTime updatedAt;
 
+  @HiveField(6)
+  String? storeNumber;
+
   Store({
     required this.id,
     required this.name,
     this.address,
     this.phone,
+    this.storeNumber,
     DateTime? createdAt,
     DateTime? updatedAt,
   })  : createdAt = createdAt ?? DateTime.now(),
         updatedAt = updatedAt ?? DateTime.now();
+
+  /// Get display name with store number in brackets
+  String get displayName {
+    if (storeNumber != null && storeNumber!.isNotEmpty) {
+      return '$name ($storeNumber)';
+    }
+    return name;
+  }
 
   Map<String, dynamic> toJson() {
     return {
@@ -38,6 +50,7 @@ class Store extends HiveObject {
       'name': name,
       'address': address,
       'phone': phone,
+      'storeNumber': storeNumber,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
     };
@@ -49,6 +62,7 @@ class Store extends HiveObject {
       name: json['name'],
       address: json['address'],
       phone: json['phone'],
+      storeNumber: json['storeNumber'],
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
     );

@@ -72,78 +72,103 @@ class InspectionWordPDFGenerator:
         return str(output_path)
     
     def _fill_inspection_details(self, doc, data):
-        """Fill in the inspection details table (first table)"""
+        """Fill in the inspection details table (Table 0)"""
         table = doc.tables[0]
         
-        # Row 0: Vehicle Registration No and Store
-        table.rows[0].cells[1].text = data.get('vehicleRegistrationNo', '')
-        table.rows[0].cells[3].text = data.get('storeName', '')
+        # Row 0: Vehicle Registration No (Cell 1) and Store (Cell 3)
+        if len(table.rows[0].cells) > 1:
+            table.rows[0].cells[1].text = data.get('vehicleRegistrationNo', '')
+        if len(table.rows[0].cells) > 3:
+            # Show store name with store number if available
+            store_name = data.get('storeName', '')
+            store_number = data.get('storeNumber', '')
+            if store_number:
+                table.rows[0].cells[3].text = f"{store_name} ({store_number})"
+            else:
+                table.rows[0].cells[3].text = store_name
         
-        # Row 1: Odometer Reading and Date
-        table.rows[1].cells[1].text = data.get('odometerReading', '')
+        # Row 1: Odometer Reading (Cell 1) and Date (Cell 3)
+        if len(table.rows[1].cells) > 1:
+            table.rows[1].cells[1].text = data.get('odometerReading', '')
         
-        # Format date
-        inspection_date = data.get('inspectionDate', '')
-        if inspection_date:
-            try:
-                # Parse ISO date string
-                date_obj = datetime.fromisoformat(inspection_date.replace('Z', '+00:00'))
-                formatted_date = date_obj.strftime('%d/%m/%Y')
-                table.rows[1].cells[3].text = formatted_date
-            except:
-                table.rows[1].cells[3].text = inspection_date
+        if len(table.rows[1].cells) > 3:
+            # Format date
+            inspection_date = data.get('inspectionDate', '')
+            if inspection_date:
+                try:
+                    # Parse ISO date string
+                    date_obj = datetime.fromisoformat(inspection_date.replace('Z', '+00:00'))
+                    formatted_date = date_obj.strftime('%d/%m/%Y')
+                    table.rows[1].cells[3].text = formatted_date
+                except:
+                    table.rows[1].cells[3].text = inspection_date
         
-        # Row 2: Employee Name
-        table.rows[2].cells[1].text = data.get('employeeName', '')
+        # Row 2: Employee Name (Cell 1)
+        if len(table.rows) > 2 and len(table.rows[2].cells) > 1:
+            table.rows[2].cells[1].text = data.get('employeeName', '')
     
     def _fill_checklist_items(self, doc, data):
-        """Fill in the checklist items table (second table)"""
+        """Fill in the checklist items table (Table 1) - EXACT template structure"""
         table = doc.tables[1]
         
-        # Mapping of table rows to inspection fields
+        # Mapping based on EXACT template analysis
+        # Format: (row_idx, col_idx, field_name)
         checklist_mapping = [
-            # Row 1: Tyres (tread depth) | Both tail lights
-            (1, 0, 'tyresTreadDepth', 1, 2, 'tailLights'),
-            # Row 2: Wheel nuts | Headlights (low beam)
-            (2, 0, 'wheelNuts', 2, 2, 'headlightsLowBeam'),
-            # Row 3: Outside section header | Headlights (high beam)
-            (3, None, None, 3, 2, 'headlightsHighBeam'),
-            # Row 4: Cleanliness | Reverse lights
-            (4, 0, 'cleanliness', 4, 2, 'reverseLights'),
-            # Row 5: Body damage | Brake lights
-            (5, 0, 'bodyDamage', 5, 2, 'brakeLights'),
-            # Row 6: Mirrors & Windows | Cab section header
-            (6, 0, 'mirrorsWindows', None, None, None),
-            # Row 7: Signage | Windscreen & wipers
-            (7, 0, 'signage', 7, 2, 'windscreenWipers'),
-            # Row 8: Mechanical section header | Horn
-            (8, None, None, 8, 2, 'horn'),
-            # Row 9: Engine – oil & water | Indicators
-            (9, 0, 'engineOilWater', 9, 2, 'indicators'),
-            # Row 10: Brakes | Seat belts
-            (10, 0, 'brakes', 10, 2, 'seatBelts'),
-            # Row 11: Transmission | Cleanliness (cab)
-            (11, 0, 'transmission', 11, 2, 'cabCleanliness'),
-            # Row 12: Empty | Service log book
-            (12, None, None, 12, 2, 'serviceLogBook'),
+            # Row 1: Tyres (tread depth) [1,0] | Both tail lights [1,2]
+            (1, 0, 'tyresTreadDepth'),
+            (1, 2, 'tailLights'),
+            
+            # Row 2: Wheel nuts [2,0] | Headlights (low beam) [2,2]
+            (2, 0, 'wheelNuts'),
+            (2, 2, 'headlightsLowBeam'),
+            
+            # Row 3: (Outside header) | Headlights (high beam) [3,2]
+            (3, 2, 'headlightsHighBeam'),
+            
+            # Row 4: Cleanliness [4,0] | Reverse lights [4,2]
+            (4, 0, 'cleanliness'),
+            (4, 2, 'reverseLights'),
+            
+            # Row 5: Body damage [5,0] | Brake lights [5,2]
+            (5, 0, 'bodyDamage'),
+            (5, 2, 'brakeLights'),
+            
+            # Row 6: Mirrors & Windows [6,0] | (Cab header)
+            (6, 0, 'mirrorsWindows'),
+            
+            # Row 7: Signage [7,0] | Windscreen & wipers [7,2]
+            (7, 0, 'signage'),
+            (7, 2, 'windscreenWipers'),
+            
+            # Row 8: (Mechanical header) | Horn [8,2]
+            (8, 2, 'horn'),
+            
+            # Row 9: Engine – oil & water [9,0] | Indicators [9,2]
+            (9, 0, 'engineOilWater'),
+            (9, 2, 'indicators'),
+            
+            # Row 10: Brakes [10,0] | Seat belts [10,2]
+            (10, 0, 'brakes'),
+            (10, 2, 'seatBelts'),
+            
+            # Row 11: Transmission [11,0] | Cleanliness (cab) [11,2]
+            (11, 0, 'transmission'),
+            (11, 2, 'cabCleanliness'),
+            
+            # Row 12: Checkboxes in [12,0], [12,1], [12,2] | Service log book [12,2]
+            # Note: Row 12 has unusual structure with multiple checkboxes
+            # The service log book checkbox is at [12,2]
+            (12, 2, 'serviceLogBook'),
         ]
         
-        for row_idx, left_col, left_field, right_col, right_cell, right_field in checklist_mapping:
-            if row_idx < len(table.rows):
-                row = table.rows[row_idx]
-                
-                # Left column checkbox
-                if left_col is not None and left_field and left_col < len(row.cells):
-                    checked = data.get(left_field, False)
-                    row.cells[left_col].text = self.CHECKBOX_CHECKED if checked else self.CHECKBOX_UNCHECKED
-                
-                # Right column checkbox
-                if right_col is not None and right_field and right_cell < len(row.cells):
-                    checked = data.get(right_field, False)
-                    row.cells[right_cell].text = self.CHECKBOX_CHECKED if checked else self.CHECKBOX_UNCHECKED
+        for row_idx, col_idx, field_name in checklist_mapping:
+            if row_idx < len(table.rows) and col_idx < len(table.rows[row_idx].cells):
+                cell = table.rows[row_idx].cells[col_idx]
+                checked = data.get(field_name, False)
+                cell.text = self.CHECKBOX_CHECKED if checked else self.CHECKBOX_UNCHECKED
     
     def _fill_spare_keys(self, doc, data):
-        """Fill in spare keys checkbox (third table)"""
+        """Fill in spare keys checkbox (Table 2)"""
         if len(doc.tables) > 2:
             table = doc.tables[2]
             if len(table.rows) > 0 and len(table.rows[0].cells) > 0:
@@ -151,24 +176,29 @@ class InspectionWordPDFGenerator:
                 table.rows[0].cells[0].text = self.CHECKBOX_CHECKED if checked else self.CHECKBOX_UNCHECKED
     
     def _fill_signatures(self, doc, data):
-        """Fill in signature section (fourth table)"""
+        """Fill in signature section (Table 3)"""
         if len(doc.tables) > 3:
             table = doc.tables[3]
             
-            # Employee signature
-            if data.get('signature'):
-                table.rows[1].cells[0].text = data['signature']
+            # Row 1: Employee signature (Cell 0)
+            if len(table.rows) > 1 and len(table.rows[1].cells) > 0:
+                if data.get('signature'):
+                    table.rows[1].cells[0].text = data['signature']
             
-            # Date (both signature columns can have the same date)
-            inspection_date = data.get('inspectionDate', '')
-            if inspection_date:
-                try:
-                    date_obj = datetime.fromisoformat(inspection_date.replace('Z', '+00:00'))
-                    formatted_date = date_obj.strftime('%d/%m/%Y')
-                    table.rows[2].cells[0].text = formatted_date
-                    table.rows[2].cells[2].text = formatted_date
-                except:
-                    pass
+            # Row 2: Dates (Cell 0 and Cell 2)
+            if len(table.rows) > 2:
+                inspection_date = data.get('inspectionDate', '')
+                if inspection_date:
+                    try:
+                        date_obj = datetime.fromisoformat(inspection_date.replace('Z', '+00:00'))
+                        formatted_date = date_obj.strftime('%d/%m/%Y')
+                        
+                        if len(table.rows[2].cells) > 0:
+                            table.rows[2].cells[0].text = formatted_date
+                        if len(table.rows[2].cells) > 2:
+                            table.rows[2].cells[2].text = formatted_date
+                    except:
+                        pass
     
     def convert_to_pdf(self, word_path, pdf_path=None):
         """
@@ -192,11 +222,8 @@ class InspectionWordPDFGenerator:
         else:
             pdf_path = Path(pdf_path)
         
-        # Convert Word to PDF
+        # Convert Word to PDF using LibreOffice
         try:
-            # For Linux systems, we'll use LibreOffice instead of docx2pdf
-            import subprocess
-            
             # Ensure output directory exists
             pdf_path.parent.mkdir(parents=True, exist_ok=True)
             
