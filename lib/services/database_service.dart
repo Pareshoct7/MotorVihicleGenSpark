@@ -4,6 +4,7 @@ import '../models/store.dart';
 import '../models/driver.dart';
 import '../models/inspection.dart';
 import '../models/notification_settings.dart';
+import 'ai_learning_service.dart';
 
 class DatabaseService {
   static const String vehiclesBox = 'vehicles';
@@ -28,6 +29,9 @@ class DatabaseService {
     await Hive.openBox<Driver>(driversBox);
     await Hive.openBox<Inspection>(inspectionsBox);
     await Hive.openBox<NotificationSettings>(notificationSettingsBox);
+    
+    // Initialize AI Learning Service
+    await AILearningService.init();
   }
 
   // Vehicle operations

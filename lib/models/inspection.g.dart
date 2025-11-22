@@ -26,6 +26,7 @@ class InspectionAdapter extends TypeAdapter<Inspection> {
       vehicleRegistrationNo: fields[6] as String,
       storeName: fields[7] as String,
       employeeName: fields[8] as String,
+      storeNumber: fields[35] as String?,
       tyresTreadDepth: fields[9] as bool?,
       wheelNuts: fields[10] as bool?,
       cleanliness: fields[11] as bool?,
@@ -58,7 +59,7 @@ class InspectionAdapter extends TypeAdapter<Inspection> {
   @override
   void write(BinaryWriter writer, Inspection obj) {
     writer
-      ..writeByte(35)
+      ..writeByte(36)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -128,7 +129,9 @@ class InspectionAdapter extends TypeAdapter<Inspection> {
       ..writeByte(33)
       ..write(obj.createdAt)
       ..writeByte(34)
-      ..write(obj.updatedAt);
+      ..write(obj.updatedAt)
+      ..writeByte(35)
+      ..write(obj.storeNumber);
   }
 
   @override

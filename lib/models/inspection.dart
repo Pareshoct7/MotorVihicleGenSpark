@@ -115,6 +115,9 @@ class Inspection extends HiveObject {
   @HiveField(34)
   DateTime updatedAt;
 
+  @HiveField(35)
+  String? storeNumber;
+
   Inspection({
     required this.id,
     required this.vehicleId,
@@ -125,6 +128,7 @@ class Inspection extends HiveObject {
     required this.vehicleRegistrationNo,
     required this.storeName,
     required this.employeeName,
+    this.storeNumber,
     this.tyresTreadDepth,
     this.wheelNuts,
     this.cleanliness,
@@ -164,6 +168,7 @@ class Inspection extends HiveObject {
       'odometerReading': odometerReading,
       'vehicleRegistrationNo': vehicleRegistrationNo,
       'storeName': storeName,
+      'storeNumber': storeNumber,
       'employeeName': employeeName,
       'tyresTreadDepth': tyresTreadDepth,
       'wheelNuts': wheelNuts,
@@ -224,5 +229,13 @@ class Inspection extends HiveObject {
 
   double get completionPercentage {
     return (completedItems / totalItems) * 100;
+  }
+
+  /// Get store display name with number in brackets
+  String get storeDisplayName {
+    if (storeNumber != null && storeNumber!.isNotEmpty) {
+      return '$storeName ($storeNumber)';
+    }
+    return storeName;
   }
 }
