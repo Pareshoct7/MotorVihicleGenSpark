@@ -42,3 +42,5 @@ flutter:
   
   assets:
     - assets/inspection_template.docx
+    - assets/dominos_logo.png
+    - assets/vehicle_diagram.jpeg

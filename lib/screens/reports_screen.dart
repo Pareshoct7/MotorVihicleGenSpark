@@ -449,7 +449,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 ),
               );
             } else if (value == 'pdf') {
-              await PdfService.shareInspection(inspection);
+              await PdfService.shareTemplateMatchingInspection(inspection);
             }
           },
         ),
@@ -507,7 +507,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
 
     try {
       for (final inspection in _filteredInspections) {
-        await PdfService.shareInspection(inspection);
+        await PdfService.shareTemplateMatchingInspection(inspection);
         await Future.delayed(const Duration(milliseconds: 300));
       }
 

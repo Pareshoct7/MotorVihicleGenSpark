@@ -191,22 +191,31 @@ class _InspectionHistoryScreenState extends State<InspectionHistoryScreen> {
                     tooltip: 'Share Options',
                     itemBuilder: (context) => [
                       const PopupMenuItem(
-                        value: 'pdf_simple',
+                        value: 'pdf_template',
                         child: Row(
                           children: [
-                            Icon(Icons.picture_as_pdf, color: Colors.red),
+                            Icon(Icons.picture_as_pdf, color: Colors.green),
                             SizedBox(width: 8),
-                            Text('Share PDF (Simple)'),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Share PDF (Template Match)'),
+                                Text(
+                                  'Exact template layout • Works offline',
+                                  style: TextStyle(fontSize: 10, color: Colors.grey),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),
                       const PopupMenuItem(
-                        value: 'word_pdf',
+                        value: 'pdf_simple',
                         child: Row(
                           children: [
-                            Icon(Icons.description, color: Colors.blue),
+                            Icon(Icons.picture_as_pdf, color: Colors.orange),
                             SizedBox(width: 8),
-                            Text('Share PDF (Word Template)'),
+                            Text('Share PDF (Basic)'),
                           ],
                         ),
                       ),
@@ -216,22 +225,24 @@ class _InspectionHistoryScreenState extends State<InspectionHistoryScreen> {
                           children: [
                             Icon(Icons.article, color: Colors.blue),
                             SizedBox(width: 8),
-                            Text('Export Word Document'),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Export Word Document'),
+                                Text(
+                                  'Desktop only (Python required)',
+                                  style: TextStyle(fontSize: 10, color: Colors.grey),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),
                     ],
                     onSelected: (value) async {
                       try {
-                        if (value == 'pdf_simple') {
-                          await PdfService.shareInspection(inspection);
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('PDF shared successfully')),
-                            );
-                          }
-                        } else if (value == 'word_pdf') {
-                          // Show loading indicator
+                        if (value == 'pdf_template') {
+                          // Template-matching PDF - Works offline on all platforms
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
@@ -243,20 +254,28 @@ class _InspectionHistoryScreenState extends State<InspectionHistoryScreen> {
                                       child: CircularProgressIndicator(strokeWidth: 2),
                                     ),
                                     SizedBox(width: 16),
-                                    Text('Generating PDF from Word template...'),
+                                    Text('Generating template-matching PDF...'),
                                   ],
                                 ),
-                                duration: Duration(seconds: 10),
+                                duration: Duration(seconds: 3),
                               ),
                             );
                           }
-                          await WordPdfService.shareInspection(inspection);
+                          await PdfService.shareTemplateMatchingInspection(inspection);
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('PDF shared successfully')),
+                            );
+                          }
+                        } else if (value == 'pdf_simple') {
+                          await PdfService.shareTemplateMatchingInspection(inspection);
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('PDF shared successfully')),
                             );
                           }
                         } else if (value == 'word') {
+                          // Word document generation (desktop only with Python)
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(

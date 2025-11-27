@@ -453,7 +453,7 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
 
     try {
       for (final inspection in recentInspections) {
-        await PdfService.shareInspection(inspection);
+        await PdfService.shareTemplateMatchingInspection(inspection);
         await Future.delayed(const Duration(milliseconds: 500));
       }
 

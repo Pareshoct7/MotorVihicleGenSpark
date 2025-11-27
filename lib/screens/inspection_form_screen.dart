@@ -149,7 +149,7 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> {
             IconButton(
               icon: const Icon(Icons.picture_as_pdf),
               onPressed: () async {
-                await PdfService.shareInspection(widget.inspection!);
+                await PdfService.shareTemplateMatchingInspection(widget.inspection!);
               },
               tooltip: 'Export PDF',
             ),
