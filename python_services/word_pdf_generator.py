@@ -227,9 +227,22 @@ class InspectionWordPDFGenerator:
             # Ensure output directory exists
             pdf_path.parent.mkdir(parents=True, exist_ok=True)
             
+            # Determine LibreOffice command (macOS uses 'soffice', Linux may use 'libreoffice')
+            libreoffice_cmd = 'soffice'  # Default to macOS/standard command
+            
+            # Check if soffice is available, otherwise try libreoffice
+            try:
+                subprocess.run(['which', 'soffice'], capture_output=True, check=True)
+            except subprocess.CalledProcessError:
+                try:
+                    subprocess.run(['which', 'libreoffice'], capture_output=True, check=True)
+                    libreoffice_cmd = 'libreoffice'
+                except subprocess.CalledProcessError:
+                    raise FileNotFoundError("LibreOffice not found. Install with: brew install libreoffice (macOS) or apt-get install libreoffice (Linux)")
+            
             # Use LibreOffice to convert
             result = subprocess.run([
-                'libreoffice',
+                libreoffice_cmd,
                 '--headless',
                 '--convert-to', 'pdf',
                 '--outdir', str(pdf_path.parent),
@@ -250,8 +263,8 @@ class InspectionWordPDFGenerator:
                 print(f"❌ LibreOffice conversion failed: {result.stderr}")
                 raise Exception(f"PDF conversion failed: {result.stderr}")
                 
-        except FileNotFoundError:
-            print("❌ LibreOffice not found. Please install: apt-get install libreoffice")
+        except FileNotFoundError as e:
+            print(f"❌ {str(e)}")
             raise
         except subprocess.TimeoutExpired:
             print("❌ PDF conversion timed out")

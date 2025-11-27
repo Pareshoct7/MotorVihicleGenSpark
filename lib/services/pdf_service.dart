@@ -493,7 +493,7 @@ class PdfService {
           pw.SizedBox(height: 4),
           pw.Text(
             'I hereby declare that the above information is true and correct at the time of inspection.',
-            style: const pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold),
+            style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold),
           ),
           pw.SizedBox(height: 4),
           pw.Row(
