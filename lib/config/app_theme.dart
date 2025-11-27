@@ -53,7 +53,7 @@ class AppTheme {
       ),
       
       // Card Theme - Bold shadows and rounded corners
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 4,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
@@ -209,7 +209,7 @@ class AppTheme {
       ),
       
       // Card Theme - Dark cards with elevation
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 6,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
@@ -240,7 +240,7 @@ class AppTheme {
       ),
       
       // Elevated Button - Domino's Red with bold style
-      elevatedButtonThemeData: ElevatedButtonThemeData(
+      elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
           shape: RoundedRectangleBorder(
