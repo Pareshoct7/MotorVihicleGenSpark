@@ -29,8 +29,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Vehicle Inspection'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(
+              'assets/dominos_logo.png',
+              height: 32,
+              errorBuilder: (context, error, stackTrace) => const Icon(Icons.local_pizza),
+            ),
+            const SizedBox(width: 12),
+            const Text('Vehicle Inspection'),
+          ],
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
@@ -52,19 +62,30 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             DrawerHeader(
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
+                gradient: LinearGradient(
+                  colors: [
+                    Theme.of(context).colorScheme.primary,
+                    Theme.of(context).colorScheme.secondary,
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
               ),
-              child: const Column(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Icon(
-                    Icons.assignment,
-                    size: 48,
-                    color: Colors.white,
+                  Image.asset(
+                    'assets/dominos_logo.png',
+                    height: 48,
+                    errorBuilder: (context, error, stackTrace) => const Icon(
+                      Icons.local_pizza,
+                      size: 48,
+                      color: Colors.white,
+                    ),
                   ),
-                  SizedBox(height: 8),
-                  Text(
+                  const SizedBox(height: 12),
+                  const Text(
                     'Vehicle Inspection',
                     style: TextStyle(
                       color: Colors.white,
@@ -72,11 +93,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Text(
-                    'Management System',
+                  const Text(
+                    'Domino\'s Fleet Management',
                     style: TextStyle(
                       color: Colors.white70,
                       fontSize: 14,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
