@@ -51,6 +51,71 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          // Theme Selection Card
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Appearance',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Customize app appearance',
+                    style: TextStyle(
+                      color: Colors.grey.shade600,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Consumer<ThemeProvider>(
+                    builder: (context, themeProvider, child) {
+                      return DropdownButtonFormField<ThemeMode>(
+                        value: themeProvider.themeMode,
+                        decoration: const InputDecoration(
+                          labelText: 'Theme Mode',
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.palette),
+                        ),
+                        items: const [
+                          DropdownMenuItem(
+                            value: ThemeMode.system,
+                            child: Text('System Default'),
+                          ),
+                          DropdownMenuItem(
+                            value: ThemeMode.light,
+                            child: Text('Light'),
+                          ),
+                          DropdownMenuItem(
+                            value: ThemeMode.dark,
+                            child: Text('Dark'),
+                          ),
+                        ],
+                        onChanged: (value) {
+                          if (value != null) {
+                            themeProvider.setThemeMode(value);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Theme updated'),
+                              ),
+                            );
+                          }
+                        },
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          
+          // Default Selections Card
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -125,7 +190,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ...stores.map((store) {
                         return DropdownMenuItem(
                           value: store.id,
-                          child: Text(store.name),
+                          child: Text(store.displayName),
                         );
                       }),
                     ],

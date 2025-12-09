@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import '../models/store.dart';
 import '../services/database_service.dart';
+import '../services/preferences_service.dart';
 
 class StoresScreen extends StatefulWidget {
   const StoresScreen({super.key});
@@ -262,17 +263,31 @@ class _StoreDialogState extends State<StoreDialog> {
       await DatabaseService.updateStore(store);
     } else {
       await DatabaseService.addStore(store);
+      
+      // Auto-set as default if this is the first store
+      final allStores = DatabaseService.getAllStores();
+      if (allStores.length == 1) {
+        await PreferencesService.setDefaultStore(store.id);
+      }
     }
 
     if (mounted) {
       widget.onSave();
       Navigator.pop(context);
+      
+      // Show appropriate message
+      final allStores = DatabaseService.getAllStores();
+      String message;
+      if (widget.store != null) {
+        message = 'Store updated';
+      } else if (allStores.length == 1) {
+        message = 'Store added and set as default';
+      } else {
+        message = 'Store added';
+      }
+      
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            widget.store != null ? 'Store updated' : 'Store added',
-          ),
-        ),
+        SnackBar(content: Text(message)),
       );
     }
   }

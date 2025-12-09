@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 import '../models/vehicle.dart';
 import '../services/database_service.dart';
+import '../services/preferences_service.dart';
 
 class VehiclesScreen extends StatefulWidget {
   const VehiclesScreen({super.key});
@@ -519,19 +520,31 @@ class _VehicleDialogState extends State<VehicleDialog> {
       await DatabaseService.updateVehicle(vehicle);
     } else {
       await DatabaseService.addVehicle(vehicle);
+      
+      // Auto-set as default if this is the first vehicle
+      final allVehicles = DatabaseService.getAllVehicles();
+      if (allVehicles.length == 1) {
+        await PreferencesService.setDefaultVehicle(vehicle.id);
+      }
     }
 
     if (mounted) {
       widget.onSave();
       Navigator.pop(context);
+      
+      // Show appropriate message
+      final allVehicles = DatabaseService.getAllVehicles();
+      String message;
+      if (widget.vehicle != null) {
+        message = 'Vehicle updated';
+      } else if (allVehicles.length == 1) {
+        message = 'Vehicle added and set as default';
+      } else {
+        message = 'Vehicle added';
+      }
+      
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            widget.vehicle != null
-                ? 'Vehicle updated'
-                : 'Vehicle added',
-          ),
-        ),
+        SnackBar(content: Text(message)),
       );
     }
   }

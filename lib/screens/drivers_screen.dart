@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import '../models/driver.dart';
 import '../services/database_service.dart';
+import '../services/preferences_service.dart';
 
 class DriversScreen extends StatefulWidget {
   const DriversScreen({super.key});
@@ -263,17 +264,31 @@ class _DriverDialogState extends State<DriverDialog> {
       await DatabaseService.updateDriver(driver);
     } else {
       await DatabaseService.addDriver(driver);
+      
+      // Auto-set as default if this is the first driver
+      final allDrivers = DatabaseService.getAllDrivers();
+      if (allDrivers.length == 1) {
+        await PreferencesService.setDefaultDriver(driver.id);
+      }
     }
 
     if (mounted) {
       widget.onSave();
       Navigator.pop(context);
+      
+      // Show appropriate message
+      final allDrivers = DatabaseService.getAllDrivers();
+      String message;
+      if (widget.driver != null) {
+        message = 'Driver updated';
+      } else if (allDrivers.length == 1) {
+        message = 'Driver added and set as default';
+      } else {
+        message = 'Driver added';
+      }
+      
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            widget.driver != null ? 'Driver updated' : 'Driver added',
-          ),
-        ),
+        SnackBar(content: Text(message)),
       );
     }
   }
