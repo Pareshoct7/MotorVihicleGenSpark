@@ -69,4 +69,38 @@ class Vehicle extends HiveObject {
     if (regoExpiryDate == null) return false;
     return regoExpiryDate!.isBefore(DateTime.now());
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'registrationNo': registrationNo,
+      'make': make,
+      'model': model,
+      'year': year,
+      'wofExpiryDate': wofExpiryDate?.toIso8601String(),
+      'regoExpiryDate': regoExpiryDate?.toIso8601String(),
+      'storeId': storeId,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+    };
+  }
+
+  factory Vehicle.fromJson(Map<String, dynamic> json) {
+    return Vehicle(
+      id: json['id'],
+      registrationNo: json['registrationNo'],
+      make: json['make'],
+      model: json['model'],
+      year: json['year'],
+      wofExpiryDate: json['wofExpiryDate'] != null
+          ? DateTime.parse(json['wofExpiryDate'])
+          : null,
+      regoExpiryDate: json['regoExpiryDate'] != null
+          ? DateTime.parse(json['regoExpiryDate'])
+          : null,
+      storeId: json['storeId'],
+      createdAt: DateTime.parse(json['createdAt']),
+      updatedAt: DateTime.parse(json['updatedAt']),
+    );
+  }
 }

@@ -5,6 +5,7 @@ import '../models/store.dart';
 import '../models/driver.dart';
 import '../services/database_service.dart';
 import '../services/preferences_service.dart';
+import '../services/data_backup_service.dart';
 import '../providers/theme_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -243,6 +244,88 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         );
                       }
                     },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Data Management Card
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Data Management',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Backup and restore your data',
+                    style: TextStyle(
+                      color: Colors.grey.shade600,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  
+                  // Export Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () async {
+                        try {
+                          await DataBackupService.exportDatabase();
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Database exported successfully')),
+                            );
+                          }
+                        } catch (e) {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Export failed: $e')),
+                            );
+                          }
+                        }
+                      },
+                      icon: const Icon(Icons.upload_file),
+                      label: const Text('Export Database'),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  
+                  // Import Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () async {
+                        try {
+                          final success = await DataBackupService.importDatabase();
+                          if (success && mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Database imported successfully')),
+                            );
+                            // Refresh UI if needed, though Hive updates should be reactive if using ValueListenableBuilder
+                            // But here we might want to reload defaults if they were overwritten
+                            _loadDefaults(); 
+                          }
+                        } catch (e) {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Import failed: $e')),
+                            );
+                          }
+                        }
+                      },
+                      icon: const Icon(Icons.download),
+                      label: const Text('Import Database'),
+                    ),
                   ),
                 ],
               ),

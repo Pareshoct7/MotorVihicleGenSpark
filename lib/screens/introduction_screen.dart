@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class IntroductionScreen extends StatefulWidget {
-  final VoidCallback? onComplete;
+  final void Function(BuildContext)? onComplete;
   
   const IntroductionScreen({super.key, this.onComplete});
 
@@ -191,7 +191,7 @@ class _IntroductionScreenState extends State<IntroductionScreen> {
     await prefs.setBool('introduction_shown', true);
     
     if (widget.onComplete != null) {
-      widget.onComplete!();
+      widget.onComplete!(context);
     } else if (mounted) {
       Navigator.of(context).pop();
     }

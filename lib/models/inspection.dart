@@ -199,6 +199,47 @@ class Inspection extends HiveObject {
     };
   }
 
+  factory Inspection.fromJson(Map<String, dynamic> json) {
+    return Inspection(
+      id: json['id'],
+      vehicleId: json['vehicleId'],
+      storeId: json['storeId'],
+      driverId: json['driverId'],
+      inspectionDate: DateTime.parse(json['inspectionDate']),
+      odometerReading: json['odometerReading'],
+      vehicleRegistrationNo: json['vehicleRegistrationNo'],
+      storeName: json['storeName'],
+      storeNumber: json['storeNumber'],
+      employeeName: json['employeeName'],
+      tyresTreadDepth: json['tyresTreadDepth'],
+      wheelNuts: json['wheelNuts'],
+      cleanliness: json['cleanliness'],
+      bodyDamage: json['bodyDamage'],
+      bodyDamageNotes: json['bodyDamageNotes'],
+      mirrorsWindows: json['mirrorsWindows'],
+      signage: json['signage'],
+      engineOilWater: json['engineOilWater'],
+      brakes: json['brakes'],
+      transmission: json['transmission'],
+      tailLights: json['tailLights'],
+      headlightsLowBeam: json['headlightsLowBeam'],
+      headlightsHighBeam: json['headlightsHighBeam'],
+      reverseLights: json['reverseLights'],
+      brakeLights: json['brakeLights'],
+      windscreenWipers: json['windscreenWipers'],
+      horn: json['horn'],
+      indicators: json['indicators'],
+      seatBelts: json['seatBelts'],
+      cabCleanliness: json['cabCleanliness'],
+      serviceLogBook: json['serviceLogBook'],
+      spareKeys: json['spareKeys'],
+      correctiveActions: json['correctiveActions'],
+      signature: json['signature'],
+      createdAt: DateTime.parse(json['createdAt']),
+      updatedAt: DateTime.parse(json['updatedAt']),
+    );
+  }
+
   int get completedItems {
     int count = 0;
     if (tyresTreadDepth == true) count++;

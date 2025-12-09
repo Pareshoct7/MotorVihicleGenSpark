@@ -338,7 +338,6 @@ class PdfService {
   /// Works offline on all platforms (Android, iOS, Desktop)
   static Future<Uint8List> generateTemplateMatchingPdf(Inspection inspection) async {
     final pdf = pw.Document();
-    final dateFormat = DateFormat('dd/MM/yyyy');
 
     // Load images
     final logoImage = await imageFromAssetBundle('assets/dominos_logo.png');
@@ -348,241 +347,273 @@ class PdfService {
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
         margin: const pw.EdgeInsets.all(20), // Reduced margin to 20
-        build: (context) => [
-          // Header with Logo
-          pw.Row(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              pw.Expanded(
-                flex: 4,
-                child: pw.Container(
-                  color: PdfColors.blue900,
-                  padding: const pw.EdgeInsets.symmetric(vertical: 6, horizontal: 10),
-                  child: pw.Text(
-                    'Motor Vehicle Inspection Form',
-                    style: pw.TextStyle(
-                      fontSize: 14,
-                      fontWeight: pw.FontWeight.bold,
-                      color: PdfColors.white,
-                    ),
-                  ),
+        build: (context) => _buildTemplateMatchingPage(inspection, logoImage, diagramImage),
+      ),
+    );
+
+    return pdf.save();
+  }
+
+  /// Generate a single PDF containing multiple inspections (Clubbed Report)
+  static Future<Uint8List> generateClubbedInspectionPdf(List<Inspection> inspections) async {
+    final pdf = pw.Document();
+
+    // Load images once
+    final logoImage = await imageFromAssetBundle('assets/dominos_logo.png');
+    final diagramImage = await imageFromAssetBundle('assets/vehicle_diagram.jpeg');
+
+    for (final inspection in inspections) {
+      pdf.addPage(
+        pw.MultiPage(
+          pageFormat: PdfPageFormat.a4,
+          margin: const pw.EdgeInsets.all(20),
+          build: (context) => _buildTemplateMatchingPage(inspection, logoImage, diagramImage),
+        ),
+      );
+    }
+
+    return pdf.save();
+  }
+
+  /// Build the list of widgets for a single inspection page
+  static List<pw.Widget> _buildTemplateMatchingPage(
+    Inspection inspection,
+    pw.ImageProvider logoImage,
+    pw.ImageProvider diagramImage,
+  ) {
+    final dateFormat = DateFormat('dd/MM/yyyy');
+    
+    return [
+      // Header with Logo
+      pw.Row(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Expanded(
+            flex: 4,
+            child: pw.Container(
+              color: PdfColors.blue900,
+              padding: const pw.EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+              child: pw.Text(
+                'Motor Vehicle Inspection Form',
+                style: pw.TextStyle(
+                  fontSize: 14,
+                  fontWeight: pw.FontWeight.bold,
+                  color: PdfColors.white,
                 ),
               ),
-              pw.SizedBox(width: 10),
-              pw.Image(logoImage, width: 60),
-            ],
-          ),
-          pw.SizedBox(height: 10),
-
-          // 1. Inspection Details
-          pw.Text(
-            '1. Inspection Details',
-            style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold),
-          ),
-          pw.SizedBox(height: 4),
-          _buildDetailsTable(inspection, dateFormat),
-          
-          pw.SizedBox(height: 10),
-
-          // 2. Inspection Checklist
-          pw.Text(
-            '2. Inspection Checklist',
-            style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold),
-          ),
-          pw.SizedBox(height: 4),
-          _buildChecklistTable(inspection),
-          
-          pw.SizedBox(height: 8),
-
-          // Part 3: Vehicle Diagram and Spare Keys
-          pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.center,
-            children: [
-              pw.Text(
-                'Circle any areas with existing damage.',
-                style: const pw.TextStyle(fontSize: 10),
-              ),
-              pw.SizedBox(height: 4),
-              pw.Center(
-                child: pw.Image(diagramImage, height: 150, fit: pw.BoxFit.contain),
-              ),
-              pw.SizedBox(height: 8),
-              pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.center,
-                children: [
-                  _buildCheckbox(inspection.spareKeys),
-                  pw.SizedBox(width: 8),
-                  pw.Container(
-                    decoration: pw.BoxDecoration(
-                      border: pw.Border.all(color: PdfColors.black, width: 0.5),
-                    ),
-                    padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    child: pw.Text(
-                      'Spare keys available in store',
-                      style: const pw.TextStyle(fontSize: 10),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          
-          pw.SizedBox(height: 8),
-
-          // 3. Corrective Actions
-          pw.Text(
-            '3. Corrective Actions/notes/issues',
-            style: pw.TextStyle(fontSize: 11, fontWeight: pw.FontWeight.bold),
-          ),
-          pw.SizedBox(height: 4),
-          pw.Container(
-            height: 60,
-            decoration: pw.BoxDecoration(
-              border: pw.Border.all(color: PdfColors.black, width: 0.5),
-            ),
-            padding: const pw.EdgeInsets.all(8),
-            child: pw.Stack(
-              children: [
-                pw.Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  child: pw.Text(
-                    inspection.correctiveActions ?? '',
-                    style: const pw.TextStyle(fontSize: 9),
-                  ),
-                ),
-                pw.Positioned(
-                  bottom: 30,
-                  left: 0,
-                  right: 0,
-                  child: pw.Container(
-                    height: 1,
-                    color: PdfColors.black,
-                  ),
-                ),
-                pw.Positioned(
-                  bottom: 15,
-                  left: 0,
-                  right: 0,
-                  child: pw.Container(
-                    height: 1,
-                    color: PdfColors.black,
-                  ),
-                ),
-                pw.Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: pw.Container(
-                    height: 1,
-                    color: PdfColors.black,
-                  ),
-                ),
-              ],
             ),
           ),
+          pw.SizedBox(width: 10),
+          pw.Image(logoImage, width: 60),
+        ],
+      ),
+      pw.SizedBox(height: 10),
 
+      // 1. Inspection Details
+      pw.Text(
+        '1. Inspection Details',
+        style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold),
+      ),
+      pw.SizedBox(height: 4),
+      _buildDetailsTable(inspection, dateFormat),
+      
+      pw.SizedBox(height: 10),
+
+      // 2. Inspection Checklist
+      pw.Text(
+        '2. Inspection Checklist',
+        style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold),
+      ),
+      pw.SizedBox(height: 4),
+      _buildChecklistTable(inspection),
+      
+      pw.SizedBox(height: 8),
+
+      // Part 3: Vehicle Diagram and Spare Keys
+      pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.center,
+        children: [
+          pw.Text(
+            'Circle any areas with existing damage.',
+            style: const pw.TextStyle(fontSize: 10),
+          ),
+          pw.SizedBox(height: 4),
+          pw.Center(
+            child: pw.Image(diagramImage, height: 150, fit: pw.BoxFit.contain),
+          ),
           pw.SizedBox(height: 8),
-
-          // 4. Sign-off
-          pw.Text(
-            '4. Sign-off',
-            style: pw.TextStyle(fontSize: 11, fontWeight: pw.FontWeight.bold),
-          ),
-          pw.SizedBox(height: 4),
-          pw.Text(
-            'I hereby declare that the above information is true and correct at the time of inspection.',
-            style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold),
-          ),
-          pw.SizedBox(height: 4),
           pw.Row(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            mainAxisAlignment: pw.MainAxisAlignment.center,
             children: [
-              // Employee Signature Section
-              pw.Expanded(
-                child: pw.Column(
-                  crossAxisAlignment: pw.CrossAxisAlignment.start,
-                  children: [
-                    pw.Text('Employee Signature', style: const pw.TextStyle(fontSize: 10)),
-                    pw.Table(
-                      border: pw.TableBorder.all(color: PdfColors.black, width: 0.5),
-                      children: [
-                        // Signature box
-                        pw.TableRow(
-                          children: [
-                            pw.Container(
-                              height: 40,
-                              padding: const pw.EdgeInsets.all(4),
-                              child: pw.Align(
-                                alignment: pw.Alignment.centerLeft,
-                                child: pw.Text(
-                                  inspection.signature ?? '',
-                                  style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        // Date box
-                        pw.TableRow(
-                          children: [
-                            pw.Container(
-                              padding: const pw.EdgeInsets.all(4),
-                              child: pw.Text(
-                                'Date    ${dateFormat.format(inspection.inspectionDate)}',
-                                style: const pw.TextStyle(fontSize: 10),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
+              _buildCheckbox(inspection.spareKeys),
+              pw.SizedBox(width: 8),
+              pw.Container(
+                decoration: pw.BoxDecoration(
+                  border: pw.Border.all(color: PdfColors.black, width: 0.5),
                 ),
-              ),
-              pw.SizedBox(width: 20),
-              // Manager Signature Section
-              pw.Expanded(
-                child: pw.Column(
-                  crossAxisAlignment: pw.CrossAxisAlignment.start,
-                  children: [
-                    pw.Text('Manager Signature', style: const pw.TextStyle(fontSize: 10)),
-                    pw.Table(
-                      border: pw.TableBorder.all(color: PdfColors.black, width: 0.5),
-                      children: [
-                        // Signature box
-                        pw.TableRow(
-                          children: [
-                            pw.Container(
-                              height: 40,
-                            ),
-                          ],
-                        ),
-                        // Date box
-                        pw.TableRow(
-                          children: [
-                            pw.Container(
-                              padding: const pw.EdgeInsets.all(4),
-                              child: pw.Text(
-                                'Date',
-                                style: const pw.TextStyle(fontSize: 10),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
+                padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: pw.Text(
+                  'Spare keys available in store',
+                  style: const pw.TextStyle(fontSize: 10),
                 ),
               ),
             ],
           ),
         ],
       ),
-    );
+      
+      pw.SizedBox(height: 8),
 
-    return pdf.save();
+      // 3. Corrective Actions
+      pw.Text(
+        '3. Corrective Actions/notes/issues',
+        style: pw.TextStyle(fontSize: 11, fontWeight: pw.FontWeight.bold),
+      ),
+      pw.SizedBox(height: 4),
+      pw.Container(
+        height: 60,
+        decoration: pw.BoxDecoration(
+          border: pw.Border.all(color: PdfColors.black, width: 0.5),
+        ),
+        padding: const pw.EdgeInsets.all(8),
+        child: pw.Stack(
+          children: [
+            pw.Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: pw.Text(
+                inspection.correctiveActions ?? '',
+                style: const pw.TextStyle(fontSize: 9),
+              ),
+            ),
+            pw.Positioned(
+              bottom: 30,
+              left: 0,
+              right: 0,
+              child: pw.Container(
+                height: 1,
+                color: PdfColors.black,
+              ),
+            ),
+            pw.Positioned(
+              bottom: 15,
+              left: 0,
+              right: 0,
+              child: pw.Container(
+                height: 1,
+                color: PdfColors.black,
+              ),
+            ),
+            pw.Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: pw.Container(
+                height: 1,
+                color: PdfColors.black,
+              ),
+            ),
+          ],
+        ),
+      ),
+
+      pw.SizedBox(height: 8),
+
+      // 4. Sign-off
+      pw.Text(
+        '4. Sign-off',
+        style: pw.TextStyle(fontSize: 11, fontWeight: pw.FontWeight.bold),
+      ),
+      pw.SizedBox(height: 4),
+      pw.Text(
+        'I hereby declare that the above information is true and correct at the time of inspection.',
+        style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold),
+      ),
+      pw.SizedBox(height: 4),
+      pw.Row(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          // Employee Signature Section
+          pw.Expanded(
+            child: pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Text('Employee Signature', style: const pw.TextStyle(fontSize: 10)),
+                pw.Table(
+                  border: pw.TableBorder.all(color: PdfColors.black, width: 0.5),
+                  children: [
+                    // Signature box
+                    pw.TableRow(
+                      children: [
+                        pw.Container(
+                          height: 40,
+                          padding: const pw.EdgeInsets.all(4),
+                          child: pw.Align(
+                            alignment: pw.Alignment.centerLeft,
+                            child: pw.Text(
+                              inspection.signature ?? '',
+                              style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    // Date box
+                    pw.TableRow(
+                      children: [
+                        pw.Container(
+                          padding: const pw.EdgeInsets.all(4),
+                          child: pw.Text(
+                            'Date    ${dateFormat.format(inspection.inspectionDate)}',
+                            style: const pw.TextStyle(fontSize: 10),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          pw.SizedBox(width: 20),
+          // Manager Signature Section
+          pw.Expanded(
+            child: pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Text('Manager Signature', style: const pw.TextStyle(fontSize: 10)),
+                pw.Table(
+                  border: pw.TableBorder.all(color: PdfColors.black, width: 0.5),
+                  children: [
+                    // Signature box
+                    pw.TableRow(
+                      children: [
+                        pw.Container(
+                          height: 40,
+                        ),
+                      ],
+                    ),
+                    // Date box
+                    pw.TableRow(
+                      children: [
+                        pw.Container(
+                          padding: const pw.EdgeInsets.all(4),
+                          child: pw.Text(
+                            'Date',
+                            style: const pw.TextStyle(fontSize: 10),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ];
   }
 
   /// Build inspection details table matching Word template Table 0
