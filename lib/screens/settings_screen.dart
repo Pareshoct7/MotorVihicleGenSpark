@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/vehicle.dart';
 import '../models/store.dart';
 import '../models/driver.dart';
 import '../services/database_service.dart';
 import '../services/preferences_service.dart';
+import '../providers/theme_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});

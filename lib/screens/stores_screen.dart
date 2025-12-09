@@ -53,7 +53,7 @@ class _StoresScreenState extends State<StoresScreen> {
                       child: Icon(Icons.store),
                     ),
                     title: Text(
-                      store.name,
+                      store.displayName,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     subtitle: Column(
@@ -163,6 +163,7 @@ class StoreDialog extends StatefulWidget {
 class _StoreDialogState extends State<StoreDialog> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
+  late TextEditingController _storeNumberController;
   late TextEditingController _addressController;
   late TextEditingController _phoneController;
 
@@ -170,6 +171,7 @@ class _StoreDialogState extends State<StoreDialog> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.store?.name);
+    _storeNumberController = TextEditingController(text: widget.store?.storeNumber);
     _addressController = TextEditingController(text: widget.store?.address);
     _phoneController = TextEditingController(text: widget.store?.phone);
   }
@@ -196,6 +198,15 @@ class _StoreDialogState extends State<StoreDialog> {
                   }
                   return null;
                 },
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _storeNumberController,
+                decoration: const InputDecoration(
+                  labelText: 'Store Number',
+                  border: OutlineInputBorder(),
+                  hintText: 'e.g., 001, ST-123',
+                ),
               ),
               const SizedBox(height: 12),
               TextFormField(
@@ -240,6 +251,7 @@ class _StoreDialogState extends State<StoreDialog> {
     final store = Store(
       id: widget.store?.id ?? const Uuid().v4(),
       name: _nameController.text,
+      storeNumber: _storeNumberController.text.isNotEmpty ? _storeNumberController.text : null,
       address: _addressController.text.isNotEmpty ? _addressController.text : null,
       phone: _phoneController.text.isNotEmpty ? _phoneController.text : null,
       createdAt: widget.store?.createdAt,
@@ -268,6 +280,7 @@ class _StoreDialogState extends State<StoreDialog> {
   @override
   void dispose() {
     _nameController.dispose();
+    _storeNumberController.dispose();
     _addressController.dispose();
     _phoneController.dispose();
     super.dispose();

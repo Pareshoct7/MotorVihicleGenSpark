@@ -12,6 +12,8 @@ import 'reminders_screen.dart';
 import 'reports_screen.dart';
 import 'bulk_reports_screen.dart';
 import 'settings_screen.dart';
+import 'introduction_screen.dart';
+import 'about_developer_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -228,6 +230,33 @@ class _HomeScreenState extends State<HomeScreen> {
                     builder: (context) => const SettingsScreen(),
                   ),
                 ).then((_) => setState(() {}));
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.info_outline),
+              title: const Text('App Introduction'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const IntroductionScreen(),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.person_outline),
+              title: const Text('About Developer'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AboutDeveloperScreen(),
+                  ),
+                );
               },
             ),
           ],
