@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'custom_reminder.dart';
 
 part 'notification_settings.g.dart';
 
@@ -10,41 +11,65 @@ class NotificationSettings extends HiveObject {
   @HiveField(1)
   String vehicleId;
 
+  // Legacy fields - kept for structure but new logic uses fields below
   @HiveField(2)
-  bool wofNotificationsEnabled;
+  bool wofDefaultReminder;
 
   @HiveField(3)
-  int wofDaysBefore;
+  bool regoDefaultReminder;
 
   @HiveField(4)
-  bool regoNotificationsEnabled;
+  List<CustomReminder> wofCustomReminders;
 
   @HiveField(5)
-  int regoDaysBefore;
+  List<CustomReminder> regoCustomReminders;
 
   @HiveField(6)
-  DateTime? customWofNotificationDate;
-
-  @HiveField(7)
-  DateTime? customRegoNotificationDate;
-
-  @HiveField(8)
   DateTime createdAt;
 
-  @HiveField(9)
+  @HiveField(7)
   DateTime updatedAt;
+
+  // New fields for simplified notification logic
+  @HiveField(8)
+  bool wofNotificationsEnabled;
+
+  @HiveField(9)
+  int wofDaysBefore;
+
+  @HiveField(10)
+  DateTime? customWofNotificationDate;
+
+  @HiveField(11)
+  bool regoNotificationsEnabled;
+
+  @HiveField(12)
+  int regoDaysBefore;
+
+  @HiveField(13)
+  DateTime? customRegoNotificationDate;
 
   NotificationSettings({
     required this.id,
     required this.vehicleId,
-    this.wofNotificationsEnabled = true,
-    this.wofDaysBefore = 30,
-    this.regoNotificationsEnabled = true,
-    this.regoDaysBefore = 30,
-    this.customWofNotificationDate,
-    this.customRegoNotificationDate,
+    this.wofDefaultReminder = true,
+    this.regoDefaultReminder = true,
+    List<CustomReminder>? wofCustomReminders,
+    List<CustomReminder>? regoCustomReminders,
     DateTime? createdAt,
     DateTime? updatedAt,
-  })  : createdAt = createdAt ?? DateTime.now(),
-        updatedAt = updatedAt ?? DateTime.now();
+    bool? wofNotificationsEnabled,
+    int? wofDaysBefore,
+    this.customWofNotificationDate,
+    bool? regoNotificationsEnabled,
+    int? regoDaysBefore,
+    this.customRegoNotificationDate,
+  })  : wofCustomReminders = wofCustomReminders ?? [],
+        regoCustomReminders = regoCustomReminders ?? [],
+        createdAt = createdAt ?? DateTime.now(),
+        updatedAt = updatedAt ?? DateTime.now(),
+        wofNotificationsEnabled = wofNotificationsEnabled ?? wofDefaultReminder,
+        wofDaysBefore = wofDaysBefore ?? 1,
+        regoNotificationsEnabled = regoNotificationsEnabled ?? regoDefaultReminder,
+        regoDaysBefore = regoDaysBefore ?? 1;
 }

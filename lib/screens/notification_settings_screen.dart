@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import '../models/vehicle.dart';
 import '../models/notification_settings.dart';
 import '../services/database_service.dart';
+import '../services/notification_service.dart';
 
 class NotificationSettingsScreen extends StatefulWidget {
   final Vehicle vehicle;
@@ -325,6 +326,11 @@ class _NotificationSettingsScreenState
 
   void _saveSettings() async {
     await DatabaseService.saveNotificationSettings(_settings);
+    
+    // Schedule notifications
+    await NotificationService().scheduleWofReminder(widget.vehicle, _settings);
+    await NotificationService().scheduleRegoReminder(widget.vehicle, _settings);
+
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Settings saved')),

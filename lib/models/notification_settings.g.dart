@@ -19,41 +19,53 @@ class NotificationSettingsAdapter extends TypeAdapter<NotificationSettings> {
     return NotificationSettings(
       id: fields[0] as String,
       vehicleId: fields[1] as String,
-      wofNotificationsEnabled: fields[2] as bool,
-      wofDaysBefore: fields[3] as int,
-      regoNotificationsEnabled: fields[4] as bool,
-      regoDaysBefore: fields[5] as int,
-      customWofNotificationDate: fields[6] as DateTime?,
-      customRegoNotificationDate: fields[7] as DateTime?,
-      createdAt: fields[8] as DateTime?,
-      updatedAt: fields[9] as DateTime?,
+      wofDefaultReminder: fields[2] as bool,
+      regoDefaultReminder: fields[3] as bool,
+      wofCustomReminders: (fields[4] as List?)?.cast<CustomReminder>(),
+      regoCustomReminders: (fields[5] as List?)?.cast<CustomReminder>(),
+      createdAt: fields[6] as DateTime?,
+      updatedAt: fields[7] as DateTime?,
+      wofNotificationsEnabled: fields[8] as bool?,
+      wofDaysBefore: fields[9] as int?,
+      customWofNotificationDate: fields[10] as DateTime?,
+      regoNotificationsEnabled: fields[11] as bool?,
+      regoDaysBefore: fields[12] as int?,
+      customRegoNotificationDate: fields[13] as DateTime?,
     );
   }
 
   @override
   void write(BinaryWriter writer, NotificationSettings obj) {
     writer
-      ..writeByte(10)
+      ..writeByte(14)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
       ..write(obj.vehicleId)
       ..writeByte(2)
-      ..write(obj.wofNotificationsEnabled)
+      ..write(obj.wofDefaultReminder)
       ..writeByte(3)
-      ..write(obj.wofDaysBefore)
+      ..write(obj.regoDefaultReminder)
       ..writeByte(4)
-      ..write(obj.regoNotificationsEnabled)
+      ..write(obj.wofCustomReminders)
       ..writeByte(5)
-      ..write(obj.regoDaysBefore)
+      ..write(obj.regoCustomReminders)
       ..writeByte(6)
-      ..write(obj.customWofNotificationDate)
-      ..writeByte(7)
-      ..write(obj.customRegoNotificationDate)
-      ..writeByte(8)
       ..write(obj.createdAt)
+      ..writeByte(7)
+      ..write(obj.updatedAt)
+      ..writeByte(8)
+      ..write(obj.wofNotificationsEnabled)
       ..writeByte(9)
-      ..write(obj.updatedAt);
+      ..write(obj.wofDaysBefore)
+      ..writeByte(10)
+      ..write(obj.customWofNotificationDate)
+      ..writeByte(11)
+      ..write(obj.regoNotificationsEnabled)
+      ..writeByte(12)
+      ..write(obj.regoDaysBefore)
+      ..writeByte(13)
+      ..write(obj.customRegoNotificationDate);
   }
 
   @override

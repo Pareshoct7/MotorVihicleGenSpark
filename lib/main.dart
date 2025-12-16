@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'services/database_service.dart';
+import 'services/notification_service.dart'; // Import the service
 import 'providers/theme_provider.dart';
 import 'config/app_theme.dart';
 import 'screens/splash_screen.dart';
@@ -8,8 +9,9 @@ import 'screens/splash_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Initialize Hive database and AI Learning Service
+  // Initialize services
   await DatabaseService.init();
+  await NotificationService().init(); // Initialize the notification service
   
   runApp(
     ChangeNotifierProvider(
