@@ -661,6 +661,29 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> {
       return;
     }
 
+    // Check for existing inspection in the same week (only for new inspections)
+    if (widget.inspection == null) {
+      final hasExisting =
+          DatabaseService.hasInspectionInSameWeek(_selectedVehicleId!, _inspectionDate);
+      if (hasExisting) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Duplicate Inspection'),
+            content: const Text(
+                'An inspection already exists for this vehicle in the selected week.\n\nOnly one inspection per week is allowed.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
+    }
+
     final inspection = Inspection(
       id: widget.inspection?.id ?? const Uuid().v4(),
       vehicleId: _selectedVehicleId!,

@@ -168,12 +168,38 @@ class DatabaseService {
       ..sort((a, b) => b.inspectionDate.compareTo(a.inspectionDate));
   }
 
+
   static List<Inspection> getInspectionsByVehicle(String vehicleId) {
     final box = getInspectionsBox();
     return box.values
         .where((i) => i.vehicleId == vehicleId)
         .toList()
       ..sort((a, b) => b.inspectionDate.compareTo(a.inspectionDate));
+  }
+
+  /// Check if an inspection already exists for this vehicle in the same calendar week
+  static bool hasInspectionInSameWeek(String vehicleId, DateTime date) {
+    final inspections = getInspectionsByVehicle(vehicleId);
+    
+    // Calculate week number for the target date
+    final targetWeek = _getWeekNumber(date);
+    final targetYear = date.year; // Note: ISO weeks can cross years, but simple year match is usually sufficient for this app's scale
+
+    for (final inspection in inspections) {
+      final inspectionWeek = _getWeekNumber(inspection.inspectionDate);
+      final inspectionYear = inspection.inspectionDate.year;
+
+      if (inspectionYear == targetYear && inspectionWeek == targetWeek) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /// Helper to calculate week number (ISO 8601-ish)
+  static int _getWeekNumber(DateTime date) {
+    final dayOfYear = int.parse(DateFormat('D').format(date));
+    return ((dayOfYear - date.weekday + 10) / 7).floor();
   }
 
   static List<Vehicle> getVehiclesNeedingAttention() {

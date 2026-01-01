@@ -7,6 +7,7 @@ import '../models/store.dart';
 import '../models/driver.dart';
 import '../services/database_service.dart';
 import '../services/pdf_service.dart';
+import 'dart:math';
 
 class BulkReportsScreen extends StatefulWidget {
   const BulkReportsScreen({super.key});
@@ -326,17 +327,37 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
       // Calculate date intervals
       final totalDays = _endDate.difference(_startDate).inDays;
       final dayInterval = totalDays / (numberOfReports - 1);
+      final random = Random();
+
+      // Pre-calculate odometer readings (working backwards from newest to oldest)
+      // Newest report (last index) has baseOdometer
+      // As we go back in time, we SUBTRACT mileage
+      List<int> odometerReadings = List.filled(numberOfReports, 0);
+      int currentReading = baseOdometer;
+      
+      // Fill from newest (last) to oldest (first)
+      for (int i = numberOfReports - 1; i >= 0; i--) {
+        odometerReadings[i] = currentReading;
+        
+        // Subtract a random amount between 100-500km for the NEXT older report
+        if (i > 0) {
+          final subtraction = 100 + random.nextInt(401); // 100 to 500
+          currentReading -= subtraction;
+        }
+      }
 
       // Generate inspections (oldest first, newest last)
-      for (int i = 0; i < numberOfReports; i++) {
         final inspectionDate = _startDate.add(
           Duration(days: (dayInterval * i).round()),
         );
 
-        // Odometer decreases as we go back in time
-        // Most recent inspection (last one) has the baseOdometer
-        // Each older inspection has 100km less
-        final odometer = baseOdometer - ((numberOfReports - 1 - i) * 100);
+        // Check availability
+        if (DatabaseService.hasInspectionInSameWeek(vehicle.id, inspectionDate)) {
+            final dateFormat = DateFormat('dd/MM/yyyy');
+            throw Exception('Inspection already exists for the week of ${dateFormat.format(inspectionDate)}. Aborting to prevent duplicates.');
+        }
+
+        final odometer = odometerReadings[i];
 
         final inspection = Inspection(
           id: const Uuid().v4(),
@@ -452,10 +473,8 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
     );
 
     try {
-      for (final inspection in recentInspections) {
-        await PdfService.shareTemplateMatchingInspection(inspection);
-        await Future.delayed(const Duration(milliseconds: 500));
-      }
+      // Generate a single combined PDF for all reports
+      await PdfService.shareClubbedInspections(recentInspections);
 
       if (mounted) {
         Navigator.pop(context); // Close progress dialog

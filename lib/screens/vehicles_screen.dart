@@ -5,6 +5,8 @@ import '../models/vehicle.dart';
 import '../services/database_service.dart';
 import '../services/preferences_service.dart';
 
+import '../services/notification_service.dart';
+
 class VehiclesScreen extends StatefulWidget {
   const VehiclesScreen({super.key});
 
@@ -527,6 +529,11 @@ class _VehicleDialogState extends State<VehicleDialog> {
         await PreferencesService.setDefaultVehicle(vehicle.id);
       }
     }
+
+    // Schedule notifications
+    final settings = DatabaseService.getOrCreateNotificationSettings(vehicle.id);
+    await NotificationService().scheduleWofReminder(vehicle, settings);
+    await NotificationService().scheduleRegoReminder(vehicle, settings);
 
     if (mounted) {
       widget.onSave();

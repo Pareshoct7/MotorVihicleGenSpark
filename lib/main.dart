@@ -11,7 +11,8 @@ void main() async {
   
   // Initialize services
   await DatabaseService.init();
-  await NotificationService().init(); // Initialize the notification service
+  await NotificationService().init();
+  await NotificationService().rescheduleAllNotifications();
   
   runApp(
     ChangeNotifierProvider(

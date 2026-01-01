@@ -1122,6 +1122,7 @@ class PdfService {
     );
   }
 
+
   /// Share inspection using template-matching PDF (offline, all platforms)
   static Future<void> shareTemplateMatchingInspection(Inspection inspection) async {
     final pdfData = await generateTemplateMatchingPdf(inspection);
@@ -1129,6 +1130,22 @@ class PdfService {
       bytes: pdfData,
       filename:
           'inspection_${inspection.vehicleRegistrationNo}_${DateFormat('yyyyMMdd').format(inspection.inspectionDate)}.pdf',
+    );
+  }
+
+  /// Share multiple inspections as a single combined PDF (offline, all platforms)
+  static Future<void> shareClubbedInspections(List<Inspection> inspections) async {
+    if (inspections.isEmpty) return;
+    
+    final pdfData = await generateClubbedInspectionPdf(inspections);
+    
+    // Use the date of the most recent inspection for the filename
+    final dateStr = DateFormat('yyyyMMdd').format(inspections.first.inspectionDate);
+    final vehicleReg = inspections.first.vehicleRegistrationNo;
+    
+    await Printing.sharePdf(
+      bytes: pdfData,
+      filename: 'bulk_inspections_${vehicleReg}_$dateStr.pdf',
     );
   }
 }
