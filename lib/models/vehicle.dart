@@ -34,6 +34,12 @@ class Vehicle extends HiveObject {
   @HiveField(9)
   DateTime updatedAt;
 
+  @HiveField(10)
+  DateTime? serviceDueDate;
+
+  @HiveField(11)
+  DateTime? tyreCheckDate;
+
   Vehicle({
     required this.id,
     required this.registrationNo,
@@ -43,6 +49,8 @@ class Vehicle extends HiveObject {
     this.wofExpiryDate,
     this.regoExpiryDate,
     this.storeId,
+    this.serviceDueDate,
+    this.tyreCheckDate,
     DateTime? createdAt,
     DateTime? updatedAt,
   })  : createdAt = createdAt ?? DateTime.now(),
@@ -70,6 +78,28 @@ class Vehicle extends HiveObject {
     return regoExpiryDate!.isBefore(DateTime.now());
   }
 
+  bool get isServiceDueSoon {
+    if (serviceDueDate == null) return false;
+    final daysUntilExpiry = serviceDueDate!.difference(DateTime.now()).inDays;
+    return daysUntilExpiry <= 30 && daysUntilExpiry >= 0;
+  }
+
+  bool get isServiceOverdue {
+    if (serviceDueDate == null) return false;
+    return serviceDueDate!.isBefore(DateTime.now());
+  }
+
+  bool get isTyreCheckDueSoon {
+    if (tyreCheckDate == null) return false;
+    final daysUntilExpiry = tyreCheckDate!.difference(DateTime.now()).inDays;
+    return daysUntilExpiry <= 30 && daysUntilExpiry >= 0;
+  }
+
+  bool get isTyreCheckOverdue {
+    if (tyreCheckDate == null) return false;
+    return tyreCheckDate!.isBefore(DateTime.now());
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -80,6 +110,8 @@ class Vehicle extends HiveObject {
       'wofExpiryDate': wofExpiryDate?.toIso8601String(),
       'regoExpiryDate': regoExpiryDate?.toIso8601String(),
       'storeId': storeId,
+      'serviceDueDate': serviceDueDate?.toIso8601String(),
+      'tyreCheckDate': tyreCheckDate?.toIso8601String(),
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
     };
@@ -99,6 +131,12 @@ class Vehicle extends HiveObject {
           ? DateTime.parse(json['regoExpiryDate'])
           : null,
       storeId: json['storeId'],
+      serviceDueDate: json['serviceDueDate'] != null
+          ? DateTime.parse(json['serviceDueDate'])
+          : null,
+      tyreCheckDate: json['tyreCheckDate'] != null
+          ? DateTime.parse(json['tyreCheckDate'])
+          : null,
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
     );

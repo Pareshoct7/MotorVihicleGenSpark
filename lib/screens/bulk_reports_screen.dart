@@ -347,6 +347,7 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
       }
 
       // Generate inspections (oldest first, newest last)
+      for (int i = 0; i < numberOfReports; i++) {
         final inspectionDate = _startDate.add(
           Duration(days: (dayInterval * i).round()),
         );

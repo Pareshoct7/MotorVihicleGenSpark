@@ -31,13 +31,19 @@ class NotificationSettingsAdapter extends TypeAdapter<NotificationSettings> {
       regoNotificationsEnabled: fields[11] as bool?,
       regoDaysBefore: fields[12] as int?,
       customRegoNotificationDate: fields[13] as DateTime?,
+      serviceNotificationsEnabled: fields[14] as bool?,
+      serviceDaysBefore: fields[15] as int?,
+      customServiceNotificationDate: fields[16] as DateTime?,
+      tyreNotificationsEnabled: fields[17] as bool?,
+      tyreDaysBefore: fields[18] as int?,
+      customTyreNotificationDate: fields[19] as DateTime?,
     );
   }
 
   @override
   void write(BinaryWriter writer, NotificationSettings obj) {
     writer
-      ..writeByte(14)
+      ..writeByte(20)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -65,7 +71,19 @@ class NotificationSettingsAdapter extends TypeAdapter<NotificationSettings> {
       ..writeByte(12)
       ..write(obj.regoDaysBefore)
       ..writeByte(13)
-      ..write(obj.customRegoNotificationDate);
+      ..write(obj.customRegoNotificationDate)
+      ..writeByte(14)
+      ..write(obj.serviceNotificationsEnabled)
+      ..writeByte(15)
+      ..write(obj.serviceDaysBefore)
+      ..writeByte(16)
+      ..write(obj.customServiceNotificationDate)
+      ..writeByte(17)
+      ..write(obj.tyreNotificationsEnabled)
+      ..writeByte(18)
+      ..write(obj.tyreDaysBefore)
+      ..writeByte(19)
+      ..write(obj.customTyreNotificationDate);
   }
 
   @override

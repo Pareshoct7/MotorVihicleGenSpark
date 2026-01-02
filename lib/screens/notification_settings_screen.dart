@@ -319,6 +319,246 @@ class _NotificationSettingsScreenState
               ),
             ),
           ),
+
+          const SizedBox(height: 16),
+
+          // Service Notifications
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.build,
+                          color: Theme.of(context).colorScheme.primary),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Service Notifications',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  SwitchListTile(
+                    title: const Text('Enable Service Reminders'),
+                    subtitle: const Text('Get notified before service is due'),
+                    value: _settings.serviceNotificationsEnabled,
+                    onChanged: (value) {
+                      setState(() {
+                        _settings.serviceNotificationsEnabled = value;
+                      });
+                      _saveSettings();
+                    },
+                  ),
+
+                  if (_settings.serviceNotificationsEnabled) ...[
+                    const Divider(),
+                    ListTile(
+                      title: const Text('Notify me'),
+                      subtitle: Row(
+                        children: [
+                          ChoiceChip(
+                            label: const Text('1 day'),
+                            selected: _settings.serviceDaysBefore == 1,
+                            onSelected: (selected) {
+                              if (selected) {
+                                setState(() {
+                                  _settings.serviceDaysBefore = 1;
+                                  _settings.customServiceNotificationDate = null;
+                                });
+                                _saveSettings();
+                              }
+                            },
+                          ),
+                          const SizedBox(width: 8),
+                          ChoiceChip(
+                            label: const Text('1 week'),
+                            selected: _settings.serviceDaysBefore == 7,
+                            onSelected: (selected) {
+                              if (selected) {
+                                setState(() {
+                                  _settings.serviceDaysBefore = 7;
+                                  _settings.customServiceNotificationDate = null;
+                                });
+                                _saveSettings();
+                              }
+                            },
+                          ),
+                          const SizedBox(width: 8),
+                          ChoiceChip(
+                            label: const Text('30 days'),
+                            selected: _settings.serviceDaysBefore == 30,
+                            onSelected: (selected) {
+                              if (selected) {
+                                setState(() {
+                                  _settings.serviceDaysBefore = 30;
+                                  _settings.customServiceNotificationDate = null;
+                                });
+                                _saveSettings();
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    ListTile(
+                      title: const Text('Custom Date'),
+                      subtitle: Text(
+                        _settings.customServiceNotificationDate != null
+                            ? dateFormat.format(
+                                _settings.customServiceNotificationDate!)
+                            : 'Not set',
+                      ),
+                      trailing: const Icon(Icons.calendar_today),
+                      onTap: () async {
+                        final date = await showDatePicker(
+                          context: context,
+                          initialDate:
+                              _settings.customServiceNotificationDate ??
+                                  DateTime.now(),
+                          firstDate: DateTime.now(),
+                          lastDate: widget.vehicle.serviceDueDate ??
+                              DateTime.now().add(const Duration(days: 365)),
+                        );
+                        if (date != null) {
+                          setState(() {
+                            _settings.customServiceNotificationDate = date;
+                          });
+                          _saveSettings();
+                        }
+                      },
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Tyre Check Notifications
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.tire_repair,
+                          color: Theme.of(context).colorScheme.primary),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Tyre Check Notifications',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  SwitchListTile(
+                    title: const Text('Enable Tyre Check Reminders'),
+                    subtitle: const Text('Get notified before tyre check is due'),
+                    value: _settings.tyreNotificationsEnabled,
+                    onChanged: (value) {
+                      setState(() {
+                        _settings.tyreNotificationsEnabled = value;
+                      });
+                      _saveSettings();
+                    },
+                  ),
+
+                  if (_settings.tyreNotificationsEnabled) ...[
+                    const Divider(),
+                    ListTile(
+                      title: const Text('Notify me'),
+                      subtitle: Row(
+                        children: [
+                          ChoiceChip(
+                            label: const Text('1 day'),
+                            selected: _settings.tyreDaysBefore == 1,
+                            onSelected: (selected) {
+                              if (selected) {
+                                setState(() {
+                                  _settings.tyreDaysBefore = 1;
+                                  _settings.customTyreNotificationDate = null;
+                                });
+                                _saveSettings();
+                              }
+                            },
+                          ),
+                          const SizedBox(width: 8),
+                          ChoiceChip(
+                            label: const Text('1 week'),
+                            selected: _settings.tyreDaysBefore == 7,
+                            onSelected: (selected) {
+                              if (selected) {
+                                setState(() {
+                                  _settings.tyreDaysBefore = 7;
+                                  _settings.customTyreNotificationDate = null;
+                                });
+                                _saveSettings();
+                              }
+                            },
+                          ),
+                          const SizedBox(width: 8),
+                          ChoiceChip(
+                            label: const Text('30 days'),
+                            selected: _settings.tyreDaysBefore == 30,
+                            onSelected: (selected) {
+                              if (selected) {
+                                setState(() {
+                                  _settings.tyreDaysBefore = 30;
+                                  _settings.customTyreNotificationDate = null;
+                                });
+                                _saveSettings();
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    ListTile(
+                      title: const Text('Custom Date'),
+                      subtitle: Text(
+                        _settings.customTyreNotificationDate != null
+                            ? dateFormat.format(
+                                _settings.customTyreNotificationDate!)
+                            : 'Not set',
+                      ),
+                      trailing: const Icon(Icons.calendar_today),
+                      onTap: () async {
+                        final date = await showDatePicker(
+                          context: context,
+                          initialDate:
+                              _settings.customTyreNotificationDate ??
+                                  DateTime.now(),
+                          firstDate: DateTime.now(),
+                          lastDate: widget.vehicle.tyreCheckDate ??
+                              DateTime.now().add(const Duration(days: 365)),
+                        );
+                        if (date != null) {
+                          setState(() {
+                            _settings.customTyreNotificationDate = date;
+                          });
+                          _saveSettings();
+                        }
+                      },
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -330,6 +570,8 @@ class _NotificationSettingsScreenState
     // Schedule notifications
     await NotificationService().scheduleWofReminder(widget.vehicle, _settings);
     await NotificationService().scheduleRegoReminder(widget.vehicle, _settings);
+    await NotificationService().scheduleServiceReminder(widget.vehicle, _settings);
+    await NotificationService().scheduleTyreCheckReminder(widget.vehicle, _settings);
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(

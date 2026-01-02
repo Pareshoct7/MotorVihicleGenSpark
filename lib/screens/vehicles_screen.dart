@@ -76,7 +76,11 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
         vehicle.isWofExpired ||
         vehicle.isWofExpiringSoon ||
         vehicle.isRegoExpired ||
-        vehicle.isRegoExpiringSoon;
+        vehicle.isRegoExpiringSoon ||
+        vehicle.isServiceOverdue ||
+        vehicle.isServiceDueSoon ||
+        vehicle.isTyreCheckOverdue ||
+        vehicle.isTyreCheckDueSoon;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -225,6 +229,122 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
                       ),
                   ],
                 ),
+                const SizedBox(height: 12),
+
+                // Service Information
+                Row(
+                  children: [
+                    Icon(
+                      Icons.build,
+                      size: 20,
+                      color: vehicle.isServiceOverdue
+                          ? Colors.red
+                          : vehicle.isServiceDueSoon
+                              ? Colors.orange
+                              : Colors.green,
+                    ),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Service:',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        vehicle.serviceDueDate != null
+                            ? dateFormat.format(vehicle.serviceDueDate!)
+                            : 'Not set',
+                        style: TextStyle(
+                          color: vehicle.isServiceOverdue
+                              ? Colors.red
+                              : vehicle.isServiceDueSoon
+                                  ? Colors.orange
+                                  : null,
+                        ),
+                      ),
+                    ),
+                    if (vehicle.isServiceOverdue)
+                      Chip(
+                        label: const Text(
+                          'OVERDUE',
+                          style: TextStyle(fontSize: 10),
+                        ),
+                        backgroundColor: Colors.red,
+                        labelStyle: const TextStyle(color: Colors.white),
+                        padding: EdgeInsets.zero,
+                        visualDensity: VisualDensity.compact,
+                      )
+                    else if (vehicle.isServiceDueSoon)
+                      Chip(
+                        label: Text(
+                          '${vehicle.serviceDueDate!.difference(DateTime.now()).inDays} days',
+                          style: const TextStyle(fontSize: 10),
+                        ),
+                        backgroundColor: Colors.orange,
+                        labelStyle: const TextStyle(color: Colors.white),
+                        padding: EdgeInsets.zero,
+                        visualDensity: VisualDensity.compact,
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+
+                // Tyre Check Information
+                Row(
+                  children: [
+                    Icon(
+                      Icons.tire_repair,
+                      size: 20,
+                      color: vehicle.isTyreCheckOverdue
+                          ? Colors.red
+                          : vehicle.isTyreCheckDueSoon
+                              ? Colors.orange
+                              : Colors.green,
+                    ),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Tyre Check:',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        vehicle.tyreCheckDate != null
+                            ? dateFormat.format(vehicle.tyreCheckDate!)
+                            : 'Not set',
+                        style: TextStyle(
+                          color: vehicle.isTyreCheckOverdue
+                              ? Colors.red
+                              : vehicle.isTyreCheckDueSoon
+                                  ? Colors.orange
+                                  : null,
+                        ),
+                      ),
+                    ),
+                    if (vehicle.isTyreCheckOverdue)
+                      Chip(
+                        label: const Text(
+                          'OVERDUE',
+                          style: TextStyle(fontSize: 10),
+                        ),
+                        backgroundColor: Colors.red,
+                        labelStyle: const TextStyle(color: Colors.white),
+                        padding: EdgeInsets.zero,
+                        visualDensity: VisualDensity.compact,
+                      )
+                    else if (vehicle.isTyreCheckDueSoon)
+                      Chip(
+                        label: Text(
+                          '${vehicle.tyreCheckDate!.difference(DateTime.now()).inDays} days',
+                          style: const TextStyle(fontSize: 10),
+                        ),
+                        backgroundColor: Colors.orange,
+                        labelStyle: const TextStyle(color: Colors.white),
+                        padding: EdgeInsets.zero,
+                        visualDensity: VisualDensity.compact,
+                      ),
+                  ],
+                ),
                 
                 const Divider(height: 24),
                 
@@ -340,6 +460,8 @@ class _VehicleDialogState extends State<VehicleDialog> {
   
   DateTime? _wofExpiryDate;
   DateTime? _regoExpiryDate;
+  DateTime? _serviceDueDate;
+  DateTime? _tyreCheckDate;
   String? _selectedStoreId;
 
   @override
@@ -353,6 +475,8 @@ class _VehicleDialogState extends State<VehicleDialog> {
     );
     _wofExpiryDate = widget.vehicle?.wofExpiryDate;
     _regoExpiryDate = widget.vehicle?.regoExpiryDate;
+    _serviceDueDate = widget.vehicle?.serviceDueDate;
+    _tyreCheckDate = widget.vehicle?.tyreCheckDate;
     _selectedStoreId = widget.vehicle?.storeId;
   }
 
@@ -482,6 +606,62 @@ class _VehicleDialogState extends State<VehicleDialog> {
                   ),
                 ),
               ),
+              const SizedBox(height: 12),
+              InkWell(
+                onTap: () async {
+                  final date = await showDatePicker(
+                    context: context,
+                    initialDate: _serviceDueDate ?? DateTime.now(),
+                    firstDate: DateTime.now(),
+                    lastDate: DateTime(2030),
+                  );
+                  if (date != null) {
+                    setState(() {
+                      _serviceDueDate = date;
+                    });
+                  }
+                },
+                child: InputDecorator(
+                  decoration: const InputDecoration(
+                    labelText: 'Service Due Date',
+                    border: OutlineInputBorder(),
+                    suffixIcon: Icon(Icons.build),
+                  ),
+                  child: Text(
+                    _serviceDueDate != null
+                        ? dateFormat.format(_serviceDueDate!)
+                        : 'Select date',
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              InkWell(
+                onTap: () async {
+                  final date = await showDatePicker(
+                    context: context,
+                    initialDate: _tyreCheckDate ?? DateTime.now(),
+                    firstDate: DateTime.now(),
+                    lastDate: DateTime(2030),
+                  );
+                  if (date != null) {
+                    setState(() {
+                      _tyreCheckDate = date;
+                    });
+                  }
+                },
+                child: InputDecorator(
+                  decoration: const InputDecoration(
+                    labelText: 'Tyre Check Date',
+                    border: OutlineInputBorder(),
+                    suffixIcon: Icon(Icons.tire_repair),
+                  ),
+                  child: Text(
+                    _tyreCheckDate != null
+                        ? dateFormat.format(_tyreCheckDate!)
+                        : 'Select date',
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -514,6 +694,8 @@ class _VehicleDialogState extends State<VehicleDialog> {
           : null,
       wofExpiryDate: _wofExpiryDate,
       regoExpiryDate: _regoExpiryDate,
+      serviceDueDate: _serviceDueDate,
+      tyreCheckDate: _tyreCheckDate,
       storeId: _selectedStoreId,
       createdAt: widget.vehicle?.createdAt,
     );
@@ -534,6 +716,8 @@ class _VehicleDialogState extends State<VehicleDialog> {
     final settings = DatabaseService.getOrCreateNotificationSettings(vehicle.id);
     await NotificationService().scheduleWofReminder(vehicle, settings);
     await NotificationService().scheduleRegoReminder(vehicle, settings);
+    await NotificationService().scheduleServiceReminder(vehicle, settings);
+    await NotificationService().scheduleTyreCheckReminder(vehicle, settings);
 
     if (mounted) {
       widget.onSave();

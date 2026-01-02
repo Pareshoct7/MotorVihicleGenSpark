@@ -65,26 +65,30 @@ class NotificationService {
     required DateTime scheduledDate,
     String? payload,
   }) async {
-    await _notificationsPlugin.zonedSchedule(
-      id,
-      title,
-      body,
-      tz.TZDateTime.from(scheduledDate, tz.local),
-      const NotificationDetails(
-        android: AndroidNotificationDetails(
-          'vehicle_reminders',
-          'Vehicle Reminders',
-          channelDescription: 'Reminders for WOF and Registration expiry',
-          importance: Importance.max,
-          priority: Priority.high,
+    try {
+      await _notificationsPlugin.zonedSchedule(
+        id,
+        title,
+        body,
+        tz.TZDateTime.from(scheduledDate, tz.local),
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'vehicle_reminders',
+            'Vehicle Reminders',
+            channelDescription: 'Reminders for WOF and Registration expiry',
+            importance: Importance.max,
+            priority: Priority.high,
+          ),
+          iOS: DarwinNotificationDetails(),
         ),
-        iOS: DarwinNotificationDetails(),
-      ),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
-      payload: payload,
-    );
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        payload: payload,
+      );
+    } catch (e) {
+      print('ERROR: Failed to schedule notification $id: $e');
+    }
   }
 
   Future<void> cancelNotification(int id) async {
@@ -107,15 +111,14 @@ class NotificationService {
     for (final days in intervals) {
        await cancelNotification(_generateId('${vehicleId}_wof_$days'));
        await cancelNotification(_generateId('${vehicleId}_rego_$days'));
+       await cancelNotification(_generateId('${vehicleId}_service_$days'));
+       await cancelNotification(_generateId('${vehicleId}_tyre_$days'));
     }
   }
 
   Future<void> scheduleWofReminder(
       Vehicle vehicle, NotificationSettings settings) async {
     if (!settings.wofNotificationsEnabled || vehicle.wofExpiryDate == null) {
-      await cancelAllRemindersForVehicle(vehicle.id); 
-      // Actually we should only cancel WOF ones, but for simplicity let's stick to specific cancel logic logic if needed.
-      // Refined: cancel only WOF specific
       final intervals = [30, 14, 7, 3, 1, 0];
       for (final days in intervals) {
          await cancelNotification(_generateId('${vehicle.id}_wof_$days'));
@@ -126,12 +129,7 @@ class NotificationService {
     final intervals = [30, 14, 7, 3, 1, 0];
     
     for (final days in intervals) {
-      if (settings.wofDaysBefore < days && days != 0) continue; // Respect user preference if they set a max "days before" (optional logic, but let's just use fixed intervals for now as requested)
-      
-      // Override: The user requirement was "30, 14, 7, 1 days before".
-      // We will schedule ALL these regardless of the single "wofDaysBefore" setting, 
-      // OR we can treat "wofDaysBefore" as the custom override. 
-      // Let's implement the robust list.
+      if (settings.wofDaysBefore < days && days != 0) continue; 
       
       final scheduledDate = vehicle.wofExpiryDate!.subtract(Duration(days: days));
       final notificationId = _generateId('${vehicle.id}_wof_$days');
@@ -180,6 +178,68 @@ class NotificationService {
       }
     }
   }
+
+  Future<void> scheduleServiceReminder(
+      Vehicle vehicle, NotificationSettings settings) async {
+
+    if (!settings.serviceNotificationsEnabled || vehicle.serviceDueDate == null) {
+      final intervals = [30, 14, 7, 3, 1, 0];
+      for (final days in intervals) {
+         await cancelNotification(_generateId('${vehicle.id}_service_$days'));
+      }
+      return;
+    }
+
+    final intervals = [30, 14, 7, 3, 1, 0];
+
+    for (final days in intervals) {
+      final scheduledDate = vehicle.serviceDueDate!.subtract(Duration(days: days));
+      final notificationId = _generateId('${vehicle.id}_service_$days');
+
+      if (scheduledDate.isAfter(DateTime.now())) {
+        await scheduleNotification(
+          id: notificationId,
+          title: 'Service Due Reminder',
+          body: days == 0 
+              ? 'Service for ${vehicle.registrationNo} is due TODAY!' 
+              : 'Service for ${vehicle.registrationNo} is due in $days days (${_formatDate(vehicle.serviceDueDate!)})',
+          scheduledDate: scheduledDate,
+          payload: 'service_reminder',
+        );
+      }
+    }
+  }
+
+  Future<void> scheduleTyreCheckReminder(
+      Vehicle vehicle, NotificationSettings settings) async {
+
+    if (!settings.tyreNotificationsEnabled || vehicle.tyreCheckDate == null) {
+      final intervals = [30, 14, 7, 3, 1, 0];
+      for (final days in intervals) {
+         await cancelNotification(_generateId('${vehicle.id}_tyre_$days'));
+      }
+      return;
+    }
+
+    final intervals = [30, 14, 7, 3, 1, 0];
+
+    for (final days in intervals) {
+      final scheduledDate = vehicle.tyreCheckDate!.subtract(Duration(days: days));
+      final notificationId = _generateId('${vehicle.id}_tyre_$days');
+
+      if (scheduledDate.isAfter(DateTime.now())) {
+        await scheduleNotification(
+          id: notificationId,
+          title: 'Tyre Check Reminder',
+          body: days == 0 
+              ? 'Tyre Check for ${vehicle.registrationNo} is due TODAY!' 
+              : 'Tyre Check for ${vehicle.registrationNo} due in $days days (${_formatDate(vehicle.tyreCheckDate!)})',
+          scheduledDate: scheduledDate,
+          payload: 'tyre_reminder',
+        );
+      }
+    }
+  }
   
   Future<void> rescheduleAllNotifications() async {
     // Load all vehicles
@@ -189,6 +249,8 @@ class NotificationService {
        final settings = DatabaseService.getOrCreateNotificationSettings(vehicle.id);
        await scheduleWofReminder(vehicle, settings);
        await scheduleRegoReminder(vehicle, settings);
+       await scheduleServiceReminder(vehicle, settings);
+       await scheduleTyreCheckReminder(vehicle, settings);
     }
   }
 

@@ -46,4 +46,16 @@ class PreferencesService {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_defaultVehicleKey);
   }
+
+  static const String _initialDataPopulatedKey = 'initial_data_populated';
+
+  static Future<bool> isInitialDataPopulated() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_initialDataPopulatedKey) ?? false;
+  }
+
+  static Future<void> setInitialDataPopulated(bool populated) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_initialDataPopulatedKey, populated);
+  }
 }

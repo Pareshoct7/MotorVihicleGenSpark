@@ -25,6 +25,8 @@ class VehicleAdapter extends TypeAdapter<Vehicle> {
       wofExpiryDate: fields[5] as DateTime?,
       regoExpiryDate: fields[6] as DateTime?,
       storeId: fields[7] as String?,
+      serviceDueDate: fields[10] as DateTime?,
+      tyreCheckDate: fields[11] as DateTime?,
       createdAt: fields[8] as DateTime?,
       updatedAt: fields[9] as DateTime?,
     );
@@ -33,7 +35,7 @@ class VehicleAdapter extends TypeAdapter<Vehicle> {
   @override
   void write(BinaryWriter writer, Vehicle obj) {
     writer
-      ..writeByte(10)
+      ..writeByte(12)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -53,7 +55,11 @@ class VehicleAdapter extends TypeAdapter<Vehicle> {
       ..writeByte(8)
       ..write(obj.createdAt)
       ..writeByte(9)
-      ..write(obj.updatedAt);
+      ..write(obj.updatedAt)
+      ..writeByte(10)
+      ..write(obj.serviceDueDate)
+      ..writeByte(11)
+      ..write(obj.tyreCheckDate);
   }
 
   @override
