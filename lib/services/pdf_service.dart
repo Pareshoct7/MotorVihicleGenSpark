@@ -4,6 +4,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:intl/intl.dart';
 import '../models/inspection.dart';
+import 'offline_drive_service.dart';
 
 class PdfService {
   static Future<Uint8List> generateInspectionPdf(Inspection inspection) async {
@@ -1126,6 +1127,10 @@ class PdfService {
   /// Share inspection using template-matching PDF (offline, all platforms)
   static Future<void> shareTemplateMatchingInspection(Inspection inspection) async {
     final pdfData = await generateTemplateMatchingPdf(inspection);
+    
+    // Save to Offline Drive
+    await OfflineDriveService.saveInspectionPdf(inspection, pdfData);
+
     await Printing.sharePdf(
       bytes: pdfData,
       filename:

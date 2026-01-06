@@ -14,7 +14,7 @@ import 'bulk_reports_screen.dart';
 import 'settings_screen.dart';
 import 'introduction_screen.dart';
 import 'about_developer_screen.dart';
-
+import 'offline_drive_screen.dart';
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -140,6 +140,17 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const Divider(),
             ListTile(
+              leading: const Icon(Icons.folder_shared),
+              title: const Text('Offline Drive'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const OfflineDriveScreen()),
+                );
+              },
+            ),
+            const Divider(),            ListTile(
               leading: const Icon(Icons.auto_awesome),
               title: const Text('Bulk Reports Generator'),
               onTap: () {
