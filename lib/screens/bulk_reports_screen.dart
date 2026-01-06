@@ -9,6 +9,8 @@ import '../services/database_service.dart';
 import '../services/pdf_service.dart';
 import 'dart:math';
 
+enum BulkReportMode { dateRange, count }
+
 class BulkReportsScreen extends StatefulWidget {
   const BulkReportsScreen({super.key});
 
@@ -18,8 +20,9 @@ class BulkReportsScreen extends StatefulWidget {
 
 class _BulkReportsScreenState extends State<BulkReportsScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _odometerController = TextEditingController();
   final _numberOfReportsController = TextEditingController(text: '5');
+  
+  BulkReportMode _selectedMode = BulkReportMode.dateRange;
 
   String? _selectedVehicleId;
   String? _selectedStoreId;
@@ -61,11 +64,34 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Create multiple backdated inspection reports with evenly distributed dates',
+                        'Create multiple backdated inspection reports for Mondays.',
                         style: TextStyle(
                           color: Colors.grey.shade600,
                           fontSize: 14,
                         ),
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Mode Selection
+                      SegmentedButton<BulkReportMode>(
+                        segments: const [
+                          ButtonSegment<BulkReportMode>(
+                            value: BulkReportMode.dateRange,
+                            label: Text('By Date Range'),
+                            icon: Icon(Icons.date_range),
+                          ),
+                          ButtonSegment<BulkReportMode>(
+                            value: BulkReportMode.count,
+                            label: Text('By Count'),
+                            icon: Icon(Icons.numbers),
+                          ),
+                        ],
+                        selected: <BulkReportMode>{_selectedMode},
+                        onSelectionChanged: (Set<BulkReportMode> newSelection) {
+                          setState(() {
+                            _selectedMode = newSelection.first;
+                          });
+                        },
                       ),
                       const SizedBox(height: 24),
 
@@ -147,106 +173,88 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
                       ),
                       const SizedBox(height: 16),
 
-                      // Number of Reports
-                      TextFormField(
-                        controller: _numberOfReportsController,
-                        decoration: const InputDecoration(
-                          labelText: 'Number of Reports *',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.numbers),
-                          helperText: 'How many reports to generate (1-50)',
-                        ),
-                        keyboardType: TextInputType.number,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Required';
-                          }
-                          final num = int.tryParse(value);
-                          if (num == null || num < 1 || num > 50) {
-                            return 'Enter number between 1-50';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Start Date
-                      InkWell(
-                        onTap: () async {
-                          final date = await showDatePicker(
-                            context: context,
-                            initialDate: _startDate,
-                            firstDate: DateTime(2020),
-                            lastDate: DateTime.now(),
-                          );
-                          if (date != null) {
-                            setState(() {
-                              _startDate = date;
-                              if (_startDate.isAfter(_endDate)) {
-                                _endDate = _startDate;
-                              }
-                            });
-                          }
-                        },
-                        child: InputDecorator(
+                      // Mode Specific Inputs
+                      if (_selectedMode == BulkReportMode.count)
+                        TextFormField(
+                          controller: _numberOfReportsController,
                           decoration: const InputDecoration(
-                            labelText: 'Start Date *',
+                            labelText: 'Number of Reports (Mondays) *',
                             border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.calendar_today),
+                            prefixIcon: Icon(Icons.numbers),
+                            helperText: 'How many past Mondays to include',
                           ),
-                          child: Text(
-                            DateFormat('dd/MM/yyyy').format(_startDate),
+                          keyboardType: TextInputType.number,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Required';
+                            }
+                            final num = int.tryParse(value);
+                            if (num == null || num < 1 || num > 50) {
+                              return 'Enter number between 1-50';
+                            }
+                            return null;
+                          },
+                        ),
+                      
+                      if (_selectedMode == BulkReportMode.dateRange) ...[
+                        // Start Date
+                        InkWell(
+                          onTap: () async {
+                            final date = await showDatePicker(
+                              context: context,
+                              initialDate: _startDate,
+                              firstDate: DateTime(2020),
+                              lastDate: DateTime.now(),
+                            );
+                            if (date != null) {
+                              setState(() {
+                                _startDate = date;
+                                if (_startDate.isAfter(_endDate)) {
+                                  _endDate = _startDate;
+                                }
+                              });
+                            }
+                          },
+                          child: InputDecorator(
+                            decoration: const InputDecoration(
+                              labelText: 'Start Date *',
+                              border: OutlineInputBorder(),
+                              prefixIcon: Icon(Icons.calendar_today),
+                            ),
+                            child: Text(
+                              DateFormat('dd/MM/yyyy').format(_startDate),
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
+                        const SizedBox(height: 16),
 
-                      // End Date
-                      InkWell(
-                        onTap: () async {
-                          final date = await showDatePicker(
-                            context: context,
-                            initialDate: _endDate,
-                            firstDate: _startDate,
-                            lastDate: DateTime.now(),
-                          );
-                          if (date != null) {
-                            setState(() {
-                              _endDate = date;
-                            });
-                          }
-                        },
-                        child: InputDecorator(
-                          decoration: const InputDecoration(
-                            labelText: 'End Date *',
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.calendar_today),
-                          ),
-                          child: Text(
-                            DateFormat('dd/MM/yyyy').format(_endDate),
+                        // End Date
+                        InkWell(
+                          onTap: () async {
+                            final date = await showDatePicker(
+                              context: context,
+                              initialDate: _endDate,
+                              firstDate: _startDate,
+                              lastDate: DateTime.now(),
+                            );
+                            if (date != null) {
+                              setState(() {
+                                _endDate = date;
+                              });
+                            }
+                          },
+                          child: InputDecorator(
+                            decoration: const InputDecoration(
+                              labelText: 'End Date *',
+                              border: OutlineInputBorder(),
+                              prefixIcon: Icon(Icons.calendar_today),
+                            ),
+                            child: Text(
+                              DateFormat('dd/MM/yyyy').format(_endDate),
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Base Odometer
-                      TextFormField(
-                        controller: _odometerController,
-                        decoration: const InputDecoration(
-                          labelText: 'Starting Odometer Reading *',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.speed),
-                          helperText:
-                              'Will increment by 100km for each report',
-                        ),
-                        keyboardType: TextInputType.number,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Required';
-                          }
-                          return null;
-                        },
-                      ),
+                      ],
                     ],
                   ),
                 ),
@@ -321,44 +329,101 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
         throw Exception('Invalid vehicle, store, or driver');
       }
 
-      final numberOfReports = int.parse(_numberOfReportsController.text);
-      final baseOdometer = int.parse(_odometerController.text);
+      // Odometer Validation
+      if (vehicle.odometerReading == null) {
+        throw Exception('Vehicle odometer reading is missing. Please update vehicle details.');
+      }
 
-      // Calculate date intervals
-      final totalDays = _endDate.difference(_startDate).inDays;
-      final dayInterval = totalDays / (numberOfReports - 1);
+      final lastUpdated = vehicle.odometerUpdatedAt;
+      if (lastUpdated == null || DateTime.now().difference(lastUpdated).inDays > 30) {
+        if (mounted) {
+           showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Odometer Outdated'),
+              content: const Text(
+                'The vehicle odometer reading is older than 30 days. Please update the vehicle details with the current odometer reading before generating reports.',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
+        }
+        return; // Stop generation
+      }
+
+      final baseOdometer = vehicle.odometerReading!;
+
+      // Calculate Target Dates (Mondays)
+      List<DateTime> targetDates = [];
+      
+      if (_selectedMode == BulkReportMode.dateRange) {
+        DateTime current = _startDate;
+        while (current.isBefore(_endDate) || current.isAtSameMomentAs(_endDate)) {
+          if (current.weekday == DateTime.monday) {
+            targetDates.add(current);
+          }
+          current = current.add(const Duration(days: 1));
+        }
+      } else {
+        // By Count
+        final count = int.parse(_numberOfReportsController.text);
+        DateTime current = DateTime.now();
+        
+        // Find most recent Monday (today or past)
+        while (current.weekday != DateTime.monday) {
+          current = current.subtract(const Duration(days: 1));
+        }
+        
+        for (int i = 0; i < count; i++) {
+          targetDates.add(current);
+          current = current.subtract(const Duration(days: 7));
+        }
+      }
+
+      if (targetDates.isEmpty) {
+        throw Exception('No Mondays found in the selected range.');
+      }
+
+      // Sort Newest First for odometer calculation
+      targetDates.sort((a, b) => b.compareTo(a));
+      final numberOfReports = targetDates.length;
       final random = Random();
 
-      // Pre-calculate odometer readings (working backwards from newest to oldest)
-      // Newest report (last index) has baseOdometer
-      // As we go back in time, we SUBTRACT mileage
+      // Calculate odometers (Newest to Oldest)
+      // Newest (index 0) gets baseOdometer
       List<int> odometerReadings = List.filled(numberOfReports, 0);
       int currentReading = baseOdometer;
       
-      // Fill from newest (last) to oldest (first)
-      for (int i = numberOfReports - 1; i >= 0; i--) {
+      for (int i = 0; i < numberOfReports; i++) {
         odometerReadings[i] = currentReading;
         
         // Subtract a random amount between 100-500km for the NEXT older report
-        if (i > 0) {
+        if (i < numberOfReports - 1) {
           final subtraction = 100 + random.nextInt(401); // 100 to 500
           currentReading -= subtraction;
         }
       }
 
-      // Generate inspections (oldest first, newest last)
+      // Generate inspections (Iterate through prepared lists)
+      // Note: Logic generates Newest First, effectively.
       for (int i = 0; i < numberOfReports; i++) {
-        final inspectionDate = _startDate.add(
-          Duration(days: (dayInterval * i).round()),
-        );
+        final inspectionDate = targetDates[i];
+        final odometer = odometerReadings[i];
 
         // Check availability
         if (DatabaseService.hasInspectionInSameWeek(vehicle.id, inspectionDate)) {
-            final dateFormat = DateFormat('dd/MM/yyyy');
-            throw Exception('Inspection already exists for the week of ${dateFormat.format(inspectionDate)}. Aborting to prevent duplicates.');
+             // Skip duplicates instead of aborting whole batch? 
+             // Logic in previous version was to abort. Let's keep it safer for now, or just skip.
+             // Given bulk nature, skipping duplicate weeks is often better UX than crashing.
+             // Let's print a warning/log but skip.
+             debugPrint('Skipping week of $inspectionDate as inspection exists.');
+             continue; 
         }
-
-        final odometer = odometerReadings[i];
 
         final inspection = Inspection(
           id: const Uuid().v4(),
@@ -406,7 +471,7 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
           builder: (context) => AlertDialog(
             title: const Text('Success!'),
             content: Text(
-              '$numberOfReports inspections created successfully!\n\nWould you like to generate PDFs for all reports now?',
+              'Inspections created successfully for ${targetDates.length} Mondays!\n\nWould you like to generate PDFs for all reports now?',
             ),
             actions: [
               TextButton(
@@ -422,7 +487,8 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
         );
 
         if (generatePdfs == true && mounted) {
-          await _generatePdfsForReports();
+          // Pass the count of reports we just tried to generate
+          await _generatePdfsForReports(targetDates.length);
         } else if (mounted) {
           Navigator.pop(context);
         }
@@ -442,7 +508,7 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
     }
   }
 
-  Future<void> _generatePdfsForReports() async {
+  Future<void> _generatePdfsForReports(int count) async {
     // Get the latest inspections we just created
     final allInspections = DatabaseService.getAllInspections();
     final vehicle = DatabaseService.getVehicle(_selectedVehicleId!);
@@ -451,7 +517,7 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
 
     final recentInspections = allInspections
         .where((i) => i.vehicleId == vehicle.id)
-        .take(int.parse(_numberOfReportsController.text))
+        .take(count)
         .toList();
 
     // Show progress dialog
@@ -498,7 +564,6 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
 
   @override
   void dispose() {
-    _odometerController.dispose();
     _numberOfReportsController.dispose();
     super.dispose();
   }

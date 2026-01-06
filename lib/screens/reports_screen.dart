@@ -20,6 +20,12 @@ class _ReportsScreenState extends State<ReportsScreen> {
   DateTime? _endDate;
   List<Inspection> _filteredInspections = [];
   bool _isGeneratingBulkPdf = false;
+  
+  // Selection State
+  final Set<String> _selectedReportIds = {};
+  bool _explicitSelectionMode = false;
+  
+  bool get _isSelectionMode => _explicitSelectionMode || _selectedReportIds.isNotEmpty;
 
   @override
   void initState() {
@@ -76,6 +82,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
 
     setState(() {
       _filteredInspections = inspections;
+      // Clear selection if items are filtered out, or keep? 
+      // safer to clear to avoid deleting unseen items
+      _selectedReportIds.clear(); 
     });
   }
 
@@ -86,8 +95,80 @@ class _ReportsScreenState extends State<ReportsScreen> {
       _selectedDriverId = null;
       _startDate = null;
       _endDate = null;
+      _selectedReportIds.clear();
+      _explicitSelectionMode = false;
     });
     _applyFilters();
+  }
+
+  void _toggleSelection(String id) {
+    setState(() {
+      if (_selectedReportIds.contains(id)) {
+        _selectedReportIds.remove(id);
+      } else {
+        _selectedReportIds.add(id);
+      }
+    });
+  }
+
+  void _selectAll() {
+    setState(() {
+      if (_selectedReportIds.length == _filteredInspections.length) {
+        _selectedReportIds.clear();
+      } else {
+        _selectedReportIds.addAll(_filteredInspections.map((i) => i.id));
+      }
+    });
+  }
+  
+  void _clearSelection() {
+    setState(() {
+      _selectedReportIds.clear();
+      _explicitSelectionMode = false;
+    });
+  }
+
+  Future<void> _deleteSelectedReports() async {
+    if (_selectedReportIds.isEmpty) return;
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Reports'),
+        content: Text(
+          'Are you sure you want to delete ${_selectedReportIds.length} reports? This action cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    // Delete locally
+    for (final id in _selectedReportIds) {
+      await DatabaseService.deleteInspection(id);
+    }
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Reports deleted')),
+      );
+      _clearSelection();
+      _applyFilters(); // Refresh list
+    }
   }
 
   @override
@@ -98,21 +179,59 @@ class _ReportsScreenState extends State<ReportsScreen> {
     final dateFormat = DateFormat('dd/MM/yyyy');
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Inspection Reports'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        actions: [
-          if (_filteredInspections.isNotEmpty)
-            IconButton(
-              icon: const Icon(Icons.picture_as_pdf),
-              onPressed: _generateBulkPdfs,
-              tooltip: 'Generate All PDFs',
+      appBar: _isSelectionMode
+          ? AppBar(
+              leading: IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: _clearSelection,
+              ),
+              title: Text('${_selectedReportIds.length} Selected'),
+              backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+              actions: [
+                IconButton(
+                  icon: Icon(
+                    _selectedReportIds.length == _filteredInspections.length
+                        ? Icons.deselect
+                        : Icons.select_all,
+                  ),
+                  onPressed: _selectAll,
+                  tooltip: _selectedReportIds.length < _filteredInspections.length
+                      ? 'Select All'
+                      : 'Deselect All',
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete),
+                  onPressed: _deleteSelectedReports,
+                  tooltip: 'Delete Selected',
+                ),
+              ],
+            )
+          : AppBar(
+              title: const Text('Inspection Reports'),
+              backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+              actions: [
+                /// Edit/Select Button
+                IconButton(
+                  icon: const Icon(Icons.checklist),
+                  onPressed: () {
+                    setState(() {
+                      _explicitSelectionMode = true;
+                    });
+                  },
+                  tooltip: 'Select Reports',
+                ),
+                if (_filteredInspections.isNotEmpty)
+                  IconButton(
+                    icon: const Icon(Icons.picture_as_pdf),
+                    onPressed: _generateBulkPdfs,
+                    tooltip: 'Generate All PDFs',
+                  ),
+              ],
             ),
-        ],
-      ),
       body: Column(
         children: [
-          // Filter Section
+          // Filter Section (Hide in selection mode or keep? Keeping for context)
+          if (!_isSelectionMode)
           Card(
             margin: const EdgeInsets.all(16),
             child: Padding(
@@ -388,58 +507,26 @@ class _ReportsScreenState extends State<ReportsScreen> {
 
   Widget _buildInspectionCard(BuildContext context, Inspection inspection) {
     final dateFormat = DateFormat('dd MMM yyyy');
+    final isSelected = _selectedReportIds.contains(inspection.id);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          child: Text(
-            '${inspection.completionPercentage.toInt()}%',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        title: Text(
-          inspection.vehicleRegistrationNo,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(dateFormat.format(inspection.inspectionDate)),
-            Text('${inspection.storeName} • ${inspection.employeeName}'),
-          ],
-        ),
-        trailing: PopupMenuButton(
-          itemBuilder: (context) => [
-            const PopupMenuItem(
-              value: 'view',
-              child: Row(
-                children: [
-                  Icon(Icons.visibility),
-                  SizedBox(width: 8),
-                  Text('View'),
-                ],
-              ),
-            ),
-            const PopupMenuItem(
-              value: 'pdf',
-              child: Row(
-                children: [
-                  Icon(Icons.picture_as_pdf),
-                  SizedBox(width: 8),
-                  Text('Generate PDF'),
-                ],
-              ),
-            ),
-          ],
-          onSelected: (value) async {
-            if (value == 'view') {
-              Navigator.push(
+      clipBehavior: Clip.antiAlias,
+      elevation: isSelected ? 4 : 1,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: isSelected
+            ? BorderSide(color: Theme.of(context).colorScheme.primary, width: 2)
+            : BorderSide.none,
+      ),
+      child: InkWell(
+        onLongPress: () => _toggleSelection(inspection.id),
+        onTap: () {
+          if (_isSelectionMode) {
+            _toggleSelection(inspection.id);
+          } else {
+             // Normal View Action
+             Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => InspectionFormScreen(
@@ -448,10 +535,78 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   ),
                 ),
               );
-            } else if (value == 'pdf') {
-              await PdfService.shareTemplateMatchingInspection(inspection);
-            }
-          },
+          }
+        },
+        child: ListTile(
+          leading: _isSelectionMode
+              ? Checkbox(
+                  value: isSelected,
+                  onChanged: (val) => _toggleSelection(inspection.id),
+                )
+              : CircleAvatar(
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  child: Text(
+                    '${inspection.completionPercentage.toInt()}%',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+          title: Text(
+            inspection.vehicleRegistrationNo,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(dateFormat.format(inspection.inspectionDate)),
+              Text('${inspection.storeName} • ${inspection.employeeName}'),
+            ],
+          ),
+          trailing: _isSelectionMode
+              ? null
+              : PopupMenuButton(
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: 'view',
+                      child: Row(
+                        children: [
+                          Icon(Icons.visibility),
+                          SizedBox(width: 8),
+                          Text('View'),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuItem(
+                      value: 'pdf',
+                      child: Row(
+                        children: [
+                          Icon(Icons.picture_as_pdf),
+                          SizedBox(width: 8),
+                          Text('Generate PDF'),
+                        ],
+                      ),
+                    ),
+                  ],
+                  onSelected: (value) async {
+                    if (value == 'view') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => InspectionFormScreen(
+                            inspection: inspection,
+                            isViewOnly: true,
+                          ),
+                        ),
+                      );
+                    } else if (value == 'pdf') {
+                      await PdfService.shareTemplateMatchingInspection(
+                          inspection);
+                    }
+                  },
+                ),
         ),
       ),
     );

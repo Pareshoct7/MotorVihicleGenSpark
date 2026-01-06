@@ -40,6 +40,12 @@ class Vehicle extends HiveObject {
   @HiveField(11)
   DateTime? tyreCheckDate;
 
+  @HiveField(12)
+  int? odometerReading;
+
+  @HiveField(13)
+  DateTime? odometerUpdatedAt;
+
   Vehicle({
     required this.id,
     required this.registrationNo,
@@ -51,6 +57,8 @@ class Vehicle extends HiveObject {
     this.storeId,
     this.serviceDueDate,
     this.tyreCheckDate,
+    this.odometerReading,
+    this.odometerUpdatedAt,
     DateTime? createdAt,
     DateTime? updatedAt,
   })  : createdAt = createdAt ?? DateTime.now(),
@@ -112,6 +120,8 @@ class Vehicle extends HiveObject {
       'storeId': storeId,
       'serviceDueDate': serviceDueDate?.toIso8601String(),
       'tyreCheckDate': tyreCheckDate?.toIso8601String(),
+      'odometerReading': odometerReading,
+      'odometerUpdatedAt': odometerUpdatedAt?.toIso8601String(),
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
     };
@@ -136,6 +146,10 @@ class Vehicle extends HiveObject {
           : null,
       tyreCheckDate: json['tyreCheckDate'] != null
           ? DateTime.parse(json['tyreCheckDate'])
+          : null,
+      odometerReading: json['odometerReading'],
+      odometerUpdatedAt: json['odometerUpdatedAt'] != null
+          ? DateTime.parse(json['odometerUpdatedAt'])
           : null,
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),

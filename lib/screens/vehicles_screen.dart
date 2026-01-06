@@ -112,6 +112,15 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
               children: [
                 if (vehicle.year != null)
                   _buildInfoRow('Year', vehicle.year.toString()),
+
+                if (vehicle.odometerReading != null)
+                   Padding(
+                    padding: const EdgeInsets.only(top: 4.0),
+                    child: _buildInfoRow(
+                      'Odometer', 
+                      '${vehicle.odometerReading} km',
+                    ),
+                  ),
                 
                 const Divider(height: 24),
                 
@@ -457,6 +466,7 @@ class _VehicleDialogState extends State<VehicleDialog> {
   late TextEditingController _makeController;
   late TextEditingController _modelController;
   late TextEditingController _yearController;
+  late TextEditingController _odometerController;
   
   DateTime? _wofExpiryDate;
   DateTime? _regoExpiryDate;
@@ -472,6 +482,9 @@ class _VehicleDialogState extends State<VehicleDialog> {
     _modelController = TextEditingController(text: widget.vehicle?.model);
     _yearController = TextEditingController(
       text: widget.vehicle?.year?.toString(),
+    );
+    _odometerController = TextEditingController(
+      text: widget.vehicle?.odometerReading?.toString(),
     );
     _wofExpiryDate = widget.vehicle?.wofExpiryDate;
     _regoExpiryDate = widget.vehicle?.regoExpiryDate;
@@ -532,6 +545,16 @@ class _VehicleDialogState extends State<VehicleDialog> {
                 keyboardType: TextInputType.number,
               ),
               const SizedBox(height: 12),
+              TextFormField(
+                controller: _odometerController,
+                decoration: const InputDecoration(
+                  labelText: 'Odometer (km)',
+                  border: OutlineInputBorder(),
+                  suffixText: 'km',
+                ),
+                keyboardType: TextInputType.number,
+              ),
+              const SizedBox(height: 12),
               DropdownButtonFormField<String>(
                 value: _selectedStoreId,
                 decoration: const InputDecoration(
@@ -556,7 +579,7 @@ class _VehicleDialogState extends State<VehicleDialog> {
                   final date = await showDatePicker(
                     context: context,
                     initialDate: _wofExpiryDate ?? DateTime.now(),
-                    firstDate: DateTime.now(),
+                    firstDate: DateTime(2000),
                     lastDate: DateTime(2030),
                   );
                   if (date != null) {
@@ -584,7 +607,7 @@ class _VehicleDialogState extends State<VehicleDialog> {
                   final date = await showDatePicker(
                     context: context,
                     initialDate: _regoExpiryDate ?? DateTime.now(),
-                    firstDate: DateTime.now(),
+                    firstDate: DateTime(2000),
                     lastDate: DateTime(2030),
                   );
                   if (date != null) {
@@ -612,7 +635,7 @@ class _VehicleDialogState extends State<VehicleDialog> {
                   final date = await showDatePicker(
                     context: context,
                     initialDate: _serviceDueDate ?? DateTime.now(),
-                    firstDate: DateTime.now(),
+                    firstDate: DateTime(2000),
                     lastDate: DateTime(2030),
                   );
                   if (date != null) {
@@ -640,7 +663,7 @@ class _VehicleDialogState extends State<VehicleDialog> {
                   final date = await showDatePicker(
                     context: context,
                     initialDate: _tyreCheckDate ?? DateTime.now(),
-                    firstDate: DateTime.now(),
+                    firstDate: DateTime(2000),
                     lastDate: DateTime(2030),
                   );
                   if (date != null) {
@@ -684,6 +707,19 @@ class _VehicleDialogState extends State<VehicleDialog> {
       return;
     }
 
+    final newOdometerReading = _odometerController.text.isNotEmpty
+        ? int.tryParse(_odometerController.text)
+        : null;
+
+    DateTime? odometerUpdatedAt = widget.vehicle?.odometerUpdatedAt;
+    
+    // Update timestamp if odometer changed or is being set for the first time
+    if (newOdometerReading != widget.vehicle?.odometerReading) {
+      if (newOdometerReading != null) {
+        odometerUpdatedAt = DateTime.now();
+      }
+    }
+
     final vehicle = Vehicle(
       id: widget.vehicle?.id ?? const Uuid().v4(),
       registrationNo: _regNoController.text,
@@ -692,6 +728,8 @@ class _VehicleDialogState extends State<VehicleDialog> {
       year: _yearController.text.isNotEmpty
           ? int.tryParse(_yearController.text)
           : null,
+      odometerReading: newOdometerReading,
+      odometerUpdatedAt: odometerUpdatedAt,
       wofExpiryDate: _wofExpiryDate,
       regoExpiryDate: _regoExpiryDate,
       serviceDueDate: _serviceDueDate,
@@ -746,6 +784,7 @@ class _VehicleDialogState extends State<VehicleDialog> {
     _makeController.dispose();
     _modelController.dispose();
     _yearController.dispose();
+    _odometerController.dispose();
     super.dispose();
   }
 }
