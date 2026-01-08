@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../services/usage_service.dart';
+import '../services/preferences_service.dart';
 import 'package:uuid/uuid.dart';
 import '../models/inspection.dart';
 import '../models/vehicle.dart';
@@ -30,6 +32,37 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
   DateTime _startDate = DateTime.now().subtract(const Duration(days: 30));
   DateTime _endDate = DateTime.now();
   bool _isGenerating = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSmartDefaults();
+  }
+
+  Future<void> _loadSmartDefaults() async {
+    final vehicleId = await PreferencesService.getDefaultVehicle();
+    final storeId = await PreferencesService.getDefaultStore();
+    final driverId = await PreferencesService.getDefaultDriver();
+    
+    if (mounted) {
+      setState(() {
+        _selectedVehicleId = vehicleId;
+        _selectedStoreId = storeId;
+        _selectedDriverId = driverId;
+      });
+    }
+
+    if (vehicleId != null) {
+      final bestStore = await UsageService.getMostFrequentStore(vehicleId);
+      final bestDriver = await UsageService.getMostFrequentDriver(vehicleId);
+      if (mounted) {
+        setState(() {
+          if (bestStore != null) _selectedStoreId = bestStore;
+          if (bestDriver != null) _selectedDriverId = bestDriver;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +128,19 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
                             ),
                             dropdownColor: const Color(0xFF161B22),
                             items: vehicles.map((v) => DropdownMenuItem(value: v.id, child: Text(v.registrationNo))).toList(),
-                            onChanged: (val) => setState(() => _selectedVehicleId = val),
+                            onChanged: (val) async {
+                              setState(() => _selectedVehicleId = val);
+                              if (val != null) {
+                                final bestStore = await UsageService.getMostFrequentStore(val);
+                                final bestDriver = await UsageService.getMostFrequentDriver(val);
+                                if (mounted) {
+                                  setState(() {
+                                    if (bestStore != null) _selectedStoreId = bestStore;
+                                    if (bestDriver != null) _selectedDriverId = bestDriver;
+                                  });
+                                }
+                              }
+                            },
                             validator: (val) => val == null ? 'REQUIRED' : null,
                           ),
                           const SizedBox(height: 16),
@@ -109,7 +154,12 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
                             ),
                             dropdownColor: const Color(0xFF161B22),
                             items: stores.map((s) => DropdownMenuItem(value: s.id, child: Text(s.name.toUpperCase()))).toList(),
-                            onChanged: (val) => setState(() => _selectedStoreId = val),
+                            onChanged: (val) async {
+                              setState(() => _selectedStoreId = val);
+                              if (val != null && _selectedVehicleId != null) {
+                                await UsageService.trackSelection(_selectedVehicleId!, storeId: val);
+                              }
+                            },
                             validator: (val) => val == null ? 'REQUIRED' : null,
                           ),
                           const SizedBox(height: 16),
@@ -123,7 +173,12 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
                             ),
                             dropdownColor: const Color(0xFF161B22),
                             items: drivers.map((d) => DropdownMenuItem(value: d.id, child: Text(d.name.toUpperCase()))).toList(),
-                            onChanged: (val) => setState(() => _selectedDriverId = val),
+                            onChanged: (val) async {
+                              setState(() => _selectedDriverId = val);
+                              if (val != null && _selectedVehicleId != null) {
+                                await UsageService.trackSelection(_selectedVehicleId!, driverId: val);
+                              }
+                            },
                             validator: (val) => val == null ? 'REQUIRED' : null,
                           ),
                           const SizedBox(height: 16),

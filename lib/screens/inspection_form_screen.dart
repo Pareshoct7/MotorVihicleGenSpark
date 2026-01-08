@@ -5,6 +5,8 @@ import '../models/inspection.dart';
 import '../services/database_service.dart';
 import '../services/pdf_service.dart';
 import '../services/preferences_service.dart';
+import '../services/usage_service.dart';
+import '../services/prediction_service.dart';
 import 'ai_scanner_overlay.dart';
 
 class InspectionFormScreen extends StatefulWidget {
@@ -118,6 +120,17 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
       _selectedStoreId = storeId;
       _selectedDriverId = driverId;
     });
+
+    if (vehicleId != null) {
+      final bestStore = await UsageService.getMostFrequentStore(vehicleId);
+      final bestDriver = await UsageService.getMostFrequentDriver(vehicleId);
+      if (mounted) {
+        setState(() {
+          if (bestStore != null) _selectedStoreId = bestStore;
+          if (bestDriver != null) _selectedDriverId = bestDriver;
+        });
+      }
+    }
   }
 
   void _loadBaseInspectionData() {
@@ -248,7 +261,12 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                       decoration: const InputDecoration(labelText: 'STAGING HUB', prefixIcon: Icon(Icons.store_outlined)),
                       dropdownColor: const Color(0xFF161B22),
                       items: stores.map((s) => DropdownMenuItem(value: s.id, child: Text(s.name.toUpperCase()))).toList(),
-                      onChanged: widget.isViewOnly ? null : (val) => setState(() => _selectedStoreId = val),
+                      onChanged: widget.isViewOnly ? null : (val) async {
+                        setState(() => _selectedStoreId = val);
+                        if (val != null && _selectedVehicleId != null) {
+                          await UsageService.trackSelection(_selectedVehicleId!, storeId: val);
+                        }
+                      },
                     ),
                     const SizedBox(height: 16),
                     Row(
@@ -259,9 +277,20 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                             decoration: InputDecoration(
                               labelText: 'ODOMETER', 
                               prefixIcon: const Icon(Icons.speed_outlined),
-                              suffixIcon: widget.isViewOnly ? null : IconButton(
-                                icon: const Icon(Icons.camera_alt_outlined, color: Color(0xFF4FC3F7)),
-                                onPressed: _scanOdometer,
+                              suffixIcon: widget.isViewOnly ? null : Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.auto_awesome, color: Color(0xFF00E676), size: 20),
+                                    tooltip: 'MAGIC ESTIMATE',
+                                    onPressed: _magicEstimateOdometer,
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.camera_alt_outlined, color: Color(0xFF4FC3F7), size: 20),
+                                    tooltip: 'SCAN ODOMETER',
+                                    onPressed: _scanOdometer,
+                                  ),
+                                ],
                               ),
                             ),
                             keyboardType: TextInputType.number,
@@ -619,6 +648,32 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
       setState(() {
         _odometerController.text = result;
       });
+    }
+  }
+
+  void _magicEstimateOdometer() {
+    if (_selectedVehicleId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('SELECT A VEHICLE FIRST')),
+      );
+      return;
+    }
+    
+    final prediction = PredictionService.predictOdometer(_selectedVehicleId!);
+    if (prediction != null) {
+      setState(() {
+        _odometerController.text = prediction.toString();
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('MAGIC ESTIMATE APPLIED BASED ON HISTORY'),
+          backgroundColor: Color(0xFF00E676),
+        ),
+      );
+    } else {
+       ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('NOT ENOUGH DATA FOR PREDICTION')),
+      );
     }
   }
 

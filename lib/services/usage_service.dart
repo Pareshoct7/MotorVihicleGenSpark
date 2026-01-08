@@ -53,6 +53,57 @@ class UsageService {
     return featureCounts.take(limit).map((e) => e.key).toList();
   }
 
+  /// Track store/driver selection for a vehicle to improve suggestions
+  static Future<void> trackSelection(String vehicleId, {String? storeId, String? driverId}) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (storeId != null) {
+      final key = 'freq_store_${vehicleId}_$storeId';
+      final count = prefs.getInt(key) ?? 0;
+      await prefs.setInt(key, count + 1);
+    }
+    if (driverId != null) {
+      final key = 'freq_driver_${vehicleId}_$driverId';
+      final count = prefs.getInt(key) ?? 0;
+      await prefs.setInt(key, count + 1);
+    }
+  }
+
+  /// Get the most frequent store for a vehicle
+  static Future<String?> getMostFrequentStore(String vehicleId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final stores = prefs.getKeys().where((k) => k.startsWith('freq_store_$vehicleId'));
+    
+    String? topStoreId;
+    int maxCount = -1;
+    
+    for (final key in stores) {
+      final count = prefs.getInt(key) ?? 0;
+      if (count > maxCount) {
+        maxCount = count;
+        topStoreId = key.split('_').last;
+      }
+    }
+    return topStoreId;
+  }
+
+  /// Get the most frequent driver for a vehicle
+  static Future<String?> getMostFrequentDriver(String vehicleId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final drivers = prefs.getKeys().where((k) => k.startsWith('freq_driver_$vehicleId'));
+    
+    String? topDriverId;
+    int maxCount = -1;
+    
+    for (final key in drivers) {
+      final count = prefs.getInt(key) ?? 0;
+      if (count > maxCount) {
+        maxCount = count;
+        topDriverId = key.split('_').last;
+      }
+    }
+    return topDriverId;
+  }
+
   /// Get feature titles and icons for UI
   static Map<String, dynamic> getFeatureMeta(String featureId) {
     switch (featureId) {
@@ -61,15 +112,15 @@ class UsageService {
       case featureManageVehicles:
         return {'title': 'Garage', 'icon': 0xe1d1, 'color': 0xFFFF5252}; // Icons.directions_car
       case featureManageStores:
-        return {'title': 'Store Hub', 'icon': 0xe60a, 'color': 0xFFAB47BC}; // Icons.store
+        return {'title': 'Stores', 'icon': 0xe60a, 'color': 0xFFAB47BC}; // Icons.store
       case featureManageDrivers:
-        return {'title': 'Driver Hub', 'icon': 0xe001, 'color': 0xFF2196F3}; // Icons.badge
+        return {'title': 'Drivers', 'icon': 0xe001, 'color': 0xFF2196F3}; // Icons.badge
       case featureOfflineDrive:
-        return {'title': 'Pizza Drive', 'icon': 0xe39a, 'color': 0xFFFFC107}; // Icons.local_pizza
+        return {'title': 'Drive', 'icon': 0xe39a, 'color': 0xFFFFC107}; // Icons.local_pizza
       case featureBulkReports:
         return {'title': 'Quick Reports', 'icon': 0xf83d, 'color': 0xFF00E676}; // Icons.bolt
       case featureReportsAnalytics:
-        return {'title': 'Performance', 'icon': 0xe092, 'color': 0xFF00BCD4}; // Icons.assessment
+        return {'title': 'Inspections', 'icon': 0xe092, 'color': 0xFF00BCD4}; // Icons.assessment
       case featureReminders:
         return {'title': 'Alert Hub', 'icon': 0xe451, 'color': 0xFFFF9800}; // Icons.notification_important
       default:

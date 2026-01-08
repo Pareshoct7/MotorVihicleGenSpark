@@ -237,14 +237,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         ],
       ),
       drawer: _buildDrawer(context),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _handleFeatureTap(
-          UsageService.featureNewInspection,
-          const InspectionFormScreen(),
-        ),
-        icon: const Icon(Icons.speed),
-        label: const Text('Speed Check'),
-      ),
+      floatingActionButton: _buildSmartFab(context, vehiclesNeedingAttention),
     );
   }
 
@@ -292,22 +285,25 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text(
-                        'FLEET POWER',
+                        'SYSTEM POWER',
                         style: TextStyle(
                           color: Color(0xFF4FC3F7),
-                          fontSize: 12,
+                          fontSize: 10,
                           fontWeight: FontWeight.w900,
                           letterSpacing: 2,
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Text(
-                        '$totalInspections',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 48,
-                          fontWeight: FontWeight.w900,
-                          height: 1,
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          '$totalInspections',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 48,
+                            fontWeight: FontWeight.w900,
+                            height: 1,
+                          ),
                         ),
                       ),
                       const Text(
@@ -352,7 +348,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     ],
                   ),
                 ),
-                Expanded(
+                Flexible(
                   flex: 2,
                   child: Center(
                     child: TweenAnimationBuilder<double>(
@@ -361,7 +357,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       curve: Curves.elasticOut,
                       builder: (context, value, child) {
                         return CustomPaint(
-                          size: const Size(120, 120),
+                          size: const Size(100, 100),
                           painter: SpeedometerPainter(value),
                           child: Center(
                             child: Column(
@@ -371,7 +367,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                   '$todayInspections',
                                   style: const TextStyle(
                                     color: Colors.white,
-                                    fontSize: 24,
+                                    fontSize: 20,
                                     fontWeight: FontWeight.w900,
                                   ),
                                 ),
@@ -744,6 +740,35 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           ).then((_) => setState(() {}));
         }
       },
+    );
+  }
+  Widget _buildSmartFab(BuildContext context, List<Vehicle> alerts) {
+    final bool hasUrgentAlarms = alerts.any((v) => v.isWofExpired || v.isRegoExpired);
+    final bool hasUpcomingAlerts = alerts.any((v) => v.isWofExpiringSoon || v.isRegoExpiringSoon || v.isServiceDueSoon);
+
+    if (hasUrgentAlarms) {
+      return FloatingActionButton.extended(
+        onPressed: () => _handleFeatureTap(UsageService.featureManageVehicles, const VehiclesScreen()),
+        backgroundColor: const Color(0xFFFF5252),
+        icon: const Icon(Icons.warning_amber_rounded, color: Colors.white),
+        label: const Text('FIX ALERTS', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+      );
+    }
+
+    if (hasUpcomingAlerts) {
+      return FloatingActionButton.extended(
+        onPressed: () => _handleFeatureTap(UsageService.featureNewInspection, const InspectionFormScreen()),
+        backgroundColor: const Color(0xFFFF9800),
+        icon: const Icon(Icons.speed, color: Colors.white),
+        label: const Text('DUE SOON: SCAN', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+      );
+    }
+
+    return FloatingActionButton.extended(
+      onPressed: () => _handleFeatureTap(UsageService.featureNewInspection, const InspectionFormScreen()),
+      backgroundColor: const Color(0xFF4FC3F7),
+      icon: const Icon(Icons.speed, color: Colors.white),
+      label: const Text('Speed Check', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
     );
   }
 }

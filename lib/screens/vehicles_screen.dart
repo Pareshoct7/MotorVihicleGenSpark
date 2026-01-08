@@ -63,7 +63,7 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
         slivers: [
           SliverAppBar.large(
             leading: Navigator.canPop(context) ? const BackButton() : null,
-            expandedHeight: 140,
+            expandedHeight: 200,
             floating: false,
             pinned: true,
             title: const Text('GARAGE'),
