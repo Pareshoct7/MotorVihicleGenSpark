@@ -15,311 +15,186 @@ class AppTheme {
   
   // Light Theme - Domino's Style
   static ThemeData get lightTheme {
+    final ColorScheme lightScheme = ColorScheme.fromSeed(
+      seedColor: dominosBlue,
+      brightness: Brightness.light,
+      primary: dominosBlue,
+      onPrimary: Colors.white,
+      secondary: dominosRed,
+      onSecondary: Colors.white,
+      surface: Colors.white,
+      onSurface: const Color(0xFF1A1C1E),
+      surfaceContainerHighest: const Color(0xFFE1E2E8),
+      onSurfaceVariant: const Color(0xFF44474E),
+      outline: const Color(0xFF74777F),
+    );
+
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: dominosBlue,
-        brightness: Brightness.light,
-        primary: dominosBlue,
-        secondary: dominosRed,
-        error: errorColor,
-        tertiary: dominosYellow,
-      ),
+      colorScheme: lightScheme,
+      scaffoldBackgroundColor: const Color(0xFFF8F9FF),
       
-      // Typography - Bold and modern like Domino's
       textTheme: const TextTheme(
-        displayLarge: TextStyle(fontWeight: FontWeight.bold, fontSize: 32),
-        displayMedium: TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
-        displaySmall: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-        headlineMedium: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-        titleLarge: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
-        titleMedium: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
-        bodyLarge: TextStyle(fontSize: 16),
-        bodyMedium: TextStyle(fontSize: 14),
+        displayLarge: TextStyle(fontWeight: FontWeight.bold),
+        displayMedium: TextStyle(fontWeight: FontWeight.bold),
+        displaySmall: TextStyle(fontWeight: FontWeight.bold),
+        headlineMedium: TextStyle(fontWeight: FontWeight.bold),
+        titleLarge: TextStyle(fontWeight: FontWeight.bold),
       ),
       
-      // App Bar Theme - Domino's Blue
       appBarTheme: const AppBarTheme(
-        centerTitle: true,
-        elevation: 2,
-        backgroundColor: dominosBlue,
-        foregroundColor: Colors.white,
+        centerTitle: false,
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        foregroundColor: Color(0xFF1A1C1E),
         titleTextStyle: TextStyle(
-          color: Colors.white,
-          fontSize: 20,
+          color: Color(0xFF1A1C1E),
+          fontSize: 22,
           fontWeight: FontWeight.bold,
         ),
       ),
       
-      // Card Theme - Bold shadows and rounded corners
       cardTheme: CardThemeData(
-        elevation: 4,
+        elevation: 0,
+        color: Colors.white,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(24),
+          side: BorderSide(color: Colors.grey.withValues(alpha: 0.1)),
         ),
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        color: Colors.white,
       ),
       
-      // Floating Action Button - Domino's Red
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        elevation: 6,
-        backgroundColor: dominosRed,
+        elevation: 4,
+        backgroundColor: dominosBlue,
         foregroundColor: Colors.white,
-        shape: CircleBorder(),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
       ),
       
-      // Input Decoration
       inputDecorationTheme: InputDecorationTheme(
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: dominosBlue, width: 2),
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: Colors.grey.shade300),
         ),
         filled: true,
-        fillColor: Colors.grey.shade50,
+        fillColor: Colors.white,
       ),
       
-      // Elevated Button - Domino's Red with bold style
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30), // Pill shape
-          ),
-          elevation: 4,
-          backgroundColor: dominosRed,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          backgroundColor: dominosBlue,
           foregroundColor: Colors.white,
-          textStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 0.5,
-          ),
         ),
       ),
       
-      // Text Button
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
           foregroundColor: dominosBlue,
-          textStyle: const TextStyle(fontWeight: FontWeight.w600),
         ),
       ),
       
-      // Outlined Button - Blue outline
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
-          side: const BorderSide(color: dominosBlue, width: 2),
           foregroundColor: dominosBlue,
-          textStyle: const TextStyle(fontWeight: FontWeight.bold),
+          side: const BorderSide(color: dominosBlue),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),
-      ),
-      
-      // List Tile
-      listTileTheme: ListTileThemeData(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
-      
-      // Drawer Theme
-      drawerTheme: const DrawerThemeData(
-        elevation: 16,
-        backgroundColor: Colors.white,
-      ),
-      
-      // Switch Theme
-      switchTheme: SwitchThemeData(
-        thumbColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
-            return dominosRed;
-          }
-          return Colors.grey;
-        }),
-        trackColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
-            return dominosRed.withValues(alpha: 0.5);
-          }
-          return Colors.grey.shade300;
-        }),
-      ),
-      
-      // Checkbox Theme
-      checkboxTheme: CheckboxThemeData(
-        fillColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
-            return dominosBlue;
-          }
-          return Colors.transparent;
-        }),
-        checkColor: const WidgetStatePropertyAll(Colors.white),
       ),
     );
   }
   
   // Dark Theme - Domino's Style
   static ThemeData get darkTheme {
+    final ColorScheme darkScheme = ColorScheme.fromSeed(
+      seedColor: dominosBlue,
+      brightness: Brightness.dark,
+      primary: dominosLightBlue,
+      onPrimary: Colors.white,
+      secondary: dominosRed,
+      onSecondary: Colors.white,
+      surface: const Color(0xFF111318),
+      onSurface: const Color(0xFFE2E2E6),
+      surfaceContainerHighest: const Color(0xFF262626),
+      onSurfaceVariant: const Color(0xFFC4C6D0),
+      outline: const Color(0xFF8E9099),
+    );
+
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: dominosBlue,
-        brightness: Brightness.dark,
-        primary: dominosLightBlue,
-        secondary: dominosRed,
-        error: errorColor,
-        tertiary: dominosYellow,
-        surface: const Color(0xFF1A1A1A),
-      ),
+      colorScheme: darkScheme,
+      scaffoldBackgroundColor: const Color(0xFF0E1014),
       
-      // Typography - Same bold style
       textTheme: const TextTheme(
-        displayLarge: TextStyle(fontWeight: FontWeight.bold, fontSize: 32, color: Colors.white),
-        displayMedium: TextStyle(fontWeight: FontWeight.bold, fontSize: 28, color: Colors.white),
-        displaySmall: TextStyle(fontWeight: FontWeight.bold, fontSize: 24, color: Colors.white),
-        headlineMedium: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),
-        titleLarge: TextStyle(fontWeight: FontWeight.w600, fontSize: 18, color: Colors.white),
-        titleMedium: TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: Colors.white),
-        bodyLarge: TextStyle(fontSize: 16, color: Colors.white70),
-        bodyMedium: TextStyle(fontSize: 14, color: Colors.white70),
+        displayLarge: TextStyle(fontWeight: FontWeight.bold),
+        displayMedium: TextStyle(fontWeight: FontWeight.bold),
+        displaySmall: TextStyle(fontWeight: FontWeight.bold),
+        headlineMedium: TextStyle(fontWeight: FontWeight.bold),
+        titleLarge: TextStyle(fontWeight: FontWeight.bold),
       ),
       
-      // App Bar Theme - Dark with Domino's Blue accent
       appBarTheme: const AppBarTheme(
-        centerTitle: true,
-        elevation: 2,
-        backgroundColor: Color(0xFF1A1A1A),
-        foregroundColor: Colors.white,
+        centerTitle: false,
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        foregroundColor: Color(0xFFE2E2E6),
         titleTextStyle: TextStyle(
-          color: Colors.white,
-          fontSize: 20,
+          color: Color(0xFFE2E2E6),
+          fontSize: 22,
           fontWeight: FontWeight.bold,
         ),
       ),
       
-      // Card Theme - Dark cards with elevation
       cardTheme: CardThemeData(
-        elevation: 6,
+        elevation: 0,
+        color: const Color(0xFF1A1C22),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(24),
+          side: const BorderSide(color: Color(0xFF2D3036)),
         ),
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        color: const Color(0xFF262626),
       ),
       
-      // Floating Action Button - Domino's Red
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        elevation: 8,
-        backgroundColor: dominosRed,
+        elevation: 4,
+        backgroundColor: dominosLightBlue,
         foregroundColor: Colors.white,
-        shape: CircleBorder(),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
       ),
-      
-      // Input Decoration
+
       inputDecorationTheme: InputDecorationTheme(
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: dominosLightBlue, width: 2),
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: Color(0xFF2D3036)),
         ),
         filled: true,
-        fillColor: Colors.grey.shade800,
+        fillColor: const Color(0xFF1A1C22),
       ),
-      
-      // Elevated Button - Domino's Red with bold style
+
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30), // Pill shape
-          ),
-          elevation: 6,
-          backgroundColor: dominosRed,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          backgroundColor: dominosLightBlue,
           foregroundColor: Colors.white,
-          textStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 0.5,
-          ),
         ),
       ),
       
-      // Text Button
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
           foregroundColor: dominosLightBlue,
-          textStyle: const TextStyle(fontWeight: FontWeight.w600),
         ),
       ),
       
-      // Outlined Button - Blue outline
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
-          side: const BorderSide(color: dominosLightBlue, width: 2),
           foregroundColor: dominosLightBlue,
-          textStyle: const TextStyle(fontWeight: FontWeight.bold),
+          side: const BorderSide(color: dominosLightBlue),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),
-      ),
-      
-      // List Tile
-      listTileTheme: ListTileThemeData(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
-      
-      // Drawer Theme
-      drawerTheme: const DrawerThemeData(
-        elevation: 16,
-        backgroundColor: Color(0xFF1A1A1A),
-      ),
-      
-      // Switch Theme
-      switchTheme: SwitchThemeData(
-        thumbColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
-            return dominosRed;
-          }
-          return Colors.grey;
-        }),
-        trackColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
-            return dominosRed.withValues(alpha: 0.5);
-          }
-          return Colors.grey.shade700;
-        }),
-      ),
-      
-      // Checkbox Theme
-      checkboxTheme: CheckboxThemeData(
-        fillColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
-            return dominosLightBlue;
-          }
-          return Colors.transparent;
-        }),
-        checkColor: const WidgetStatePropertyAll(Colors.white),
       ),
     );
   }
