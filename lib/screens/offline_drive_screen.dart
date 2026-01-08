@@ -5,6 +5,7 @@ import 'package:printing/printing.dart';
 import 'package:intl/intl.dart';
 
 import '../services/offline_drive_service.dart';
+import 'pdf_viewer_screen.dart';
 
 class OfflineDriveScreen extends StatefulWidget {
   final Directory? initialDirectory;
@@ -24,6 +25,13 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> {
   // Selection state
   bool _isSelectionMode = false;
   Set<String> _selectedPaths = {};
+
+  // Search and Sort state
+  bool _isSearchMode = false;
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+  String _sortBy = 'name'; // 'name', 'date', 'type'
+  bool _sortAscending = true;
 
   @override
   void initState() {
@@ -242,8 +250,16 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> {
   }
 
   Future<void> _openFile(File file) async {
-    final xFile = XFile(file.path);
-    await Share.shareXFiles([xFile], text: 'Inspection Report');
+    final name = file.path.split('/').last;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PdfViewerScreen(
+          file: file,
+          title: name,
+        ),
+      ),
+    );
   }
 
   Future<void> _runBackfill() async {
@@ -324,6 +340,41 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> {
   }
 
   @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  List<FileSystemEntity> get _filteredAndSortedContents {
+    List<FileSystemEntity> result = _contents;
+
+    // Filter by search query
+    if (_searchQuery.isNotEmpty) {
+      result = result.where((entity) {
+        final name = entity.path.split('/').last.toLowerCase();
+        return name.contains(_searchQuery);
+      }).toList();
+    }
+
+    // Sort
+    result.sort((a, b) {
+      int comparison = 0;
+      if (_sortBy == 'name') {
+        comparison = a.path.split('/').last.toLowerCase().compareTo(b.path.split('/').last.toLowerCase());
+      } else if (_sortBy == 'date') {
+        comparison = a.statSync().modified.compareTo(b.statSync().modified);
+      } else if (_sortBy == 'type') {
+        if (a is Directory && b is File) comparison = -1;
+        if (a is File && b is Directory) comparison = 1;
+      }
+
+      return _sortAscending ? comparison : -comparison;
+    });
+
+    return result;
+  }
+
+  @override
   Widget build(BuildContext context) {
     if (_currentDir == null) {
       return Scaffold(
@@ -338,14 +389,43 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isSelectionMode ? '${_selectedPaths.length} selected' : folderName),
+        title: _isSelectionMode
+            ? Text('${_selectedPaths.length} selected')
+            : _isSearchMode
+                ? TextField(
+                    controller: _searchController,
+                    autofocus: true,
+                    style: const TextStyle(color: Colors.black),
+                    decoration: const InputDecoration(
+                      hintText: 'Search folders or files...',
+                      border: InputBorder.none,
+                      hintStyle: TextStyle(color: Colors.black54),
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        _searchQuery = value.toLowerCase();
+                      });
+                    },
+                  )
+                : Text(folderName),
         backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
         leading: _isSelectionMode
             ? IconButton(
                 icon: const Icon(Icons.close),
                 onPressed: _exitSelectionMode,
               )
-            : null,
+            : _isSearchMode
+                ? IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: () {
+                      setState(() {
+                        _isSearchMode = false;
+                        _searchQuery = '';
+                        _searchController.clear();
+                      });
+                    },
+                  )
+                : null,
         actions: _isSelectionMode
             ? [
                 IconButton(
@@ -370,28 +450,95 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> {
                 ),
               ]
             : [
-                if (folderName == 'Offline Drive' || folderName == 'OfflineDrive')
+                if (!_isSearchMode) ...[
+                  if (folderName == 'Offline Drive' || folderName == 'OfflineDrive')
+                    IconButton(
+                      icon: const Icon(Icons.sync),
+                      onPressed: _isBackfilling ? null : _runBackfill,
+                      tooltip: 'Sync & Backfill',
+                    ),
                   IconButton(
-                    icon: const Icon(Icons.sync),
-                    onPressed: _isBackfilling ? null : _runBackfill,
-                    tooltip: 'Sync & Backfill',
+                    icon: const Icon(Icons.search),
+                    onPressed: () => setState(() => _isSearchMode = true),
+                    tooltip: 'Search',
                   ),
-                if (_contents.isNotEmpty)
                   IconButton(
-                    icon: const Icon(Icons.checklist),
-                    onPressed: () => _enterSelectionMode(''),
-                    tooltip: 'Select',
+                    icon: const Icon(Icons.library_books),
+                    onPressed: _combinePdfs,
+                    tooltip: 'Combine All PDFs',
                   ),
+                  PopupMenuButton<String>(
+                    icon: const Icon(Icons.sort),
+                    onSelected: (value) {
+                      if (value == 'toggle_order') {
+                        setState(() => _sortAscending = !_sortAscending);
+                      } else {
+                        setState(() => _sortBy = value);
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        value: 'name',
+                        child: Row(
+                          children: [
+                            Icon(Icons.sort_by_alpha, color: _sortBy == 'name' ? Theme.of(context).primaryColor : null),
+                            const SizedBox(width: 8),
+                            const Text('Sort by Name'),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'date',
+                        child: Row(
+                          children: [
+                            Icon(Icons.calendar_today, color: _sortBy == 'date' ? Theme.of(context).primaryColor : null),
+                            const SizedBox(width: 8),
+                            const Text('Sort by Date'),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'type',
+                        child: Row(
+                          children: [
+                            Icon(Icons.category, color: _sortBy == 'type' ? Theme.of(context).primaryColor : null),
+                            const SizedBox(width: 8),
+                            const Text('Sort by Type'),
+                          ],
+                        ),
+                      ),
+                      const PopupMenuDivider(),
+                      PopupMenuItem(
+                        value: 'toggle_order',
+                        child: Row(
+                          children: [
+                            Icon(_sortAscending ? Icons.arrow_upward : Icons.arrow_downward),
+                            const SizedBox(width: 8),
+                            Text(_sortAscending ? 'Ascending' : 'Descending'),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (_contents.isNotEmpty)
+                    IconButton(
+                      icon: const Icon(Icons.checklist),
+                      onPressed: () => _enterSelectionMode(''),
+                      tooltip: 'Select',
+                    ),
+                ]
               ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : _contents.isEmpty
-              ? const Center(child: Text('Empty Folder'))
+          : _filteredAndSortedContents.isEmpty
+              ? Center(
+                  child: Text(_searchQuery.isEmpty ? 'Empty Folder' : 'No matches found'),
+                )
               : ListView.builder(
-                  itemCount: _contents.length,
+                  itemCount: _filteredAndSortedContents.length,
                   itemBuilder: (context, index) {
-                    final item = _contents[index];
+                    final item = _filteredAndSortedContents[index];
                     final name = item.path.split('/').last;
                     final isDir = item is Directory;
                     final isSelected = _selectedPaths.contains(item.path);
@@ -408,6 +555,9 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> {
                               size: 32,
                             ),
                       title: Text(name),
+                      subtitle: _sortBy == 'date' && !isDir 
+                        ? Text('Date: ${DateFormat('dd MMM yyyy HH:mm').format(item.statSync().modified)}')
+                        : null,
                       trailing: isDir && !_isSelectionMode ? const Icon(Icons.chevron_right) : null,
                       selected: isSelected,
                       onLongPress: () => _enterSelectionMode(item.path),
@@ -425,14 +575,6 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> {
                     );
                   },
                 ),
-      floatingActionButton: !_isSelectionMode && !_isLoading && _contents.isNotEmpty && _currentDir != null
-          ? FloatingActionButton.extended(
-              onPressed: _combinePdfs,
-              icon: const Icon(Icons.picture_as_pdf),
-              label: const Text('Combine All'),
-              tooltip: 'Combine all PDFs in this folder',
-            )
-          : null,
     );
   }
 

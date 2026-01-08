@@ -253,38 +253,9 @@ class OfflineDriveService {
       final List<Inspection> inspectionsToMerge = [];
       
       for (final pdfFile in pdfFiles) {
-        // Extract date from filename: Inspection_yyyyMMdd_HHmm.pdf
-        final filename = pdfFile.path.split('/').last;
-        final match = RegExp(r'Inspection_(\d{8})_(\d{4})\.pdf').firstMatch(filename);
-        
-        if (match != null) {
-          final dateStr = match.group(1)!; // yyyyMMdd
-          final timeStr = match.group(2)!; // HHmm
-          
-          // Parse date: yyyyMMdd -> yyyy-MM-dd
-          final year = dateStr.substring(0, 4);
-          final month = dateStr.substring(4, 6);
-          final day = dateStr.substring(6, 8);
-          final hour = timeStr.substring(0, 2);
-          final minute = timeStr.substring(2, 4);
-          
-          final targetDate = DateTime(
-            int.parse(year),
-            int.parse(month),
-            int.parse(day),
-            int.parse(hour),
-            int.parse(minute),
-          );
-          
-          // Find inspection with matching date (within 1 hour tolerance due to time zones, DST, etc.)
-          final matchingInspection = allInspections.where((insp) {
-            final diff = insp.inspectionDate.difference(targetDate).inMinutes.abs();
-            return diff < 60; // Within 1 hour
-          }).firstOrNull;
-          
-          if (matchingInspection != null) {
-            inspectionsToMerge.add(matchingInspection);
-          }
+        final matchingInspection = _mapPdfToInspection(pdfFile, allInspections);
+        if (matchingInspection != null) {
+          inspectionsToMerge.add(matchingInspection);
         }
       }
       
@@ -358,35 +329,9 @@ class OfflineDriveService {
       
       for (int i = 0; i < pdfFiles.length; i++) {
         final pdfFile = pdfFiles[i];
-        final filename = pdfFile.path.split('/').last;
-        final match = RegExp(r'Inspection_(\d{8})_(\d{4})\.pdf').firstMatch(filename);
-        
-        if (match != null) {
-          final dateStr = match.group(1)!;
-          final timeStr = match.group(2)!;
-          
-          final year = dateStr.substring(0, 4);
-          final month = dateStr.substring(4, 6);
-          final day = dateStr.substring(6, 8);
-          final hour = timeStr.substring(0, 2);
-          final minute = timeStr.substring(2, 4);
-          
-          final targetDate = DateTime(
-            int.parse(year),
-            int.parse(month),
-            int.parse(day),
-            int.parse(hour),
-            int.parse(minute),
-          );
-          
-          final matchingInspection = allInspections.where((insp) {
-            final diff = insp.inspectionDate.difference(targetDate).inMinutes.abs();
-            return diff < 60;
-          }).firstOrNull;
-          
-          if (matchingInspection != null) {
-            inspectionsToMerge.add(matchingInspection);
-          }
+        final matchingInspection = _mapPdfToInspection(pdfFile, allInspections);
+        if (matchingInspection != null) {
+          inspectionsToMerge.add(matchingInspection);
         }
         
         onProgress(i + 1, pdfFiles.length);
@@ -404,6 +349,51 @@ class OfflineDriveService {
     } catch (e) {
       debugPrint('Error generating clubbed PDF from files: $e');
       rethrow;
+    }
+  }
+
+  /// Maps a PDF file to an Inspection record based on filename (date) and directory (vehicle)
+  static Inspection? _mapPdfToInspection(File pdfFile, List<Inspection> allInspections) {
+    try {
+      final filename = pdfFile.path.split('/').last;
+      final pathParts = pdfFile.path.split('/');
+      
+      // Filename pattern: Inspection_yyyyMMdd_HHmm.pdf
+      final match = RegExp(r'Inspection_(\d{8})_(\d{4})\.pdf').firstMatch(filename);
+      if (match == null) return null;
+
+      final dateStr = match.group(1)!;
+      final timeStr = match.group(2)!;
+      
+      final targetDate = DateTime(
+        int.parse(dateStr.substring(0, 4)),
+        int.parse(dateStr.substring(4, 6)),
+        int.parse(dateStr.substring(6, 8)),
+        int.parse(timeStr.substring(0, 2)),
+        int.parse(timeStr.substring(2, 4)),
+      );
+
+      // Vehicle reg is expected in the parent directory of the PDF
+      String? targetVehicleReg;
+      if (pathParts.length >= 2) {
+        targetVehicleReg = pathParts[pathParts.length - 2];
+      }
+
+      return allInspections.where((insp) {
+        // Match vehicle first if possible
+        if (targetVehicleReg != null) {
+          final sanitizedReg = _sanitize(insp.vehicleRegistrationNo);
+          if (sanitizedReg != targetVehicleReg) return false;
+        }
+
+        // Match date within 1 hour tolerance
+        final diff = insp.inspectionDate.difference(targetDate).inMinutes.abs();
+        return diff < 60;
+      }).firstOrNull;
+      
+    } catch (e) {
+      debugPrint('Error mapping PDF to inspection: $e');
+      return null;
     }
   }
 }
