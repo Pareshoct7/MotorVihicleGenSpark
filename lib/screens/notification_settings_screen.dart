@@ -36,12 +36,12 @@ class _NotificationSettingsScreenState
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16),
         children: [
           // Vehicle Info
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -56,7 +56,7 @@ class _NotificationSettingsScreenState
                           children: [
                             Text(
                               widget.vehicle.registrationNo,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -85,7 +85,7 @@ class _NotificationSettingsScreenState
           // WOF Notifications
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -94,7 +94,7 @@ class _NotificationSettingsScreenState
                       Icon(Icons.verified_user,
                           color: Theme.of(context).colorScheme.primary),
                       const SizedBox(width: 8),
-                      const Text(
+                      Text(
                         'WOF Notifications',
                         style: TextStyle(
                           fontSize: 18,
@@ -106,8 +106,8 @@ class _NotificationSettingsScreenState
                   const SizedBox(height: 16),
                   
                   SwitchListTile(
-                    title: const Text('Enable WOF Reminders'),
-                    subtitle: const Text('Get notified before WOF expires'),
+                    title: Text('Enable WOF Reminders'),
+                    subtitle: Text('Get notified before WOF expires'),
                     value: _settings.wofNotificationsEnabled,
                     onChanged: (value) {
                       setState(() {
@@ -120,11 +120,11 @@ class _NotificationSettingsScreenState
                   if (_settings.wofNotificationsEnabled) ...[
                     const Divider(),
                     ListTile(
-                      title: const Text('Notify me'),
+                      title: Text('Notify me'),
                       subtitle: Row(
                         children: [
                           ChoiceChip(
-                            label: const Text('1 day'),
+                            label: Text('1 day'),
                             selected: _settings.wofDaysBefore == 1,
                             onSelected: (selected) {
                               if (selected) {
@@ -138,7 +138,7 @@ class _NotificationSettingsScreenState
                           ),
                           const SizedBox(width: 8),
                           ChoiceChip(
-                            label: const Text('1 week'),
+                            label: Text('1 week'),
                             selected: _settings.wofDaysBefore == 7,
                             onSelected: (selected) {
                               if (selected) {
@@ -152,7 +152,7 @@ class _NotificationSettingsScreenState
                           ),
                           const SizedBox(width: 8),
                           ChoiceChip(
-                            label: const Text('30 days'),
+                            label: Text('30 days'),
                             selected: _settings.wofDaysBefore == 30,
                             onSelected: (selected) {
                               if (selected) {
@@ -168,14 +168,14 @@ class _NotificationSettingsScreenState
                       ),
                     ),
                     ListTile(
-                      title: const Text('Custom Date'),
+                      title: Text('Custom Date'),
                       subtitle: Text(
                         _settings.customWofNotificationDate != null
                             ? dateFormat.format(
                                 _settings.customWofNotificationDate!)
                             : 'Not set',
                       ),
-                      trailing: const Icon(Icons.calendar_today),
+                      trailing: Icon(Icons.calendar_today),
                       onTap: () async {
                         final date = await showDatePicker(
                           context: context,
@@ -205,7 +205,7 @@ class _NotificationSettingsScreenState
           // Rego Notifications
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -214,7 +214,7 @@ class _NotificationSettingsScreenState
                       Icon(Icons.description,
                           color: Theme.of(context).colorScheme.primary),
                       const SizedBox(width: 8),
-                      const Text(
+                      Text(
                         'Registration Notifications',
                         style: TextStyle(
                           fontSize: 18,
@@ -226,8 +226,8 @@ class _NotificationSettingsScreenState
                   const SizedBox(height: 16),
                   
                   SwitchListTile(
-                    title: const Text('Enable Rego Reminders'),
-                    subtitle: const Text('Get notified before registration expires'),
+                    title: Text('Enable Rego Reminders'),
+                    subtitle: Text('Get notified before registration expires'),
                     value: _settings.regoNotificationsEnabled,
                     onChanged: (value) {
                       setState(() {
@@ -240,11 +240,11 @@ class _NotificationSettingsScreenState
                   if (_settings.regoNotificationsEnabled) ...[
                     const Divider(),
                     ListTile(
-                      title: const Text('Notify me'),
+                      title: Text('Notify me'),
                       subtitle: Row(
                         children: [
                           ChoiceChip(
-                            label: const Text('1 day'),
+                            label: Text('1 day'),
                             selected: _settings.regoDaysBefore == 1,
                             onSelected: (selected) {
                               if (selected) {
@@ -258,7 +258,7 @@ class _NotificationSettingsScreenState
                           ),
                           const SizedBox(width: 8),
                           ChoiceChip(
-                            label: const Text('1 week'),
+                            label: Text('1 week'),
                             selected: _settings.regoDaysBefore == 7,
                             onSelected: (selected) {
                               if (selected) {
@@ -272,7 +272,7 @@ class _NotificationSettingsScreenState
                           ),
                           const SizedBox(width: 8),
                           ChoiceChip(
-                            label: const Text('30 days'),
+                            label: Text('30 days'),
                             selected: _settings.regoDaysBefore == 30,
                             onSelected: (selected) {
                               if (selected) {
@@ -288,14 +288,14 @@ class _NotificationSettingsScreenState
                       ),
                     ),
                     ListTile(
-                      title: const Text('Custom Date'),
+                      title: Text('Custom Date'),
                       subtitle: Text(
                         _settings.customRegoNotificationDate != null
                             ? dateFormat.format(
                                 _settings.customRegoNotificationDate!)
                             : 'Not set',
                       ),
-                      trailing: const Icon(Icons.calendar_today),
+                      trailing: Icon(Icons.calendar_today),
                       onTap: () async {
                         final date = await showDatePicker(
                           context: context,
@@ -325,7 +325,7 @@ class _NotificationSettingsScreenState
           // Service Notifications
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -334,7 +334,7 @@ class _NotificationSettingsScreenState
                       Icon(Icons.build,
                           color: Theme.of(context).colorScheme.primary),
                       const SizedBox(width: 8),
-                      const Text(
+                      Text(
                         'Service Notifications',
                         style: TextStyle(
                           fontSize: 18,
@@ -346,8 +346,8 @@ class _NotificationSettingsScreenState
                   const SizedBox(height: 16),
                   
                   SwitchListTile(
-                    title: const Text('Enable Service Reminders'),
-                    subtitle: const Text('Get notified before service is due'),
+                    title: Text('Enable Service Reminders'),
+                    subtitle: Text('Get notified before service is due'),
                     value: _settings.serviceNotificationsEnabled,
                     onChanged: (value) {
                       setState(() {
@@ -360,11 +360,11 @@ class _NotificationSettingsScreenState
                   if (_settings.serviceNotificationsEnabled) ...[
                     const Divider(),
                     ListTile(
-                      title: const Text('Notify me'),
+                      title: Text('Notify me'),
                       subtitle: Row(
                         children: [
                           ChoiceChip(
-                            label: const Text('1 day'),
+                            label: Text('1 day'),
                             selected: _settings.serviceDaysBefore == 1,
                             onSelected: (selected) {
                               if (selected) {
@@ -378,7 +378,7 @@ class _NotificationSettingsScreenState
                           ),
                           const SizedBox(width: 8),
                           ChoiceChip(
-                            label: const Text('1 week'),
+                            label: Text('1 week'),
                             selected: _settings.serviceDaysBefore == 7,
                             onSelected: (selected) {
                               if (selected) {
@@ -392,7 +392,7 @@ class _NotificationSettingsScreenState
                           ),
                           const SizedBox(width: 8),
                           ChoiceChip(
-                            label: const Text('30 days'),
+                            label: Text('30 days'),
                             selected: _settings.serviceDaysBefore == 30,
                             onSelected: (selected) {
                               if (selected) {
@@ -408,14 +408,14 @@ class _NotificationSettingsScreenState
                       ),
                     ),
                     ListTile(
-                      title: const Text('Custom Date'),
+                      title: Text('Custom Date'),
                       subtitle: Text(
                         _settings.customServiceNotificationDate != null
                             ? dateFormat.format(
                                 _settings.customServiceNotificationDate!)
                             : 'Not set',
                       ),
-                      trailing: const Icon(Icons.calendar_today),
+                      trailing: Icon(Icons.calendar_today),
                       onTap: () async {
                         final date = await showDatePicker(
                           context: context,
@@ -445,7 +445,7 @@ class _NotificationSettingsScreenState
           // Tyre Check Notifications
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -454,7 +454,7 @@ class _NotificationSettingsScreenState
                       Icon(Icons.tire_repair,
                           color: Theme.of(context).colorScheme.primary),
                       const SizedBox(width: 8),
-                      const Text(
+                      Text(
                         'Tyre Check Notifications',
                         style: TextStyle(
                           fontSize: 18,
@@ -466,8 +466,8 @@ class _NotificationSettingsScreenState
                   const SizedBox(height: 16),
                   
                   SwitchListTile(
-                    title: const Text('Enable Tyre Check Reminders'),
-                    subtitle: const Text('Get notified before tyre check is due'),
+                    title: Text('Enable Tyre Check Reminders'),
+                    subtitle: Text('Get notified before tyre check is due'),
                     value: _settings.tyreNotificationsEnabled,
                     onChanged: (value) {
                       setState(() {
@@ -480,11 +480,11 @@ class _NotificationSettingsScreenState
                   if (_settings.tyreNotificationsEnabled) ...[
                     const Divider(),
                     ListTile(
-                      title: const Text('Notify me'),
+                      title: Text('Notify me'),
                       subtitle: Row(
                         children: [
                           ChoiceChip(
-                            label: const Text('1 day'),
+                            label: Text('1 day'),
                             selected: _settings.tyreDaysBefore == 1,
                             onSelected: (selected) {
                               if (selected) {
@@ -498,7 +498,7 @@ class _NotificationSettingsScreenState
                           ),
                           const SizedBox(width: 8),
                           ChoiceChip(
-                            label: const Text('1 week'),
+                            label: Text('1 week'),
                             selected: _settings.tyreDaysBefore == 7,
                             onSelected: (selected) {
                               if (selected) {
@@ -512,7 +512,7 @@ class _NotificationSettingsScreenState
                           ),
                           const SizedBox(width: 8),
                           ChoiceChip(
-                            label: const Text('30 days'),
+                            label: Text('30 days'),
                             selected: _settings.tyreDaysBefore == 30,
                             onSelected: (selected) {
                               if (selected) {
@@ -528,14 +528,14 @@ class _NotificationSettingsScreenState
                       ),
                     ),
                     ListTile(
-                      title: const Text('Custom Date'),
+                      title: Text('Custom Date'),
                       subtitle: Text(
                         _settings.customTyreNotificationDate != null
                             ? dateFormat.format(
                                 _settings.customTyreNotificationDate!)
                             : 'Not set',
                       ),
-                      trailing: const Icon(Icons.calendar_today),
+                      trailing: Icon(Icons.calendar_today),
                       onTap: () async {
                         final date = await showDatePicker(
                           context: context,

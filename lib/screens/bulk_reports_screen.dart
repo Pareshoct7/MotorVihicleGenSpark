@@ -80,18 +80,18 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
               expandedHeight: 140,
               floating: false,
               pinned: true,
-              title: const Text('BATCH GENERATOR'),
+              title: Text('BATCH GENERATOR'),
             ),
             SliverPadding(
-              padding: const EdgeInsets.all(24),
+              padding: EdgeInsets.all(24),
               sliver: SliverToBoxAdapter(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(24),
+                      padding: EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF161B22),
+                        color: Theme.of(context).colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(32),
                         border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
                       ),
@@ -123,11 +123,11 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
                           DropdownButtonFormField<String>(
                             value: _selectedVehicleId,
                             isExpanded: true,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               labelText: 'TARGET VEHICLE',
                               prefixIcon: Icon(Icons.directions_car_outlined),
                             ),
-                            dropdownColor: const Color(0xFF161B22),
+                            dropdownColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                             items: vehicles.map((v) => DropdownMenuItem(
                               value: v.id, 
                               child: Text(v.registrationNo.toUpperCase(), overflow: TextOverflow.ellipsis)
@@ -153,11 +153,11 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
                           DropdownButtonFormField<String>(
                             isExpanded: true,
                             value: _selectedStoreId,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               labelText: 'BASE HUB',
                               prefixIcon: Icon(Icons.store_outlined),
                             ),
-                            dropdownColor: const Color(0xFF161B22),
+                            dropdownColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                             items: stores.map((s) => DropdownMenuItem(
                               value: s.id, 
                               child: Text(s.name.toUpperCase(), overflow: TextOverflow.ellipsis)
@@ -176,11 +176,11 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
                           DropdownButtonFormField<String>(
                             isExpanded: true,
                             value: _selectedDriverId,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               labelText: 'ASSIGNED DRIVER',
                               prefixIcon: Icon(Icons.person_outline),
                             ),
-                            dropdownColor: const Color(0xFF161B22),
+                            dropdownColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                             items: drivers.map((d) => DropdownMenuItem(
                               value: d.id, 
                               child: Text(d.name.toUpperCase(), overflow: TextOverflow.ellipsis)
@@ -199,7 +199,7 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
                           if (_selectedMode == BulkReportMode.count)
                             TextFormField(
                               controller: _numberOfReportsController,
-                              decoration: const InputDecoration(
+                              decoration: InputDecoration(
                                 labelText: 'BATCH COUNT (MONDAYS)',
                                 prefixIcon: Icon(Icons.tag),
                                 helperText: 'Enter 1-50 past Mondays',
@@ -234,7 +234,7 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
                                       }
                                     },
                                     child: InputDecorator(
-                                      decoration: const InputDecoration(labelText: 'START DATE'),
+                                      decoration: InputDecoration(labelText: 'START DATE'),
                                       child: Text(DateFormat('dd/MM/yyyy').format(_startDate)),
                                     ),
                                   ),
@@ -252,7 +252,7 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
                                       if (date != null) setState(() => _endDate = date);
                                     },
                                     child: InputDecorator(
-                                      decoration: const InputDecoration(labelText: 'END DATE'),
+                                      decoration: InputDecoration(labelText: 'END DATE'),
                                       child: Text(DateFormat('dd/MM/yyyy').format(_endDate)),
                                     ),
                                   ),
@@ -290,9 +290,9 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const Icon(Icons.bolt, size: 24),
+                                  Icon(Icons.bolt, size: 24),
                                   const SizedBox(width: 12),
-                                  const Text(
+                                  Text(
                                     'GENERATE BATCH',
                                     style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 1),
                                   ),
@@ -305,7 +305,7 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
                     if (!_isGenerating)
                       TextButton(
                         onPressed: () => Navigator.pop(context),
-                        child: const Text('CANCEL', style: TextStyle(color: Colors.white24, fontSize: 12, letterSpacing: 1, fontWeight: FontWeight.bold)),
+                        child: Text('CANCEL', style: TextStyle(color: Colors.white24, fontSize: 12, letterSpacing: 1, fontWeight: FontWeight.bold)),
                       ),
                     
                     if (_isGenerating) ...[
@@ -336,7 +336,7 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
   Widget _buildPremiumSegmentedButton() {
     return SegmentedButton<BulkReportMode>(
       style: SegmentedButton.styleFrom(
-        backgroundColor: const Color(0xFF0D1117),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         selectedBackgroundColor: const Color(0xFF1F2937),
         selectedForegroundColor: const Color(0xFFFFD700),
         foregroundColor: Colors.white38,
@@ -389,16 +389,16 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
            showDialog(
             context: context,
             builder: (context) => Dialog(
-              backgroundColor: const Color(0xFF0D1117),
+              backgroundColor: Theme.of(context).colorScheme.surface,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
               child: Padding(
-                padding: const EdgeInsets.all(32),
+                padding: EdgeInsets.all(32),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.speed, color: Color(0xFFFF5252), size: 48),
+                    Icon(Icons.speed, color: Color(0xFFFF5252), size: 48),
                     const SizedBox(height: 24),
-                    const Text(
+                    Text(
                       'OUTDATED ODOMETER',
                       style: TextStyle(
                         fontSize: 18,
@@ -407,7 +407,7 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const Text(
+                    Text(
                       'The vehicle odometer reading is older than 30 days. Please update the vehicle details with current telemetry before activating Nitro.',
                       textAlign: TextAlign.center,
                       style: TextStyle(color: Colors.white70, height: 1.5),
@@ -418,7 +418,7 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size(double.infinity, 50),
                       ),
-                      child: const Text('ACKNOWLEDGE'),
+                      child: Text('ACKNOWLEDGE'),
                     ),
                   ],
                 ),
@@ -542,16 +542,16 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
         final generatePdfs = await showDialog<bool>(
           context: context,
           builder: (context) => Dialog(
-            backgroundColor: const Color(0xFF0D1117),
+            backgroundColor: Theme.of(context).colorScheme.surface,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
             child: Padding(
-              padding: const EdgeInsets.all(32),
+              padding: EdgeInsets.all(32),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.check_circle_outline, color: Color(0xFF4FC3F7), size: 48),
+                  Icon(Icons.check_circle_outline, color: Color(0xFF4FC3F7), size: 48),
                   const SizedBox(height: 24),
-                  const Text(
+                  Text(
                     'BATCH COMPLETE',
                     style: TextStyle(
                       fontSize: 18,
@@ -563,7 +563,7 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
                   Text(
                     '${targetDates.length} reports injected into the system. High-speed generation complete.',
                     textAlign: TextAlign.center,
-                    style: const TextStyle(color: Colors.white70, height: 1.5),
+                    style: TextStyle(color: Colors.white70, height: 1.5),
                   ),
                   const SizedBox(height: 32),
                   Row(
@@ -571,14 +571,14 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
                       Expanded(
                         child: TextButton(
                           onPressed: () => Navigator.pop(context, false),
-                          child: const Text('LATER'),
+                          child: Text('LATER'),
                         ),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () => Navigator.pop(context, true),
-                          child: const Text('EXPORT PDFs'),
+                          child: Text('EXPORT PDFs'),
                         ),
                       ),
                     ],
@@ -630,16 +630,16 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) => Dialog(
-        backgroundColor: const Color(0xFF0D1117),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
         child: Padding(
-          padding: const EdgeInsets.all(32),
+          padding: EdgeInsets.all(32),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               const CircularProgressIndicator(color: Color(0xFF4FC3F7)),
               const SizedBox(height: 24),
-              const Text(
+              Text(
                 'EXPORTING TELEMETRY',
                 style: TextStyle(
                   fontSize: 14,
@@ -650,7 +650,7 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
               const SizedBox(height: 8),
               Text(
                 'Processing ${recentInspections.length} units...',
-                style: const TextStyle(color: Colors.white38, fontSize: 12),
+                style: TextStyle(color: Colors.white38, fontSize: 12),
               ),
             ],
           ),

@@ -103,9 +103,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             expandedHeight: 180,
             floating: false,
             pinned: true,
-            backgroundColor: colorScheme.surface,
+            backgroundColor: Theme.of(context).colorScheme.surface,
             flexibleSpace: FlexibleSpaceBar(
-              titlePadding: const EdgeInsets.only(left: 72, bottom: 16, right: 24),
+              titlePadding: EdgeInsets.only(left: 72, bottom: 16, right: 24),
               title: FittedBox(
                 fit: BoxFit.scaleDown,
                 alignment: Alignment.bottomLeft,
@@ -137,7 +137,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   context,
                   MaterialPageRoute(builder: (context) => const SettingsScreen()),
                 ).then((_) => setState(() {})),
-                icon: const Icon(Icons.settings_outlined),
+                icon: Icon(Icons.settings_outlined),
               ),
               const SizedBox(width: 8),
             ],
@@ -145,7 +145,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -218,7 +218,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                             context,
                             MaterialPageRoute(builder: (context) => const InspectionHistoryScreen()),
                           ).then((_) => setState(() {})),
-                          child: const Text('FULL LOG'),
+                          child: Text('FULL LOG'),
                         ),
                       ],
                     ),
@@ -252,7 +252,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     return Container(
       height: 220,
       decoration: BoxDecoration(
-        color: const Color(0xFF161B22),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
@@ -279,7 +279,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(24.0),
+            padding: EdgeInsets.all(24.0),
             child: Row(
               children: [
                 Expanded(
@@ -288,7 +288,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
+                      Text(
                         'SYSTEM POWER',
                         style: TextStyle(
                           color: Color(0xFF4FC3F7),
@@ -302,7 +302,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         fit: BoxFit.scaleDown,
                         child: Text(
                           '$totalInspections',
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.white,
                             fontSize: 48,
                             fontWeight: FontWeight.w900,
@@ -310,7 +310,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                           ),
                         ),
                       ),
-                      const Text(
+                      Text(
                         'TOTAL RUNS',
                         style: TextStyle(
                           color: Colors.white54,
@@ -326,7 +326,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         ),
                         borderRadius: BorderRadius.circular(20),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           decoration: BoxDecoration(
                             color: const Color(0xFF4FC3F7).withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(20),
@@ -369,13 +369,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                               children: [
                                 Text(
                                   '$todayInspections',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 20,
                                     fontWeight: FontWeight.w900,
                                   ),
                                 ),
-                                const Text(
+                                Text(
                                   'TODAY',
                                   style: TextStyle(color: Colors.white54, fontSize: 8),
                                 ),
@@ -401,9 +401,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       children: [
         Row(
           children: [
-            const Icon(Icons.notification_important, color: Colors.orangeAccent, size: 20),
+            Icon(Icons.notification_important, color: Colors.orangeAccent, size: 20),
             const SizedBox(width: 8),
-            const Text(
+            Text(
               'ALERT HUB',
               style: TextStyle(
                 color: Colors.orangeAccent,
@@ -424,10 +424,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               final v = vehicles[index];
               return Container(
                 width: 200,
-                margin: const EdgeInsets.only(right: 12),
-                padding: const EdgeInsets.all(16),
+                margin: EdgeInsets.only(right: 12),
+                padding: EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF161B22),
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(color: Colors.orangeAccent.withValues(alpha: 0.3)),
                 ),
@@ -437,12 +437,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   children: [
                     Text(
                       v.registrationNo,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white),
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       v.isWofExpired ? 'WOF EXPIRED' : 'REGO EXPIRED',
-                      style: const TextStyle(color: Colors.orangeAccent, fontSize: 10, fontWeight: FontWeight.bold),
+                      style: TextStyle(color: Colors.orangeAccent, fontSize: 10, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -497,11 +497,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           return GestureDetector(
             onTap: () => _handleFeatureTap(featureId, _getFeatureScreen(featureId)),
             child: Container(
-              margin: const EdgeInsets.only(right: 24),
+              margin: EdgeInsets.only(right: 24),
               child: Column(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: color.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
@@ -516,7 +516,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   const SizedBox(height: 8),
                   Text(
                     meta['title'],
-                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white70),
+                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white70),
                   ),
                 ],
               ),
@@ -539,9 +539,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       onTap: () => _handleFeatureTap(featureId, screen),
       borderRadius: BorderRadius.circular(28),
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: const Color(0xFF161B22),
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(28),
           border: Border.all(color: color.withValues(alpha: 0.1)),
           gradient: LinearGradient(
@@ -558,7 +558,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
@@ -568,7 +568,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             const SizedBox(height: 16),
             Text(
               title.toUpperCase(),
-              style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: Colors.white, letterSpacing: 0.5),
+              style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: Colors.white, letterSpacing: 0.5),
             ),
           ],
         ),
@@ -602,29 +602,29 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   Widget _buildRecentInspectionItem(BuildContext context, Inspection inspection) {
     final dateFormat = DateFormat('MMM dd, yyyy');
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFF161B22),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         leading: Container(
-          padding: const EdgeInsets.all(12),
+          padding: EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: const Color(0xFF4FC3F7).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(16),
           ),
-          child: const Icon(Icons.flag, color: Color(0xFF4FC3F7)),
+          child: Icon(Icons.flag, color: Color(0xFF4FC3F7)),
         ),
         title: Text(
           inspection.vehicleRegistrationNo,
-          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
         subtitle: Text(
           '${inspection.employeeName} • ${inspection.storeName}',
-          style: const TextStyle(color: Colors.white54, fontSize: 12),
+          style: TextStyle(color: Colors.white54, fontSize: 12),
         ),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -632,9 +632,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           children: [
             Text(
               dateFormat.format(inspection.inspectionDate),
-              style: const TextStyle(fontSize: 10, color: Colors.white38, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 10, color: Colors.white38, fontWeight: FontWeight.bold),
             ),
-            const Icon(Icons.chevron_right, size: 16, color: Colors.white24),
+            Icon(Icons.chevron_right, size: 16, color: Colors.white24),
           ],
         ),
         onTap: () {
@@ -655,12 +655,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   Widget _buildEmptyState() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(48.0),
+        padding: EdgeInsets.all(48.0),
         child: Column(
           children: [
             Icon(Icons.timer_off_outlined, size: 64, color: Colors.white.withValues(alpha: 0.1)),
             const SizedBox(height: 16),
-            const Text('NO TRACK DATA FOUND', style: TextStyle(color: Colors.white24, fontWeight: FontWeight.bold, letterSpacing: 1)),
+            Text('NO TRACK DATA FOUND', style: TextStyle(color: Colors.white24, fontWeight: FontWeight.bold, letterSpacing: 1)),
           ],
         ),
       ),
@@ -669,13 +669,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
   Widget _buildDrawer(BuildContext context) {
     return Drawer(
-      backgroundColor: const Color(0xFF0D1117),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
           DrawerHeader(
-            decoration: const BoxDecoration(
-              color: Color(0xFF161B22),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
               border: Border(bottom: BorderSide(color: Colors.white12)),
             ),
             child: Column(
@@ -683,15 +683,15 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: const Color(0xFF4FC3F7).withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.speed, color: Color(0xFF4FC3F7), size: 30),
+                  child: Icon(Icons.speed, color: Color(0xFF4FC3F7), size: 30),
                 ),
                 const SizedBox(height: 16),
-                const Text(
+                Text(
                   'TURBO INSPECT',
                   style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: 1),
                 ),
@@ -713,8 +713,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           const Divider(color: Colors.white12),
           _buildThemedDrawerItem(context, 'Alert Hub', Icons.notification_important_outlined, UsageService.featureReminders, const RemindersScreen()),
           ListTile(
-            leading: const Icon(Icons.settings_outlined, color: Colors.white70),
-            title: const Text('Settings', style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold)),
+            leading: Icon(Icons.settings_outlined, color: Colors.white70),
+            title: Text('Settings', style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold)),
             onTap: () {
               Navigator.pop(context);
               Navigator.push(
@@ -731,7 +731,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   Widget _buildThemedDrawerItem(BuildContext context, String title, IconData icon, String featureId, Widget screen) {
     return ListTile(
       leading: Icon(icon, color: Colors.white70),
-      title: Text(title, style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.bold, fontSize: 13)),
+      title: Text(title, style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold, fontSize: 13)),
       onTap: () {
         Navigator.pop(context);
         if (featureId == 'home') return;
@@ -754,8 +754,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       return FloatingActionButton.extended(
         onPressed: () => _handleFeatureTap(UsageService.featureManageVehicles, const VehiclesScreen()),
         backgroundColor: const Color(0xFFFF5252),
-        icon: const Icon(Icons.warning_amber_rounded, color: Colors.white),
-        label: const Text('FIX ALERTS', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        icon: Icon(Icons.warning_amber_rounded, color: Colors.white),
+        label: Text('FIX ALERTS', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
       );
     }
 
@@ -763,16 +763,16 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       return FloatingActionButton.extended(
         onPressed: () => _handleFeatureTap(UsageService.featureNewInspection, const InspectionFormScreen()),
         backgroundColor: const Color(0xFFFF9800),
-        icon: const Icon(Icons.speed, color: Colors.white),
-        label: const Text('DUE SOON: SCAN', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        icon: Icon(Icons.speed, color: Colors.white),
+        label: Text('DUE SOON: SCAN', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
       );
     }
 
     return FloatingActionButton.extended(
       onPressed: () => _handleFeatureTap(UsageService.featureNewInspection, const InspectionFormScreen()),
       backgroundColor: const Color(0xFF4FC3F7),
-      icon: const Icon(Icons.speed, color: Colors.white),
-      label: FittedBox(child: const Text('Speed Check', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white))),
+      icon: Icon(Icons.speed, color: Colors.white),
+      label: FittedBox(child: Text('Speed Check', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white))),
     );
   }
 }

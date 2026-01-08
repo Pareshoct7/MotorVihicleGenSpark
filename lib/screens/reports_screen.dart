@@ -156,14 +156,14 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Reports'),
+        title: Text('Delete Reports'),
         content: Text(
           'Are you sure you want to delete ${_selectedReportIds.length} reports? This action cannot be undone.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text('Cancel'),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -171,7 +171,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
               foregroundColor: Colors.white,
             ),
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete'),
+            child: Text('Delete'),
           ),
         ],
       ),
@@ -207,11 +207,11 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
             SliverAppBar.medium(
               pinned: true,
               leading: IconButton(
-                icon: const Icon(Icons.close),
+                icon: Icon(Icons.close),
                 onPressed: _clearSelection,
               ),
               title: Text('${_selectedReportIds.length} SELECTED'),
-              backgroundColor: const Color(0xFF161B22),
+              backgroundColor: Theme.of(context).colorScheme.surface,
               actions: [
                 IconButton(
                   icon: Icon(
@@ -222,7 +222,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                   onPressed: _selectAll,
                 ),
                 IconButton(
-                  icon: const Icon(Icons.delete_outline, color: Color(0xFFFF5252)),
+                  icon: Icon(Icons.delete_outline, color: Color(0xFFFF5252)),
                   onPressed: _deleteSelectedReports,
                 ),
                 const SizedBox(width: 8),
@@ -235,15 +235,15 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
             expandedHeight: 140,
               floating: false,
               pinned: true,
-              title: const Text('INSPECTIONS'),
+              title: Text('INSPECTIONS'),
               actions: [
                 IconButton(
-                  icon: const Icon(Icons.checklist, size: 28),
+                  icon: Icon(Icons.checklist, size: 28),
                   onPressed: () => setState(() => _explicitSelectionMode = true),
                 ),
                 if (_filteredInspections.isNotEmpty)
                   IconButton(
-                    icon: const Icon(Icons.picture_as_pdf_outlined, size: 28),
+                    icon: Icon(Icons.picture_as_pdf_outlined, size: 28),
                     onPressed: _generateBulkPdfs,
                   ),
                 const SizedBox(width: 8),
@@ -254,9 +254,9 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
             child: ExpansionTile(
               title: Row(
                 children: [
-                   const Icon(Icons.tune, size: 18, color: Color(0xFF4FC3F7)),
+                   Icon(Icons.tune, size: 18, color: Color(0xFF4FC3F7)),
                    const SizedBox(width: 12),
-                   const Text(
+                   Text(
                     'FILTERS',
                     style: TextStyle(
                       fontSize: 10,
@@ -270,26 +270,26 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                     Container(
                       width: 8,
                       height: 8,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         color: Color(0xFF4FC3F7),
                         shape: BoxShape.circle,
                       ),
                     ),
                 ],
               ),
-              childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-              backgroundColor: const Color(0xFF0D1117),
-              collapsedBackgroundColor: const Color(0xFF0D1117),
+              childrenPadding: EdgeInsets.fromLTRB(16, 0, 16, 24),
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              collapsedBackgroundColor: Theme.of(context).colorScheme.surface,
               iconColor: const Color(0xFF4FC3F7),
               collapsedIconColor: Colors.white24,
               children: [
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
                   value: _selectedVehicleId,
-                  decoration: const InputDecoration(labelText: 'VEHICLE', prefixIcon: Icon(Icons.directions_car_outlined)),
-                  dropdownColor: const Color(0xFF161B22),
+                  decoration: InputDecoration(labelText: 'VEHICLE', prefixIcon: Icon(Icons.directions_car_outlined)),
+                  dropdownColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                   items: [
-                    const DropdownMenuItem(value: null, child: Text('ALL VEHICLES')),
+                    DropdownMenuItem(value: null, child: Text('ALL VEHICLES')),
                     ...vehicles.map((v) => DropdownMenuItem(value: v.id, child: Text(v.registrationNo))),
                   ],
                   onChanged: (val) { setState(() => _selectedVehicleId = val); _applyFilters(); },
@@ -297,10 +297,10 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
                   value: _selectedStoreId,
-                  decoration: const InputDecoration(labelText: 'STORE HUB', prefixIcon: Icon(Icons.store_outlined)),
-                  dropdownColor: const Color(0xFF161B22),
+                  decoration: InputDecoration(labelText: 'STORE HUB', prefixIcon: Icon(Icons.store_outlined)),
+                  dropdownColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                   items: [
-                    const DropdownMenuItem(value: null, child: Text('ALL HUBS')),
+                    DropdownMenuItem(value: null, child: Text('ALL HUBS')),
                     ...stores.map((s) => DropdownMenuItem(value: s.id, child: Text(s.name.toUpperCase()))),
                   ],
                   onChanged: (val) { setState(() => _selectedStoreId = val); _applyFilters(); },
@@ -320,7 +320,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                           if (date != null) { setState(() => _startDate = date); _applyFilters(); }
                         },
                         child: InputDecorator(
-                          decoration: const InputDecoration(labelText: 'FROM'),
+                          decoration: InputDecoration(labelText: 'FROM'),
                           child: Text(_startDate != null ? dateFormat.format(_startDate!).toUpperCase() : 'ANYTIME'),
                         ),
                       ),
@@ -338,7 +338,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                           if (date != null) { setState(() => _endDate = date); _applyFilters(); }
                         },
                         child: InputDecorator(
-                          decoration: const InputDecoration(labelText: 'TO'),
+                          decoration: InputDecoration(labelText: 'TO'),
                           child: Text(_endDate != null ? dateFormat.format(_endDate!).toUpperCase() : 'ANYTIME'),
                         ),
                       ),
@@ -348,8 +348,8 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                 const SizedBox(height: 24),
                 TextButton.icon(
                   onPressed: _clearFilters,
-                  icon: const Icon(Icons.refresh, size: 18),
-                  label: const Text('RESET FILTERS'),
+                  icon: Icon(Icons.refresh, size: 18),
+                  label: Text('RESET FILTERS'),
                   style: TextButton.styleFrom(minimumSize: const Size(double.infinity, 50)),
                 ),
               ],
@@ -362,20 +362,20 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.analytics_outlined, size: 80, color: Colors.white10),
+                        Icon(Icons.analytics_outlined, size: 80, color: Colors.white10),
                         const SizedBox(height: 24),
-                        const Text(
+                        Text(
                           'NO TELEMETRY DATA FOUND',
                           style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 2, color: Colors.white38),
                         ),
                         const SizedBox(height: 16),
-                        TextButton(onPressed: _clearFilters, child: const Text('RESET FILTERS')),
+                        TextButton(onPressed: _clearFilters, child: Text('RESET FILTERS')),
                       ],
                     ),
                   ),
                 )
               : SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
+                  padding: EdgeInsets.fromLTRB(16, 8, 16, 100),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
@@ -403,9 +403,9 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
     const accentColor = Color(0xFF4FC3F7);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFF161B22),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
           color: isSelected ? accentColor : accentColor.withValues(alpha: 0.1),
@@ -431,7 +431,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
         },
         borderRadius: BorderRadius.circular(24),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           child: Row(
             children: [
               if (_isSelectionMode) ...[
@@ -452,7 +452,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                   child: Center(
                     child: Text(
                       '${inspection.completionPercentage.toInt()}%',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: accentColor,
                         fontSize: 12,
                         fontWeight: FontWeight.w900,
@@ -468,7 +468,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                   children: [
                     Text(
                       inspection.vehicleRegistrationNo.toUpperCase(),
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.w900,
@@ -479,7 +479,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                     Text(
                       '${dateFormat.format(inspection.inspectionDate).toUpperCase()} • ${inspection.employeeName.toUpperCase()}',
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white38,
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
@@ -488,7 +488,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                     Text(
                       inspection.storeName.toUpperCase(),
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white24,
                         fontSize: 10,
                       ),
@@ -498,8 +498,8 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
               ),
               if (!_isSelectionMode)
                 PopupMenuButton(
-                  icon: const Icon(Icons.more_vert, color: Colors.white30),
-                  color: const Color(0xFF161B22),
+                  icon: Icon(Icons.more_vert, color: Colors.white30),
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   itemBuilder: (context) => [
                     const PopupMenuItem(
@@ -552,18 +552,18 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Generate Bulk PDFs'),
+        title: Text('Generate Bulk PDFs'),
         content: Text(
           'Generate PDFs for all ${_filteredInspections.length} filtered reports?\n\nThis may take a few moments.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Generate'),
+            child: Text('Generate'),
           ),
         ],
       ),
@@ -582,7 +582,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: const Text('Generating PDFs'),
+        title: Text('Generating PDFs'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

@@ -38,7 +38,7 @@ class _RemindersScreenState extends State<RemindersScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('WOF & Rego Reminders'),
+        title: Text('WOF & Rego Reminders'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       body: vehiclesWithReminders.isEmpty
@@ -71,7 +71,7 @@ class _RemindersScreenState extends State<RemindersScreen> {
               ),
             )
           : ListView(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               children: [
                 // Expired Section
                 if (expiredVehicles.isNotEmpty) ...[
@@ -125,7 +125,7 @@ class _RemindersScreenState extends State<RemindersScreen> {
     Color color,
   ) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.only(bottom: 12),
       child: Row(
         children: [
           Container(
@@ -144,7 +144,7 @@ class _RemindersScreenState extends State<RemindersScreen> {
           ),
           const SizedBox(width: 8),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
               color: color.withOpacity(0.2),
               borderRadius: BorderRadius.circular(12),
@@ -171,10 +171,10 @@ class _RemindersScreenState extends State<RemindersScreen> {
     final dateFormat = DateFormat('dd MMM yyyy');
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: EdgeInsets.only(bottom: 12),
       color: color.withOpacity(0.05),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -185,14 +185,14 @@ class _RemindersScreenState extends State<RemindersScreen> {
                 Expanded(
                   child: Text(
                     vehicle.registrationNo,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.notifications),
+                  icon: Icon(Icons.notifications),
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -206,7 +206,7 @@ class _RemindersScreenState extends State<RemindersScreen> {
                   tooltip: 'Notification Settings',
                 ),
                 IconButton(
-                  icon: const Icon(Icons.edit),
+                  icon: Icon(Icons.edit),
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -245,7 +245,7 @@ class _RemindersScreenState extends State<RemindersScreen> {
                             : Colors.green,
                   ),
                   const SizedBox(width: 8),
-                  const Text(
+                  Text(
                     'WOF:',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
@@ -277,10 +277,10 @@ class _RemindersScreenState extends State<RemindersScreen> {
                     Chip(
                       label: Text(
                         '${vehicle.wofExpiryDate!.difference(DateTime.now()).inDays} days',
-                        style: const TextStyle(fontSize: 10),
+                        style: TextStyle(fontSize: 10),
                       ),
                       backgroundColor: Colors.orange,
-                      labelStyle: const TextStyle(color: Colors.white),
+                      labelStyle: TextStyle(color: Colors.white),
                       padding: EdgeInsets.zero,
                       visualDensity: VisualDensity.compact,
                     ),
@@ -303,7 +303,7 @@ class _RemindersScreenState extends State<RemindersScreen> {
                             : Colors.green,
                   ),
                   const SizedBox(width: 8),
-                  const Text(
+                  Text(
                     'Registration:',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
@@ -335,10 +335,10 @@ class _RemindersScreenState extends State<RemindersScreen> {
                     Chip(
                       label: Text(
                         '${vehicle.regoExpiryDate!.difference(DateTime.now()).inDays} days',
-                        style: const TextStyle(fontSize: 10),
+                        style: TextStyle(fontSize: 10),
                       ),
                       backgroundColor: Colors.orange,
-                      labelStyle: const TextStyle(color: Colors.white),
+                      labelStyle: TextStyle(color: Colors.white),
                       padding: EdgeInsets.zero,
                       visualDensity: VisualDensity.compact,
                     ),

@@ -46,16 +46,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: Text('Settings'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16),
         children: [
           // Theme Selection Card
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -78,7 +78,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     builder: (context, themeProvider, child) {
                       return DropdownButtonFormField<ThemeMode>(
                         value: themeProvider.themeMode,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: 'Theme Mode',
                           border: OutlineInputBorder(),
                           prefixIcon: Icon(Icons.palette),
@@ -119,7 +119,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           // Default Selections Card
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -142,13 +142,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   // Default Vehicle
                   DropdownButtonFormField<String>(
                     value: _defaultVehicleId,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Default Vehicle',
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.directions_car),
                     ),
                     items: [
-                      const DropdownMenuItem<String>(
+                      DropdownMenuItem<String>(
                         value: null,
                         child: Text('None'),
                       ),
@@ -178,13 +178,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   // Default Store
                   DropdownButtonFormField<String>(
                     value: _defaultStoreId,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Default Store',
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.store),
                     ),
                     items: [
-                      const DropdownMenuItem<String>(
+                      DropdownMenuItem<String>(
                         value: null,
                         child: Text('None'),
                       ),
@@ -214,13 +214,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   // Default Driver
                   DropdownButtonFormField<String>(
                     value: _defaultDriverId,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Default Driver/Employee',
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.person),
                     ),
                     items: [
-                      const DropdownMenuItem<String>(
+                      DropdownMenuItem<String>(
                         value: null,
                         child: Text('None'),
                       ),
@@ -254,7 +254,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           // Data Management Card
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -294,8 +294,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           }
                         }
                       },
-                      icon: const Icon(Icons.upload_file),
-                      label: const Text('Export Database'),
+                      icon: Icon(Icons.upload_file),
+                      label: Text('Export Database'),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -323,8 +323,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           }
                         }
                       },
-                      icon: const Icon(Icons.download),
-                      label: const Text('Import Database'),
+                      icon: Icon(Icons.download),
+                      label: Text('Import Database'),
                     ),
                   ),
                 ],

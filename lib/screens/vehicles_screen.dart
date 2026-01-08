@@ -66,29 +66,29 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
             expandedHeight: 200,
             floating: false,
             pinned: true,
-            title: const Text('GARAGE'),
+            title: Text('GARAGE'),
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(80),
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.05),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white10),
+                    border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1)),
                   ),
                   child: TextField(
                     controller: _searchController,
                     onChanged: (val) => setState(() => _searchQuery = val.toUpperCase()),
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
                     decoration: InputDecoration(
                       hintText: 'SEARCH RIG...',
-                      prefixIcon: const Icon(Icons.search, color: Color(0xFF4FC3F7)),
+                      prefixIcon: Icon(Icons.search, color: Color(0xFF4FC3F7)),
                       border: InputBorder.none,
                       enabledBorder: InputBorder.none,
                       focusedBorder: InputBorder.none,
                       suffixIcon: IconButton(
-                        icon: const Icon(Icons.camera_alt_outlined, color: Color(0xFF4FC3F7)),
+                        icon: Icon(Icons.camera_alt_outlined, color: Color(0xFF4FC3F7)),
                         onPressed: _scanPlate,
                       ),
                     ),
@@ -99,7 +99,7 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
             actions: [
               IconButton(
                 onPressed: () => _showVehicleDialog(context),
-                icon: const Icon(Icons.add_circle_outline, size: 28),
+                icon: Icon(Icons.add_circle_outline, size: 28),
               ),
               const SizedBox(width: 8),
             ],
@@ -113,23 +113,23 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
                         Icon(
                           Icons.directions_car_outlined,
                           size: 80,
-                          color: Colors.white10,
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
                         ),
                         const SizedBox(height: 24),
-                        const Text(
+                        Text(
                           'YOUR GARAGE IS EMPTY',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w900,
                             letterSpacing: 2,
-                            color: Colors.white38,
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38),
                           ),
                         ),
                         const SizedBox(height: 16),
                         ElevatedButton.icon(
                           onPressed: () => _showVehicleDialog(context),
-                          icon: const Icon(Icons.add),
-                          label: const Text('ADD FIRST VEHICLE'),
+                          icon: Icon(Icons.add),
+                          label: Text('ADD FIRST VEHICLE'),
                           style: ElevatedButton.styleFrom(
                             minimumSize: const Size(200, 50),
                           ),
@@ -139,7 +139,7 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
                   ),
                 )
               : SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
+                  padding: EdgeInsets.fromLTRB(16, 8, 16, 100),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
@@ -198,9 +198,9 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
             : const Color(0xFF4FC3F7);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 20),
+      margin: EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
-        color: const Color(0xFF161B22),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(28),
         border: Border.all(color: statusColor.withValues(alpha: 0.2)),
         boxShadow: [
@@ -214,11 +214,11 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: EdgeInsets.all(20.0),
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: statusColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(16),
@@ -232,7 +232,7 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
                     children: [
                       Text(
                         vehicle.registrationNo,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w900,
                           color: Colors.white,
@@ -240,7 +240,7 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
                       ),
                       Text(
                         '${vehicle.make ?? ''} ${vehicle.model ?? ''}'.trim().toUpperCase(),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
                           color: Colors.white38,
@@ -251,13 +251,13 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
                   ),
                 ),
                 if (hasAlerts)
-                  const Icon(Icons.error_outline, color: Color(0xFFFF5252), size: 24),
+                  Icon(Icons.error_outline, color: Color(0xFFFF5252), size: 24),
               ],
             ),
           ),
           const Divider(height: 1, color: Colors.white10),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             child: Column(
               children: [
                 _buildStatusRow(
@@ -287,10 +287,10 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.05),
-              borderRadius: const BorderRadius.only(
+              borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(28),
                 bottomRight: Radius.circular(28),
               ),
@@ -300,13 +300,13 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
               children: [
                 TextButton.icon(
                   onPressed: () => _showVehicleDialog(context, vehicle: vehicle),
-                  icon: const Icon(Icons.tune, size: 18),
-                  label: const Text('TUNE'),
+                  icon: Icon(Icons.tune, size: 18),
+                  label: Text('TUNE'),
                 ),
                 TextButton.icon(
                   onPressed: () => _deleteVehicle(context, vehicle),
-                  icon: const Icon(Icons.delete_outline, size: 18),
-                  label: const Text('SCRAP'),
+                  icon: Icon(Icons.delete_outline, size: 18),
+                  label: Text('SCRAP'),
                   style: TextButton.styleFrom(foregroundColor: const Color(0xFFFF5252)),
                 ),
               ],
@@ -323,7 +323,7 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 10,
             fontWeight: FontWeight.w900,
             color: Colors.white38,
@@ -352,7 +352,7 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
       children: [
         Text(
           '$label: ',
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
         Text(value),
       ],
@@ -373,14 +373,14 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Vehicle'),
+        title: Text('Delete Vehicle'),
         content: Text(
           'Are you sure you want to delete ${vehicle.registrationNo}?',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text('Cancel'),
           ),
           TextButton(
             onPressed: () async {
@@ -394,7 +394,7 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
               }
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Delete'),
+            child: Text('Delete'),
           ),
         ],
       ),
@@ -451,10 +451,10 @@ class _VehicleDialogState extends State<VehicleDialog> {
     final dateFormat = DateFormat('dd MMM yyyy');
 
     return Dialog(
-      backgroundColor: const Color(0xFF0D1117),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
       child: Container(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(24),
         child: Form(
           key: _formKey,
           child: SingleChildScrollView(
@@ -467,7 +467,7 @@ class _VehicleDialogState extends State<VehicleDialog> {
                   children: [
                     Text(
                       widget.vehicle == null ? 'NEW RIG' : 'TUNE RIG',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
                         fontSize: 24,
                         fontWeight: FontWeight.w900,
@@ -476,7 +476,7 @@ class _VehicleDialogState extends State<VehicleDialog> {
                     ),
                     IconButton(
                       onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close, color: Colors.white38),
+                      icon: Icon(Icons.close, color: Colors.white38),
                     ),
                   ],
                 ),
@@ -484,7 +484,7 @@ class _VehicleDialogState extends State<VehicleDialog> {
                 TextFormField(
                   controller: _regNoController,
                   textCapitalization: TextCapitalization.characters,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'REGISTRATION NO',
                     prefixIcon: Icon(Icons.badge_outlined),
                   ),
@@ -496,14 +496,14 @@ class _VehicleDialogState extends State<VehicleDialog> {
                     Expanded(
                       child: TextFormField(
                         controller: _makeController,
-                        decoration: const InputDecoration(labelText: 'MAKE'),
+                        decoration: InputDecoration(labelText: 'MAKE'),
                       ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: TextFormField(
                         controller: _modelController,
-                        decoration: const InputDecoration(labelText: 'MODEL'),
+                        decoration: InputDecoration(labelText: 'MODEL'),
                       ),
                     ),
                   ],
@@ -514,7 +514,7 @@ class _VehicleDialogState extends State<VehicleDialog> {
                     Expanded(
                       child: TextFormField(
                         controller: _yearController,
-                        decoration: const InputDecoration(labelText: 'YEAR'),
+                        decoration: InputDecoration(labelText: 'YEAR'),
                         keyboardType: TextInputType.number,
                       ),
                     ),
@@ -522,7 +522,7 @@ class _VehicleDialogState extends State<VehicleDialog> {
                     Expanded(
                       child: TextFormField(
                         controller: _odometerController,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: 'ODOMETER',
                           suffixText: 'KM',
                         ),
@@ -535,11 +535,11 @@ class _VehicleDialogState extends State<VehicleDialog> {
                 DropdownButtonFormField<String>(
                   value: _selectedStoreId,
                   isExpanded: true,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'BASE HUB',
                     prefixIcon: Icon(Icons.store_outlined),
                   ),
-                  dropdownColor: const Color(0xFF161B22),
+                  dropdownColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                   items: stores.map((store) {
                     return DropdownMenuItem(
                       value: store.id,
@@ -549,7 +549,7 @@ class _VehicleDialogState extends State<VehicleDialog> {
                   onChanged: (value) => setState(() => _selectedStoreId = value),
                 ),
                 const SizedBox(height: 24),
-                const Text(
+                Text(
                   'MAINTENANCE LOGS',
                   style: TextStyle(
                     color: Color(0xFF4FC3F7),
@@ -617,7 +617,7 @@ class _VehicleDialogState extends State<VehicleDialog> {
       },
       borderRadius: BorderRadius.circular(16),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(16),
@@ -628,7 +628,7 @@ class _VehicleDialogState extends State<VehicleDialog> {
           children: [
             Text(
               label,
-              style: const TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.bold),
+              style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.bold),
             ),
             Text(
               value != null ? format.format(value).toUpperCase() : 'SET DATE',

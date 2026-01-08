@@ -53,11 +53,11 @@ class _DriversScreenState extends State<DriversScreen> with SingleTickerProvider
             expandedHeight: 140,
             floating: false,
             pinned: true,
-            title: const Text('DRIVERS'),
+            title: Text('DRIVERS'),
             actions: [
               IconButton(
                 onPressed: () => _showDriverDialog(context),
-                icon: const Icon(Icons.person_add_outlined, size: 28),
+                icon: Icon(Icons.person_add_outlined, size: 28),
               ),
               const SizedBox(width: 8),
             ],
@@ -74,7 +74,7 @@ class _DriversScreenState extends State<DriversScreen> with SingleTickerProvider
                           color: Colors.white10,
                         ),
                         const SizedBox(height: 24),
-                        const Text(
+                        Text(
                           'ROSTER IS EMPTY',
                           style: TextStyle(
                             fontSize: 14,
@@ -86,15 +86,15 @@ class _DriversScreenState extends State<DriversScreen> with SingleTickerProvider
                         const SizedBox(height: 16),
                         ElevatedButton.icon(
                           onPressed: () => _showDriverDialog(context),
-                          icon: const Icon(Icons.add),
-                          label: const Text('ADD DRIVER'),
+                          icon: Icon(Icons.add),
+                          label: Text('ADD DRIVER'),
                         ),
                       ],
                     ),
                   ),
                 )
               : SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
+                  padding: EdgeInsets.fromLTRB(16, 8, 16, 100),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
@@ -123,25 +123,25 @@ class _DriversScreenState extends State<DriversScreen> with SingleTickerProvider
     const accentColor = Color(0xFF4FC3F7); // Driver theme color
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFF161B22),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(28),
         border: Border.all(color: accentColor.withValues(alpha: 0.1)),
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         leading: Container(
-          padding: const EdgeInsets.all(12),
+          padding: EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: accentColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(16),
           ),
-          child: const Icon(Icons.person, color: accentColor),
+          child: Icon(Icons.person, color: accentColor),
         ),
         title: Text(
           driver.name.toUpperCase(),
-          style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.white, fontSize: 16),
+          style: TextStyle(fontWeight: FontWeight.w900, color: Colors.white, fontSize: 16),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -150,18 +150,18 @@ class _DriversScreenState extends State<DriversScreen> with SingleTickerProvider
             if (driver.licenseNumber != null)
               Text(
                 'LICENSE: ${driver.licenseNumber!.toUpperCase()}',
-                style: const TextStyle(color: Colors.white38, fontSize: 10, fontWeight: FontWeight.bold),
+                style: TextStyle(color: Colors.white38, fontSize: 10, fontWeight: FontWeight.bold),
               ),
             if (driver.phone != null || driver.email != null)
               Text(
                 '${driver.phone ?? ''} ${driver.email ?? ''}'.trim(),
-                style: const TextStyle(color: Colors.white24, fontSize: 10),
+                style: TextStyle(color: Colors.white24, fontSize: 10),
               ),
           ],
         ),
         trailing: PopupMenuButton(
-          icon: const Icon(Icons.more_vert, color: Colors.white30),
-          color: const Color(0xFF161B22),
+          icon: Icon(Icons.more_vert, color: Colors.white30),
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           itemBuilder: (context) => [
             const PopupMenuItem(
@@ -211,12 +211,12 @@ class _DriversScreenState extends State<DriversScreen> with SingleTickerProvider
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Driver'),
+        title: Text('Delete Driver'),
         content: Text('Are you sure you want to delete ${driver.name}?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text('Cancel'),
           ),
           TextButton(
             onPressed: () async {
@@ -230,7 +230,7 @@ class _DriversScreenState extends State<DriversScreen> with SingleTickerProvider
               }
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Delete'),
+            child: Text('Delete'),
           ),
         ],
       ),
@@ -267,10 +267,10 @@ class _DriverDialogState extends State<DriverDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: const Color(0xFF0D1117),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
       child: Container(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(24),
         child: Form(
           key: _formKey,
           child: SingleChildScrollView(
@@ -283,7 +283,7 @@ class _DriverDialogState extends State<DriverDialog> {
                   children: [
                     Text(
                       widget.driver == null ? 'ADD DRIVER' : 'EDIT DRIVER',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
                         fontSize: 24,
                         fontWeight: FontWeight.w900,
@@ -292,7 +292,7 @@ class _DriverDialogState extends State<DriverDialog> {
                     ),
                     IconButton(
                       onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close, color: Colors.white38),
+                      icon: Icon(Icons.close, color: Colors.white38),
                     ),
                   ],
                 ),
@@ -300,7 +300,7 @@ class _DriverDialogState extends State<DriverDialog> {
                 TextFormField(
                   controller: _nameController,
                   textCapitalization: TextCapitalization.words,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'DRIVER FULL NAME',
                     prefixIcon: Icon(Icons.person_outline),
                   ),
@@ -310,7 +310,7 @@ class _DriverDialogState extends State<DriverDialog> {
                 TextFormField(
                   controller: _licenseController,
                   textCapitalization: TextCapitalization.characters,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'LICENSE NUMBER',
                     prefixIcon: Icon(Icons.badge_outlined),
                   ),
@@ -318,7 +318,7 @@ class _DriverDialogState extends State<DriverDialog> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _phoneController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'CONTACT PHONE',
                     prefixIcon: Icon(Icons.phone_outlined),
                   ),
@@ -327,7 +327,7 @@ class _DriverDialogState extends State<DriverDialog> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _emailController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'EMAIL ADDRESS',
                     prefixIcon: Icon(Icons.email_outlined),
                   ),

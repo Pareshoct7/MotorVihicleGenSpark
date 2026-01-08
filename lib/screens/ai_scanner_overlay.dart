@@ -150,11 +150,11 @@ class _AiScannerViewState extends State<AiScannerView> with WidgetsBindingObserv
   @override
   Widget build(BuildContext context) {
     if (!_isPermissionGranted) {
-      return const Scaffold(body: Center(child: Text('Camera Permission Required')));
+      return Scaffold(body: Center(child: Text('Camera Permission Required')));
     }
 
     if (_cameraController == null || !_cameraController!.value.isInitialized) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
@@ -172,7 +172,7 @@ class _AiScannerViewState extends State<AiScannerView> with WidgetsBindingObserv
             top: 50,
             left: 20,
             child: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white, size: 30),
+              icon: Icon(Icons.arrow_back, color: Colors.white, size: 30),
               onPressed: () => Navigator.pop(context),
             ),
           ),
@@ -190,7 +190,7 @@ class _AiScannerViewState extends State<AiScannerView> with WidgetsBindingObserv
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
+            Text(
               'STEALTH SCANNER',
               style: TextStyle(
                 color: Color(0xFF4FC3F7),
@@ -202,7 +202,7 @@ class _AiScannerViewState extends State<AiScannerView> with WidgetsBindingObserv
             const SizedBox(height: 12),
             Text(
               widget.mode == 'plate' ? 'POSITION LICENSE PLATE' : 'POSITION ODOMETER',
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.white,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -226,14 +226,14 @@ class _AiScannerViewState extends State<AiScannerView> with WidgetsBindingObserv
                    if (_result != null)
                     Center(
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         decoration: BoxDecoration(
                           color: const Color(0xFF4CAF50).withValues(alpha: 0.8),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
                           _result!,
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 24),
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 24),
                         ),
                       ),
                     ),
@@ -242,7 +242,7 @@ class _AiScannerViewState extends State<AiScannerView> with WidgetsBindingObserv
             ),
             
             const SizedBox(height: 32),
-            const Text(
+            Text(
               '100% OFFLINE BRAIN ACTIVE',
               style: TextStyle(color: Colors.white24, fontSize: 10, fontWeight: FontWeight.bold),
             ),

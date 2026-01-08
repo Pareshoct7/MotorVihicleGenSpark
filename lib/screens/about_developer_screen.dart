@@ -9,10 +9,10 @@ class AboutDeveloperScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('About Developer'),
+        title: Text('About Developer'),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -53,7 +53,7 @@ class AboutDeveloperScreen extends StatelessWidget {
             // App info card
             Card(
               child: Padding(
-                padding: const EdgeInsets.all(20),
+                padding: EdgeInsets.all(20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -71,7 +71,7 @@ class AboutDeveloperScreen extends StatelessWidget {
                     const SizedBox(height: 16),
                     Row(
                       children: [
-                        const Icon(Icons.verified, size: 20, color: Color(0xFF0B6BB8)),
+                        Icon(Icons.verified, size: 20, color: Color(0xFF0B6BB8)),
                         const SizedBox(width: 8),
                         Text(
                           'Version 2.0.0',
@@ -91,7 +91,7 @@ class AboutDeveloperScreen extends StatelessWidget {
               child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.all(20),
+                    padding: EdgeInsets.all(20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -120,10 +120,10 @@ class AboutDeveloperScreen extends StatelessWidget {
                       backgroundColor: Color(0xFFE31837),
                       child: Icon(Icons.email, color: Colors.white),
                     ),
-                    title: const Text('Email'),
-                    subtitle: const Text('paresh.oct7@gmail.com'),
+                    title: Text('Email'),
+                    subtitle: Text('paresh.oct7@gmail.com'),
                     trailing: IconButton(
-                      icon: const Icon(Icons.copy),
+                      icon: Icon(Icons.copy),
                       onPressed: () {
                         Clipboard.setData(
                           const ClipboardData(text: 'paresh.oct7@gmail.com'),
@@ -144,10 +144,10 @@ class AboutDeveloperScreen extends StatelessWidget {
                       backgroundColor: Color(0xFF0B6BB8),
                       child: Icon(Icons.phone, color: Colors.white),
                     ),
-                    title: const Text('Phone'),
-                    subtitle: const Text('+64 220949069'),
+                    title: Text('Phone'),
+                    subtitle: Text('+64 220949069'),
                     trailing: IconButton(
-                      icon: const Icon(Icons.copy),
+                      icon: Icon(Icons.copy),
                       onPressed: () {
                         Clipboard.setData(
                           const ClipboardData(text: '+64 220949069'),

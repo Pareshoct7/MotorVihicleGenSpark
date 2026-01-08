@@ -58,7 +58,7 @@ class _IntroductionScreenState extends State<IntroductionScreen> {
               alignment: Alignment.topRight,
               child: TextButton(
                 onPressed: _complete,
-                child: const Text('Skip'),
+                child: Text('Skip'),
               ),
             ),
             
@@ -84,7 +84,7 @@ class _IntroductionScreenState extends State<IntroductionScreen> {
               children: List.generate(
                 _pages.length,
                 (index) => Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  margin: EdgeInsets.symmetric(horizontal: 4),
                   width: _currentPage == index ? 32 : 8,
                   height: 8,
                   decoration: BoxDecoration(
@@ -101,7 +101,7 @@ class _IntroductionScreenState extends State<IntroductionScreen> {
             
             // Navigation buttons
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32),
+              padding: EdgeInsets.symmetric(horizontal: 32),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -113,7 +113,7 @@ class _IntroductionScreenState extends State<IntroductionScreen> {
                           curve: Curves.easeInOut,
                         );
                       },
-                      child: const Text('Back'),
+                      child: Text('Back'),
                     )
                   else
                     const SizedBox(width: 80),
@@ -146,7 +146,7 @@ class _IntroductionScreenState extends State<IntroductionScreen> {
 
   Widget _buildPage(IntroPage page) {
     return Padding(
-      padding: const EdgeInsets.all(32),
+      padding: EdgeInsets.all(32),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

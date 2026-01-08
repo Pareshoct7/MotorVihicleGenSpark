@@ -109,19 +109,19 @@ class _InspectionHistoryScreenState extends State<InspectionHistoryScreen> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         leading: _isSelectionMode
             ? IconButton(
-                icon: const Icon(Icons.close),
+                icon: Icon(Icons.close),
                 onPressed: _toggleSelectionMode,
               )
             : null,
         actions: [
           if (_isSelectionMode)
             IconButton(
-              icon: const Icon(Icons.share),
+              icon: Icon(Icons.share),
               onPressed: _shareSelectedInspections,
             )
           else
             IconButton(
-              icon: const Icon(Icons.checklist),
+              icon: Icon(Icons.checklist),
               tooltip: 'Select Multiple',
               onPressed: _toggleSelectionMode,
             ),
@@ -149,7 +149,7 @@ class _InspectionHistoryScreenState extends State<InspectionHistoryScreen> {
               ),
             )
           : ListView.builder(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               itemCount: inspections.length,
               itemBuilder: (context, index) {
                 final inspection = inspections[index];
@@ -164,7 +164,7 @@ class _InspectionHistoryScreenState extends State<InspectionHistoryScreen> {
     final isSelected = _selectedInspectionIds.contains(inspection.id);
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: EdgeInsets.only(bottom: 12),
       color: isSelected ? Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3) : null,
       child: InkWell(
         onTap: () {
@@ -192,12 +192,12 @@ class _InspectionHistoryScreenState extends State<InspectionHistoryScreen> {
         },
         borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16),
           child: Row(
             children: [
               if (_isSelectionMode)
                 Padding(
-                  padding: const EdgeInsets.only(right: 16),
+                  padding: EdgeInsets.only(right: 16),
                   child: Checkbox(
                     value: isSelected,
                     onChanged: (value) => _toggleSelection(inspection.id),
@@ -215,7 +215,7 @@ class _InspectionHistoryScreenState extends State<InspectionHistoryScreen> {
                             children: [
                               Text(
                                 inspection.vehicleRegistrationNo,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -246,7 +246,7 @@ class _InspectionHistoryScreenState extends State<InspectionHistoryScreen> {
                             const SizedBox(height: 4),
                             Text(
                               '${inspection.completionPercentage.toStringAsFixed(0)}%',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 12,
                               ),
@@ -312,11 +312,11 @@ class _InspectionHistoryScreenState extends State<InspectionHistoryScreen> {
                                 ),
                               ).then((_) => setState(() {}));
                             },
-                            icon: const Icon(Icons.visibility),
-                            label: const Text('View'),
+                            icon: Icon(Icons.visibility),
+                            label: Text('View'),
                           ),
                           PopupMenuButton<String>(
-                            icon: const Icon(Icons.share),
+                            icon: Icon(Icons.share),
                             tooltip: 'Share Options',
                             itemBuilder: (context) => [
                               const PopupMenuItem(
@@ -519,14 +519,14 @@ class _InspectionHistoryScreenState extends State<InspectionHistoryScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Inspection'),
+        title: Text('Delete Inspection'),
         content: Text(
           'Are you sure you want to delete this inspection for ${inspection.vehicleRegistrationNo}?',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text('Cancel'),
           ),
           TextButton(
             onPressed: () async {
@@ -540,7 +540,7 @@ class _InspectionHistoryScreenState extends State<InspectionHistoryScreen> {
               }
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Delete'),
+            child: Text('Delete'),
           ),
         ],
       ),

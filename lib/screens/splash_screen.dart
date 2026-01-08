@@ -56,11 +56,11 @@ class _SplashScreenState extends State<SplashScreen> {
             Container(
               width: 120,
               height: 120,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.local_pizza,
                 size: 80,
                 color: Color(0xFFE31837),
@@ -70,7 +70,7 @@ class _SplashScreenState extends State<SplashScreen> {
             const SizedBox(height: 32),
             
             // App name
-            const Text(
+            Text(
               'Domino\'s',
               style: TextStyle(
                 fontSize: 32,
@@ -79,7 +79,7 @@ class _SplashScreenState extends State<SplashScreen> {
               ),
             ),
             
-            const Text(
+            Text(
               'Fleet Inspector',
               style: TextStyle(
                 fontSize: 24,

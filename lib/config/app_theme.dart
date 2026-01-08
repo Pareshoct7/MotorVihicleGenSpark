@@ -28,6 +28,8 @@ class AppTheme {
       surfaceContainerHighest: const Color(0xFFE1E2E8),
       onSurfaceVariant: const Color(0xFF44474E),
       outline: const Color(0xFF74777F),
+      error: dominosRed,
+      onError: Colors.white,
     );
 
     return ThemeData(
@@ -132,10 +134,16 @@ class AppTheme {
         seedColor: primaryColor,
         brightness: Brightness.dark,
         primary: primaryColor,
+        onPrimary: Colors.black,
         secondary: accentColor,
+        onSecondary: Colors.white,
         surface: backgroundColor,
         onSurface: const Color(0xFFE2E2E6),
+        surfaceContainerHighest: surfaceColor,
+        onSurfaceVariant: const Color(0xFF8B949E),
         outline: const Color(0xFF30363D),
+        error: accentColor,
+        onError: Colors.white,
       ),
       scaffoldBackgroundColor: backgroundColor,
       

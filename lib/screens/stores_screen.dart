@@ -53,11 +53,11 @@ class _StoresScreenState extends State<StoresScreen> with SingleTickerProviderSt
             expandedHeight: 140,
             floating: false,
             pinned: true,
-            title: const Text('STORES'),
+            title: Text('STORES'),
             actions: [
               IconButton(
                 onPressed: () => _showStoreDialog(context),
-                icon: const Icon(Icons.add_business_outlined, size: 28),
+                icon: Icon(Icons.add_business_outlined, size: 28),
               ),
               const SizedBox(width: 8),
             ],
@@ -74,7 +74,7 @@ class _StoresScreenState extends State<StoresScreen> with SingleTickerProviderSt
                           color: Colors.white10,
                         ),
                         const SizedBox(height: 24),
-                        const Text(
+                        Text(
                           'NO STORES REGISTERED',
                           style: TextStyle(
                             fontSize: 14,
@@ -86,15 +86,15 @@ class _StoresScreenState extends State<StoresScreen> with SingleTickerProviderSt
                         const SizedBox(height: 16),
                         ElevatedButton.icon(
                           onPressed: () => _showStoreDialog(context),
-                          icon: const Icon(Icons.add),
-                          label: const Text('ADD STORE'),
+                          icon: Icon(Icons.add),
+                          label: Text('ADD STORE'),
                         ),
                       ],
                     ),
                   ),
                 )
               : SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
+                  padding: EdgeInsets.fromLTRB(16, 8, 16, 100),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
@@ -123,25 +123,25 @@ class _StoresScreenState extends State<StoresScreen> with SingleTickerProviderSt
     const accentColor = Color(0xFFAB47BC); // Store theme color
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFF161B22),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(28),
         border: Border.all(color: accentColor.withValues(alpha: 0.1)),
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         leading: Container(
-          padding: const EdgeInsets.all(12),
+          padding: EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: accentColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(16),
           ),
-          child: const Icon(Icons.store, color: accentColor),
+          child: Icon(Icons.store, color: accentColor),
         ),
         title: Text(
           store.displayName.toUpperCase(),
-          style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.white, fontSize: 16),
+          style: TextStyle(fontWeight: FontWeight.w900, color: Colors.white, fontSize: 16),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -150,18 +150,18 @@ class _StoresScreenState extends State<StoresScreen> with SingleTickerProviderSt
             if (store.address != null)
               Text(
                 store.address!.toUpperCase(),
-                style: const TextStyle(color: Colors.white38, fontSize: 10, fontWeight: FontWeight.bold),
+                style: TextStyle(color: Colors.white38, fontSize: 10, fontWeight: FontWeight.bold),
               ),
             if (store.phone != null)
               Text(
                 store.phone!,
-                style: const TextStyle(color: Colors.white24, fontSize: 10),
+                style: TextStyle(color: Colors.white24, fontSize: 10),
               ),
           ],
         ),
         trailing: PopupMenuButton(
-          icon: const Icon(Icons.more_vert, color: Colors.white30),
-          color: const Color(0xFF161B22),
+          icon: Icon(Icons.more_vert, color: Colors.white30),
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           itemBuilder: (context) => [
             const PopupMenuItem(
@@ -211,12 +211,12 @@ class _StoresScreenState extends State<StoresScreen> with SingleTickerProviderSt
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Store'),
+        title: Text('Delete Store'),
         content: Text('Are you sure you want to delete ${store.name}?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text('Cancel'),
           ),
           TextButton(
             onPressed: () async {
@@ -230,7 +230,7 @@ class _StoresScreenState extends State<StoresScreen> with SingleTickerProviderSt
               }
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Delete'),
+            child: Text('Delete'),
           ),
         ],
       ),
@@ -267,10 +267,10 @@ class _StoreDialogState extends State<StoreDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: const Color(0xFF0D1117),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
       child: Container(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(24),
         child: Form(
           key: _formKey,
           child: SingleChildScrollView(
@@ -283,7 +283,7 @@ class _StoreDialogState extends State<StoreDialog> {
                   children: [
                     Text(
                       widget.store == null ? 'ADD STORE' : 'EDIT STORE',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
                         fontSize: 24,
                         fontWeight: FontWeight.w900,
@@ -292,7 +292,7 @@ class _StoreDialogState extends State<StoreDialog> {
                     ),
                     IconButton(
                       onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close, color: Colors.white38),
+                      icon: Icon(Icons.close, color: Colors.white38),
                     ),
                   ],
                 ),
@@ -300,7 +300,7 @@ class _StoreDialogState extends State<StoreDialog> {
                 TextFormField(
                   controller: _nameController,
                   textCapitalization: TextCapitalization.characters,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'STORE NAME',
                     prefixIcon: Icon(Icons.business_outlined),
                   ),
@@ -309,7 +309,7 @@ class _StoreDialogState extends State<StoreDialog> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _storeNumberController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'STORE ID / NUMBER',
                     prefixIcon: Icon(Icons.numbers_outlined),
                   ),
@@ -317,7 +317,7 @@ class _StoreDialogState extends State<StoreDialog> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _addressController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'ADDRESS',
                     prefixIcon: Icon(Icons.location_on_outlined),
                   ),
@@ -326,7 +326,7 @@ class _StoreDialogState extends State<StoreDialog> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _phoneController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'CONTACT PHONE',
                     prefixIcon: Icon(Icons.phone_outlined),
                   ),

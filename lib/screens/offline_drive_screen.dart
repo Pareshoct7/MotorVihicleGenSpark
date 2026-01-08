@@ -137,16 +137,16 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => Dialog(
-        backgroundColor: const Color(0xFF0D1117),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
         child: Padding(
-          padding: const EdgeInsets.all(32),
+          padding: EdgeInsets.all(32),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.delete_sweep_outlined, color: Color(0xFFFF5252), size: 48),
+              Icon(Icons.delete_sweep_outlined, color: Color(0xFFFF5252), size: 48),
               const SizedBox(height: 24),
-              const Text(
+              Text(
                 'DELETE',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 1),
               ),
@@ -154,7 +154,7 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
               Text(
                 'Permanently delete ${_selectedPaths.length} items from the system? This action is irreversible.',
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.white70, height: 1.5),
+                style: TextStyle(color: Colors.white70, height: 1.5),
               ),
               const SizedBox(height: 32),
               Row(
@@ -162,7 +162,7 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
                    Expanded(
                      child: TextButton(
                        onPressed: () => Navigator.pop(context, false),
-                       child: const Text('ABORT'),
+                       child: Text('ABORT'),
                      ),
                    ),
                    const SizedBox(width: 16),
@@ -170,7 +170,7 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
                      child: ElevatedButton(
                        onPressed: () => Navigator.pop(context, true),
                        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF5252), foregroundColor: Colors.white),
-                       child: const Text('DELETE'),
+                       child: Text('DELETE'),
                      ),
                    ),
                 ],
@@ -236,21 +236,21 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
       context: context,
       barrierDismissible: false,
       builder: (context) => Dialog(
-        backgroundColor: const Color(0xFF0D1117),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
         child: Padding(
-          padding: const EdgeInsets.all(32),
+          padding: EdgeInsets.all(32),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               const CircularProgressIndicator(color: Color(0xFFE91E63)),
               const SizedBox(height: 24),
-              const Text(
+              Text(
                 'COMPILING DATA',
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 2),
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 'Merging selected units into master log...',
                 style: TextStyle(color: Colors.white38, fontSize: 12),
                 textAlign: TextAlign.center,
@@ -331,21 +331,21 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => Dialog(
-        backgroundColor: const Color(0xFF0D1117),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
         child: Padding(
-          padding: const EdgeInsets.all(32),
+          padding: EdgeInsets.all(32),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.sync_alt, color: Color(0xFFFFD700), size: 48),
+              Icon(Icons.sync_alt, color: Color(0xFFFFD700), size: 48),
               const SizedBox(height: 24),
-              const Text(
+              Text(
                 'DRIVE SYNC',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 1),
               ),
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 'Initiate system-wide backfill? This will scan historical telemetry for the past year and generate missing reports.',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.white70, height: 1.5),
@@ -356,7 +356,7 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
                    Expanded(
                      child: TextButton(
                        onPressed: () => Navigator.pop(context, false),
-                       child: const Text('LATER'),
+                       child: Text('LATER'),
                      ),
                    ),
                    const SizedBox(width: 16),
@@ -364,7 +364,7 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
                      child: ElevatedButton(
                        onPressed: () => Navigator.pop(context, true),
                        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFD700), foregroundColor: Colors.black),
-                       child: const Text('INITIALIZE'),
+                       child: Text('INITIALIZE'),
                      ),
                    ),
                 ],
@@ -386,21 +386,21 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
       barrierDismissible: false,
       builder: (context) {
         return Dialog(
-          backgroundColor: const Color(0xFF0D1117),
+          backgroundColor: Theme.of(context).colorScheme.surface,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
           child: Padding(
-            padding: const EdgeInsets.all(32),
+            padding: EdgeInsets.all(32),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 const CircularProgressIndicator(color: Color(0xFFFFD700)),
                 const SizedBox(height: 24),
-                const Text(
+                Text(
                   'SYNCING DRIVE',
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 2),
                 ),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   'Reconstructing telemetry history...',
                   style: TextStyle(color: Colors.white38, fontSize: 12),
                   textAlign: TextAlign.center,
@@ -473,8 +473,8 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
   @override
   Widget build(BuildContext context) {
     if (_currentDir == null) {
-      return const Scaffold(
-        backgroundColor: Color(0xFF0D1117),
+      return Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.surface,
         body: Center(child: CircularProgressIndicator(color: Color(0xFF4FC3F7))),
       );
     }
@@ -484,48 +484,48 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
         : _currentDir!.path.split('/').last.toUpperCase();
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0D1117),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: CustomScrollView(
         slivers: [
           SliverAppBar.large(
             expandedHeight: 160,
             floating: false,
             pinned: true,
-            backgroundColor: const Color(0xFF0D1117),
+            backgroundColor: Theme.of(context).colorScheme.surface,
             title: _isSelectionMode
-                ? Text('${_selectedPaths.length} SELECTED', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900))
+                ? Text('${_selectedPaths.length} SELECTED', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900))
                 : _isSearchMode
                     ? TextField(
                         controller: _searchController,
                         autofocus: true,
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                        decoration: const InputDecoration(hintText: 'SCANNING...'),
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        decoration: InputDecoration(hintText: 'SCANNING...'),
                         onChanged: (val) => setState(() => _searchQuery = val.toLowerCase()),
                       )
                     : Text(folderName),
             leading: _isSelectionMode
-                ? IconButton(icon: const Icon(Icons.close), onPressed: _exitSelectionMode)
+                ? IconButton(icon: Icon(Icons.close), onPressed: _exitSelectionMode)
                 : _isSearchMode
-                    ? IconButton(icon: const Icon(Icons.arrow_back), onPressed: () {
+                    ? IconButton(icon: Icon(Icons.arrow_back), onPressed: () {
                         setState(() { _isSearchMode = false; _searchQuery = ''; _searchController.clear(); });
                       })
                     : (Navigator.canPop(context) ? const BackButton() : null),
             actions: _isSelectionMode
                 ? [
-                    IconButton(icon: const Icon(Icons.select_all), onPressed: _selectAll, tooltip: 'Select All'),
-                    IconButton(icon: const Icon(Icons.share_outlined), onPressed: _shareSelected, tooltip: 'Share'),
-                    IconButton(icon: const Icon(Icons.picture_as_pdf_outlined), onPressed: _combineSelected, tooltip: 'Combine PDFs'),
-                    IconButton(icon: const Icon(Icons.delete_outline, color: Color(0xFFFF5252)), onPressed: _deleteSelected, tooltip: 'Delete'),
+                    IconButton(icon: Icon(Icons.select_all), onPressed: _selectAll, tooltip: 'Select All'),
+                    IconButton(icon: Icon(Icons.share_outlined), onPressed: _shareSelected, tooltip: 'Share'),
+                    IconButton(icon: Icon(Icons.picture_as_pdf_outlined), onPressed: _combineSelected, tooltip: 'Combine PDFs'),
+                    IconButton(icon: Icon(Icons.delete_outline, color: Color(0xFFFF5252)), onPressed: _deleteSelected, tooltip: 'Delete'),
                   ]
                 : [
                     if (!_isSearchMode) ...[
                       if (folderName == 'DATA DRIVE' || folderName == 'OFFLINE DRIVE')
-                        IconButton(icon: const Icon(Icons.sync_outlined), onPressed: _isBackfilling ? null : _runBackfill, tooltip: 'Sync'),
-                      IconButton(icon: const Icon(Icons.search_outlined), onPressed: () => setState(() => _isSearchMode = true), tooltip: 'Search'),
-                      IconButton(icon: const Icon(Icons.library_books_outlined), onPressed: _combinePdfs, tooltip: 'Combine All'),
+                        IconButton(icon: Icon(Icons.sync_outlined), onPressed: _isBackfilling ? null : _runBackfill, tooltip: 'Sync'),
+                      IconButton(icon: Icon(Icons.search_outlined), onPressed: () => setState(() => _isSearchMode = true), tooltip: 'Search'),
+                      IconButton(icon: Icon(Icons.library_books_outlined), onPressed: _combinePdfs, tooltip: 'Combine All'),
                       PopupMenuButton<String>(
-                        icon: const Icon(Icons.sort_outlined),
-                        color: const Color(0xFF161B22),
+                        icon: Icon(Icons.sort_outlined),
+                        color: Theme.of(context).colorScheme.surfaceContainerHighest,
                         onSelected: (value) => value == 'toggle_order' ? setState(() => _sortAscending = !_sortAscending) : setState(() => _sortBy = value),
                         itemBuilder: (context) => [
                           _buildSortItem('name', Icons.sort_by_alpha, 'Name'),
@@ -534,12 +534,12 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
                           const PopupMenuDivider(height: 1),
                           PopupMenuItem(
                             value: 'toggle_order',
-                            child: Row(children: [Icon(_sortAscending ? Icons.arrow_upward : Icons.arrow_downward, size: 18), const SizedBox(width: 8), Text(_sortAscending ? 'ASCENDING' : 'DESCENDING', style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold))]),
+                            child: Row(children: [Icon(_sortAscending ? Icons.arrow_upward : Icons.arrow_downward, size: 18), const SizedBox(width: 8), Text(_sortAscending ? 'ASCENDING' : 'DESCENDING', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold))]),
                           ),
                         ],
                       ),
                       if (_contents.isNotEmpty)
-                        IconButton(icon: const Icon(Icons.checklist_outlined), onPressed: () => _enterSelectionMode(''), tooltip: 'Select'),
+                        IconButton(icon: Icon(Icons.checklist_outlined), onPressed: () => _enterSelectionMode(''), tooltip: 'Select'),
                     ]
                   ],
             bottom: PreferredSize(
@@ -560,7 +560,7 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
                     const SizedBox(height: 16),
                     Text(
                       _searchQuery.isEmpty ? 'EMPTY SYSTEM HUB' : 'NO TELEMETRY MATCHES',
-                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 2, color: Colors.white24),
+                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 2, color: Colors.white24),
                     ),
                   ],
                 ),
@@ -568,7 +568,7 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
             )
           else
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
+              padding: EdgeInsets.fromLTRB(16, 8, 16, 100),
               sliver: SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
@@ -584,9 +584,9 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
                       child: SlideTransition(
                         position: animation.drive(Tween<Offset>(begin: const Offset(0.1, 0), end: Offset.zero)),
                         child: Container(
-                          margin: const EdgeInsets.only(bottom: 8),
+                          margin: EdgeInsets.only(bottom: 8),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF161B22),
+                            color: Theme.of(context).colorScheme.surfaceContainerHighest,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
                               color: isSelected ? const Color(0xFF4FC3F7) : Colors.white.withValues(alpha: 0.05),
@@ -594,17 +594,17 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
                             ),
                           ),
                           child: ListTile(
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                             leading: isDir
                                 ? Container(
-                                    padding: const EdgeInsets.all(10),
+                                    padding: EdgeInsets.all(10),
                                     decoration: BoxDecoration(color: const Color(0xFF1C222D), borderRadius: BorderRadius.circular(12)),
-                                    child: const Icon(Icons.folder_open_outlined, color: Color(0xFF4FC3F7), size: 24),
+                                    child: Icon(Icons.folder_open_outlined, color: Color(0xFF4FC3F7), size: 24),
                                   )
                                 : Container(
-                                    padding: const EdgeInsets.all(10),
+                                    padding: EdgeInsets.all(10),
                                     decoration: BoxDecoration(color: const Color(0xFF1C222D), borderRadius: BorderRadius.circular(12)),
-                                    child: const Icon(Icons.description_outlined, color: Color(0xFFE91E63), size: 24),
+                                    child: Icon(Icons.description_outlined, color: Color(0xFFE91E63), size: 24),
                                   ),
                             title: Text(
                               name.toUpperCase(),
@@ -618,10 +618,10 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
                             ),
                             subtitle: Text(
                               isDir ? 'FOLDER' : 'REPORT PDF',
-                              style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white24, letterSpacing: 1),
+                              style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white24, letterSpacing: 1),
                             ),
                             trailing: isDir && !_isSelectionMode 
-                                ? const Icon(Icons.chevron_right, color: Colors.white10) 
+                                ? Icon(Icons.chevron_right, color: Colors.white10) 
                                 : _isSelectionMode
                                     ? Icon(
                                         isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
@@ -679,21 +679,21 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => Dialog(
-        backgroundColor: const Color(0xFF0D1117),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
         child: Padding(
-          padding: const EdgeInsets.all(32),
+          padding: EdgeInsets.all(32),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.library_books_outlined, color: Color(0xFF4FC3F7), size: 48),
+              Icon(Icons.library_books_outlined, color: Color(0xFF4FC3F7), size: 48),
               const SizedBox(height: 24),
-              const Text(
+              Text(
                 'COMBINE ALL',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 1),
               ),
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 'Combine all PDFs in this hub and its sub-sectors into a single master log?',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.white70, height: 1.5),
@@ -704,14 +704,14 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
                    Expanded(
                      child: TextButton(
                        onPressed: () => Navigator.pop(context, false),
-                       child: const Text('ABORT'),
+                       child: Text('ABORT'),
                      ),
                    ),
                    const SizedBox(width: 16),
                    Expanded(
                      child: ElevatedButton(
                        onPressed: () => Navigator.pop(context, true),
-                       child: const Text('PROCEED'),
+                       child: Text('PROCEED'),
                      ),
                    ),
                 ],
@@ -729,21 +729,21 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
       context: context,
       barrierDismissible: false,
       builder: (context) => Dialog(
-        backgroundColor: const Color(0xFF0D1117),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
         child: Padding(
-          padding: const EdgeInsets.all(32),
+          padding: EdgeInsets.all(32),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               const CircularProgressIndicator(color: Color(0xFF4FC3F7)),
               const SizedBox(height: 24),
-              const Text(
+              Text(
                 'COMPILING HUB',
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 2),
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 'Scanning and merging all sub-sector telemetry...',
                 style: TextStyle(color: Colors.white38, fontSize: 12),
                 textAlign: TextAlign.center,
@@ -801,7 +801,7 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
         
         return Container(
           height: 40,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: EdgeInsets.symmetric(horizontal: 16),
           child: ListView(
             scrollDirection: Axis.horizontal,
             children: [
@@ -817,7 +817,7 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
                 return Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.chevron_right, size: 14, color: Colors.white10),
+                    Icon(Icons.chevron_right, size: 14, color: Colors.white10),
                     _buildBreadcrumbItem(name.toUpperCase(), () {
                       // Construct path to this point
                       String path = rootPath;
@@ -840,13 +840,13 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
     return TextButton(
       onPressed: onTap,
       style: TextButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
+        padding: EdgeInsets.symmetric(horizontal: 8),
         minimumSize: Size.zero,
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
       child: Text(
         label,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.w900,
           color: Color(0xFF4FC3F7),

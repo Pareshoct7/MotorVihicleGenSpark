@@ -187,7 +187,6 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
     final accentColor = const Color(0xFF4FC3F7);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0D1117),
       body: Form(
         key: _formKey,
         child: CustomScrollView(
@@ -197,12 +196,12 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
               expandedHeight: 180,
               floating: false,
               pinned: true,
-              backgroundColor: const Color(0xFF0D1117),
-              title: const Text('INSPECTION'),
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              title: Text('INSPECTION'),
               actions: [
                 if (widget.inspection != null)
                   IconButton(
-                    icon: const Icon(Icons.picture_as_pdf_outlined, size: 28),
+                    icon: Icon(Icons.picture_as_pdf_outlined, size: 28),
                     onPressed: () => PdfService.shareTemplateMatchingInspection(widget.inspection!),
                   ),
                 const SizedBox(width: 8),
@@ -210,13 +209,13 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
               bottom: PreferredSize(
                 preferredSize: const Size.fromHeight(60),
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+                  padding: EdgeInsets.fromLTRB(24, 0, 24, 16),
                   child: Column(
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
+                          Text(
                              'SYSTEM READINESS',
                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 2, color: Colors.white24),
                           ),
@@ -243,7 +242,7 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
             ),
             
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(24, 8, 24, 100),
+              padding: EdgeInsets.fromLTRB(24, 8, 24, 100),
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
                   // Section 1: Telemetry
@@ -251,8 +250,8 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                     DropdownButtonFormField<String>(
                       value: _selectedVehicleId,
                       isExpanded: true,
-                      decoration: const InputDecoration(labelText: 'TARGET VEHICLE', prefixIcon: Icon(Icons.directions_car_outlined)),
-                      dropdownColor: const Color(0xFF161B22),
+                      decoration: InputDecoration(labelText: 'TARGET VEHICLE', prefixIcon: Icon(Icons.directions_car_outlined)),
+                      dropdownColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                       items: vehicles.map((v) => DropdownMenuItem(
                         value: v.id, 
                         child: Text(v.registrationNo.toUpperCase(), overflow: TextOverflow.ellipsis)
@@ -263,8 +262,8 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                     DropdownButtonFormField<String>(
                       value: _selectedStoreId,
                       isExpanded: true,
-                      decoration: const InputDecoration(labelText: 'STAGING HUB', prefixIcon: Icon(Icons.store_outlined)),
-                      dropdownColor: const Color(0xFF161B22),
+                      decoration: InputDecoration(labelText: 'STAGING HUB', prefixIcon: Icon(Icons.store_outlined)),
+                      dropdownColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                       items: stores.map((s) => DropdownMenuItem(
                         value: s.id, 
                         child: Text(s.name.toUpperCase(), overflow: TextOverflow.ellipsis)
@@ -293,7 +292,7 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                                     IconButton(
                                       padding: EdgeInsets.zero,
                                       constraints: const BoxConstraints(),
-                                      icon: const Icon(Icons.auto_awesome, color: Color(0xFF00E676), size: 18),
+                                      icon: Icon(Icons.auto_awesome, color: Color(0xFF00E676), size: 18),
                                       tooltip: 'MAGIC ESTIMATE',
                                       onPressed: _magicEstimateOdometer,
                                     ),
@@ -301,7 +300,7 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                                     IconButton(
                                       padding: EdgeInsets.zero,
                                       constraints: const BoxConstraints(),
-                                      icon: const Icon(Icons.camera_alt_outlined, color: Color(0xFF4FC3F7), size: 18),
+                                      icon: Icon(Icons.camera_alt_outlined, color: Color(0xFF4FC3F7), size: 18),
                                       tooltip: 'SCAN ODOMETER',
                                       onPressed: _scanOdometer,
                                     ),
@@ -322,7 +321,7 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                               if (date != null) setState(() => _inspectionDate = date);
                             },
                             child: InputDecorator(
-                              decoration: const InputDecoration(labelText: 'SCAN DATE'),
+                              decoration: InputDecoration(labelText: 'SCAN DATE'),
                               child: FittedBox(
                                 fit: BoxFit.scaleDown,
                                 alignment: Alignment.centerLeft,
@@ -337,8 +336,8 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                     DropdownButtonFormField<String>(
                       value: _selectedDriverId,
                       isExpanded: true,
-                      decoration: const InputDecoration(labelText: 'OPERATOR', prefixIcon: Icon(Icons.person_outline)),
-                      dropdownColor: const Color(0xFF161B22),
+                      decoration: InputDecoration(labelText: 'OPERATOR', prefixIcon: Icon(Icons.person_outline)),
+                      dropdownColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                       items: drivers.map((d) => DropdownMenuItem(
                         value: d.id, 
                         child: Text(d.name.toUpperCase(), overflow: TextOverflow.ellipsis)
@@ -365,10 +364,10 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                       _ChecklistItem('LIVERY / SIGNAGE', _signage, (v) => setState(() => _signage = v)),
                     ]),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       child: TextFormField(
                         controller: _bodyDamageNotesController,
-                        decoration: const InputDecoration(labelText: 'BODY DAMAGE LOG', hintText: 'LOG ANOMALIES...'),
+                        decoration: InputDecoration(labelText: 'BODY DAMAGE LOG', hintText: 'LOG ANOMALIES...'),
                         maxLines: 2,
                         readOnly: widget.isViewOnly,
                       ),
@@ -400,7 +399,7 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                   _buildAnimatedSection(2, 'CORRECTIVE ACTIONS', [
                     TextFormField(
                       controller: _correctiveActionsController,
-                      decoration: const InputDecoration(labelText: 'REACTION LOG', hintText: 'LOG CORRECTIVE MEASURES...'),
+                      decoration: InputDecoration(labelText: 'REACTION LOG', hintText: 'LOG CORRECTIVE MEASURES...'),
                       maxLines: 4,
                       readOnly: widget.isViewOnly,
                     ),
@@ -408,14 +407,14 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
 
                   // Section 4: Sign-off
                   _buildAnimatedSection(3, 'SYSTEM AUTHENTICATION', [
-                    const Text(
+                    Text(
                       'I CONFIRM ALL PERFORMANCE DATA IS ACCURATE.',
                       style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white24),
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _signatureController,
-                      decoration: const InputDecoration(labelText: 'DIGITAL SIGNATURE', prefixIcon: Icon(Icons.history_edu_outlined)),
+                      decoration: InputDecoration(labelText: 'DIGITAL SIGNATURE', prefixIcon: Icon(Icons.history_edu_outlined)),
                       readOnly: widget.isViewOnly,
                       validator: (val) => (val == null || val.isEmpty) ? 'REQUIRED' : null,
                     ),
@@ -436,11 +435,11 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.save_outlined),
+                          Icon(Icons.save_outlined),
                           const SizedBox(width: 12),
                           Text(
                             widget.inspection != null ? 'UPDATE INSPECTION' : 'SAVE INSPECTION',
-                            style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1),
+                            style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1),
                           ),
                         ],
                       ),
@@ -448,7 +447,7 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                     const SizedBox(height: 12),
                     TextButton(
                       onPressed: () => Navigator.pop(context),
-                      child: const Text('CANCEL', style: TextStyle(color: Colors.white24, fontWeight: FontWeight.bold, fontSize: 12)),
+                      child: Text('CANCEL', style: TextStyle(color: Colors.white24, fontWeight: FontWeight.bold, fontSize: 12)),
                     ),
                   ],
                 ]),
@@ -467,10 +466,10 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
       child: SlideTransition(
         position: animation.drive(Tween<Offset>(begin: const Offset(0, 0.05), end: Offset.zero)),
         child: Container(
-          margin: const EdgeInsets.only(bottom: 24),
-          padding: const EdgeInsets.all(24),
+          margin: EdgeInsets.only(bottom: 24),
+          padding: EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: const Color(0xFF161B22),
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(32),
             border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
           ),
@@ -479,7 +478,7 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
             children: [
               Text(
                 title,
-                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 2, color: Colors.white38),
+                style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 2, color: Colors.white38),
               ),
               const SizedBox(height: 24),
               ...children,
@@ -495,10 +494,10 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          padding: EdgeInsets.symmetric(vertical: 8),
           child: Text(
             title,
-            style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: Color(0xFF4FC3F7), letterSpacing: 1),
+            style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: Color(0xFF4FC3F7), letterSpacing: 1),
           ),
         ),
         ...items.map((item) {
@@ -507,7 +506,7 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
             onTap: widget.isViewOnly ? null : () => item.onChanged(!isChecked),
             borderRadius: BorderRadius.circular(12),
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
               child: Row(
                 children: [
                    Container(
@@ -521,7 +520,7 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                        ),
                        color: isChecked ? const Color(0xFF4ADE80).withValues(alpha: 0.1) : Colors.transparent,
                      ),
-                     child: isChecked ? const Icon(Icons.check, size: 14, color: Color(0xFF4ADE80)) : null,
+                     child: isChecked ? Icon(Icons.check, size: 14, color: Color(0xFF4ADE80)) : null,
                    ),
                    const SizedBox(width: 16),
                    Expanded(
@@ -573,21 +572,21 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
         showDialog(
           context: context,
           builder: (context) => Dialog(
-            backgroundColor: const Color(0xFF0D1117),
+            backgroundColor: Theme.of(context).colorScheme.surface,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
             child: Padding(
-              padding: const EdgeInsets.all(32),
+              padding: EdgeInsets.all(32),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.warning_amber_rounded, color: Color(0xFFFF5252), size: 48),
+                  Icon(Icons.warning_amber_rounded, color: Color(0xFFFF5252), size: 48),
                   const SizedBox(height: 24),
-                  const Text(
+                  Text(
                     'DUPLICATE ENTRY',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 1),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
+                  Text(
                     'An inspection already exists for this vehicle in the selected week. System protocols only allow one entry per week.',
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.white70, height: 1.5),
@@ -596,7 +595,7 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                   ElevatedButton(
                     onPressed: () => Navigator.pop(context),
                     style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 50)),
-                    child: const Text('ACKNOWLEDGE'),
+                    child: Text('ACKNOWLEDGE'),
                   ),
                 ],
               ),
