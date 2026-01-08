@@ -57,23 +57,23 @@ class UsageService {
   static Map<String, dynamic> getFeatureMeta(String featureId) {
     switch (featureId) {
       case featureNewInspection:
-        return {'title': 'New Inspection', 'icon': 0xe060}; // Icons.add_task
+        return {'title': 'Speed Check', 'icon': 0xe09b, 'color': 0xFF4FC3F7}; // Icons.auto_awesome (Sparkly/Nitro)
       case featureManageVehicles:
-        return {'title': 'Vehicles', 'icon': 0xe1d1}; // Icons.directions_car
+        return {'title': 'Garage', 'icon': 0xe1d1, 'color': 0xFFFF5252}; // Icons.directions_car
       case featureManageStores:
-        return {'title': 'Stores', 'icon': 0xe60a}; // Icons.store
+        return {'title': 'Store Hub', 'icon': 0xe60a, 'color': 0xFFAB47BC}; // Icons.store
       case featureManageDrivers:
-        return {'title': 'Drivers', 'icon': 0xe491}; // Icons.person
+        return {'title': 'Driver Hub', 'icon': 0xe001, 'color': 0xFF2196F3}; // Icons.badge
       case featureOfflineDrive:
-        return {'title': 'Offline Drive', 'icon': 0xe2a3}; // Icons.folder_shared
+        return {'title': 'Pizza Drive', 'icon': 0xe39a, 'color': 0xFFFFC107}; // Icons.local_pizza
       case featureBulkReports:
-        return {'title': 'Bulk Reports', 'icon': 0xe09b}; // Icons.auto_awesome
+        return {'title': 'Quick Reports', 'icon': 0xf83d, 'color': 0xFF00E676}; // Icons.bolt
       case featureReportsAnalytics:
-        return {'title': 'Analytics', 'icon': 0xe092}; // Icons.assessment
+        return {'title': 'Performance', 'icon': 0xe092, 'color': 0xFF00BCD4}; // Icons.assessment
       case featureReminders:
-        return {'title': 'Reminders', 'icon': 0xe451}; // Icons.notification_important
+        return {'title': 'Alert Hub', 'icon': 0xe451, 'color': 0xFFFF9800}; // Icons.notification_important
       default:
-        return {'title': 'Unknown', 'icon': 0xe33c}; // Icons.help
+        return {'title': 'Unknown', 'icon': 0xe33c, 'color': 0xFF9E9E9E};
     }
   }
 }

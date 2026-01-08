@@ -1,10 +1,10 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 import '../models/vehicle.dart';
 import '../services/database_service.dart';
 import '../services/preferences_service.dart';
-
 import '../services/notification_service.dart';
 
 class VehiclesScreen extends StatefulWidget {
@@ -14,384 +14,279 @@ class VehiclesScreen extends StatefulWidget {
   State<VehiclesScreen> createState() => _VehiclesScreenState();
 }
 
-class _VehiclesScreenState extends State<VehiclesScreen> {
+class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProviderStateMixin {
+  late AnimationController _entranceController;
+  final List<Animation<double>> _staggeredAnimations = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _entranceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    );
+
+    for (int i = 0; i < 10; i++) {
+      _staggeredAnimations.add(
+        CurvedAnimation(
+          parent: _entranceController,
+          curve: Interval(i * 0.1, 0.6 + (i * 0.04), curve: Curves.easeOutCubic),
+        ),
+      );
+    }
+    _entranceController.forward();
+  }
+
+  @override
+  void dispose() {
+    _entranceController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final vehicles = DatabaseService.getAllVehicles();
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Manage Vehicles'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      ),
-      body: vehicles.isEmpty
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.directions_car_outlined,
-                    size: 80,
-                    color: Colors.grey.shade400,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No vehicles yet',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Add your first vehicle',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey.shade500,
-                    ),
-                  ),
-                ],
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar.large(
+            leading: Navigator.canPop(context) ? const BackButton() : null,
+            expandedHeight: 140,
+            floating: false,
+            pinned: true,
+            title: const Text('GARAGE'),
+            actions: [
+              IconButton(
+                onPressed: () => _showVehicleDialog(context),
+                icon: const Icon(Icons.add_circle_outline, size: 28),
               ),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: vehicles.length,
-              itemBuilder: (context, index) {
-                final vehicle = vehicles[index];
-                return _buildVehicleCard(context, vehicle);
-              },
-            ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _showVehicleDialog(context);
-        },
-        child: const Icon(Icons.add),
+              const SizedBox(width: 8),
+            ],
+          ),
+          vehicles.isEmpty
+              ? SliverFillRemaining(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.directions_car_outlined,
+                          size: 80,
+                          color: Colors.white10,
+                        ),
+                        const SizedBox(height: 24),
+                        const Text(
+                          'YOUR GARAGE IS EMPTY',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 2,
+                            color: Colors.white38,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton.icon(
+                          onPressed: () => _showVehicleDialog(context),
+                          icon: const Icon(Icons.add),
+                          label: const Text('ADD FIRST VEHICLE'),
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: const Size(200, 50),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final vehicle = vehicles[index];
+                        final animation = _staggeredAnimations[math.min(index, 9)];
+                        return FadeTransition(
+                          opacity: animation,
+                          child: SlideTransition(
+                            position: animation.drive(
+                              Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero),
+                            ),
+                            child: _buildVehicleCard(context, vehicle),
+                          ),
+                        );
+                      },
+                      childCount: vehicles.length,
+                    ),
+                  ),
+                ),
+        ],
       ),
     );
   }
 
   Widget _buildVehicleCard(BuildContext context, Vehicle vehicle) {
-    final dateFormat = DateFormat('dd/MM/yyyy');
+    final dateFormat = DateFormat('dd MMM yyyy');
     final hasAlerts =
         vehicle.isWofExpired ||
-        vehicle.isWofExpiringSoon ||
         vehicle.isRegoExpired ||
-        vehicle.isRegoExpiringSoon ||
         vehicle.isServiceOverdue ||
+        vehicle.isTyreCheckOverdue;
+
+    final expiringSoon = 
+        vehicle.isWofExpiringSoon ||
+        vehicle.isRegoExpiringSoon ||
         vehicle.isServiceDueSoon ||
-        vehicle.isTyreCheckOverdue ||
         vehicle.isTyreCheckDueSoon;
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      color: hasAlerts ? Colors.red.shade50 : null,
-      child: ExpansionTile(
-        leading: Icon(
-          Icons.directions_car,
-          color: hasAlerts ? Colors.red.shade700 : Colors.blue,
-          size: 32,
-        ),
-        title: Text(
-          vehicle.registrationNo,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
+    final Color statusColor = hasAlerts 
+        ? const Color(0xFFFF5252) 
+        : expiringSoon 
+            ? Colors.orangeAccent 
+            : const Color(0xFF4FC3F7);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      decoration: BoxDecoration(
+        color: const Color(0xFF161B22),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: statusColor.withValues(alpha: 0.2)),
+        boxShadow: [
+          BoxShadow(
+            color: statusColor.withValues(alpha: 0.05),
+            blurRadius: 20,
+            spreadRadius: -5,
           ),
-        ),
-        subtitle: vehicle.make != null || vehicle.model != null
-            ? Text('${vehicle.make ?? ''} ${vehicle.model ?? ''}'.trim())
-            : null,
-        trailing: hasAlerts
-            ? Icon(Icons.warning, color: Colors.red.shade700)
-            : null,
+        ],
+      ),
+      child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            padding: const EdgeInsets.all(20.0),
+            child: Row(
               children: [
-                if (vehicle.year != null)
-                  _buildInfoRow('Year', vehicle.year.toString()),
-
-                if (vehicle.odometerReading != null)
-                   Padding(
-                    padding: const EdgeInsets.only(top: 4.0),
-                    child: _buildInfoRow(
-                      'Odometer', 
-                      '${vehicle.odometerReading} km',
-                    ),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: statusColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                
-                const Divider(height: 24),
-                
-                // WOF Information
-                Row(
-                  children: [
-                    Icon(
-                      Icons.verified_user,
-                      size: 20,
-                      color: vehicle.isWofExpired
-                          ? Colors.red
-                          : vehicle.isWofExpiringSoon
-                              ? Colors.orange
-                              : Colors.green,
-                    ),
-                    const SizedBox(width: 8),
-                    const Text(
-                      'WOF:',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        vehicle.wofExpiryDate != null
-                            ? dateFormat.format(vehicle.wofExpiryDate!)
-                            : 'Not set',
-                        style: TextStyle(
-                          color: vehicle.isWofExpired
-                              ? Colors.red
-                              : vehicle.isWofExpiringSoon
-                                  ? Colors.orange
-                                  : null,
-                        ),
-                      ),
-                    ),
-                    if (vehicle.isWofExpired)
-                      Chip(
-                        label: const Text(
-                          'EXPIRED',
-                          style: TextStyle(fontSize: 10),
-                        ),
-                        backgroundColor: Colors.red,
-                        labelStyle: const TextStyle(color: Colors.white),
-                        padding: EdgeInsets.zero,
-                        visualDensity: VisualDensity.compact,
-                      )
-                    else if (vehicle.isWofExpiringSoon)
-                      Chip(
-                        label: Text(
-                          '${vehicle.wofExpiryDate!.difference(DateTime.now()).inDays} days',
-                          style: const TextStyle(fontSize: 10),
-                        ),
-                        backgroundColor: Colors.orange,
-                        labelStyle: const TextStyle(color: Colors.white),
-                        padding: EdgeInsets.zero,
-                        visualDensity: VisualDensity.compact,
-                      ),
-                  ],
+                  child: Icon(Icons.directions_car, color: statusColor, size: 28),
                 ),
-                const SizedBox(height: 12),
-                
-                // Registration Information
-                Row(
-                  children: [
-                    Icon(
-                      Icons.description,
-                      size: 20,
-                      color: vehicle.isRegoExpired
-                          ? Colors.red
-                          : vehicle.isRegoExpiringSoon
-                              ? Colors.orange
-                              : Colors.green,
-                    ),
-                    const SizedBox(width: 8),
-                    const Text(
-                      'Registration:',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        vehicle.regoExpiryDate != null
-                            ? dateFormat.format(vehicle.regoExpiryDate!)
-                            : 'Not set',
-                        style: TextStyle(
-                          color: vehicle.isRegoExpired
-                              ? Colors.red
-                              : vehicle.isRegoExpiringSoon
-                                  ? Colors.orange
-                                  : null,
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        vehicle.registrationNo,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.white,
                         ),
                       ),
-                    ),
-                    if (vehicle.isRegoExpired)
-                      Chip(
-                        label: const Text(
-                          'EXPIRED',
-                          style: TextStyle(fontSize: 10),
-                        ),
-                        backgroundColor: Colors.red,
-                        labelStyle: const TextStyle(color: Colors.white),
-                        padding: EdgeInsets.zero,
-                        visualDensity: VisualDensity.compact,
-                      )
-                    else if (vehicle.isRegoExpiringSoon)
-                      Chip(
-                        label: Text(
-                          '${vehicle.regoExpiryDate!.difference(DateTime.now()).inDays} days',
-                          style: const TextStyle(fontSize: 10),
-                        ),
-                        backgroundColor: Colors.orange,
-                        labelStyle: const TextStyle(color: Colors.white),
-                        padding: EdgeInsets.zero,
-                        visualDensity: VisualDensity.compact,
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-
-                // Service Information
-                Row(
-                  children: [
-                    Icon(
-                      Icons.build,
-                      size: 20,
-                      color: vehicle.isServiceOverdue
-                          ? Colors.red
-                          : vehicle.isServiceDueSoon
-                              ? Colors.orange
-                              : Colors.green,
-                    ),
-                    const SizedBox(width: 8),
-                    const Text(
-                      'Service:',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        vehicle.serviceDueDate != null
-                            ? dateFormat.format(vehicle.serviceDueDate!)
-                            : 'Not set',
-                        style: TextStyle(
-                          color: vehicle.isServiceOverdue
-                              ? Colors.red
-                              : vehicle.isServiceDueSoon
-                                  ? Colors.orange
-                                  : null,
+                      Text(
+                        '${vehicle.make ?? ''} ${vehicle.model ?? ''}'.trim().toUpperCase(),
+                        style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white38,
+                          letterSpacing: 1,
                         ),
                       ),
-                    ),
-                    if (vehicle.isServiceOverdue)
-                      Chip(
-                        label: const Text(
-                          'OVERDUE',
-                          style: TextStyle(fontSize: 10),
-                        ),
-                        backgroundColor: Colors.red,
-                        labelStyle: const TextStyle(color: Colors.white),
-                        padding: EdgeInsets.zero,
-                        visualDensity: VisualDensity.compact,
-                      )
-                    else if (vehicle.isServiceDueSoon)
-                      Chip(
-                        label: Text(
-                          '${vehicle.serviceDueDate!.difference(DateTime.now()).inDays} days',
-                          style: const TextStyle(fontSize: 10),
-                        ),
-                        backgroundColor: Colors.orange,
-                        labelStyle: const TextStyle(color: Colors.white),
-                        padding: EdgeInsets.zero,
-                        visualDensity: VisualDensity.compact,
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-
-                // Tyre Check Information
-                Row(
-                  children: [
-                    Icon(
-                      Icons.tire_repair,
-                      size: 20,
-                      color: vehicle.isTyreCheckOverdue
-                          ? Colors.red
-                          : vehicle.isTyreCheckDueSoon
-                              ? Colors.orange
-                              : Colors.green,
-                    ),
-                    const SizedBox(width: 8),
-                    const Text(
-                      'Tyre Check:',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        vehicle.tyreCheckDate != null
-                            ? dateFormat.format(vehicle.tyreCheckDate!)
-                            : 'Not set',
-                        style: TextStyle(
-                          color: vehicle.isTyreCheckOverdue
-                              ? Colors.red
-                              : vehicle.isTyreCheckDueSoon
-                                  ? Colors.orange
-                                  : null,
-                        ),
-                      ),
-                    ),
-                    if (vehicle.isTyreCheckOverdue)
-                      Chip(
-                        label: const Text(
-                          'OVERDUE',
-                          style: TextStyle(fontSize: 10),
-                        ),
-                        backgroundColor: Colors.red,
-                        labelStyle: const TextStyle(color: Colors.white),
-                        padding: EdgeInsets.zero,
-                        visualDensity: VisualDensity.compact,
-                      )
-                    else if (vehicle.isTyreCheckDueSoon)
-                      Chip(
-                        label: Text(
-                          '${vehicle.tyreCheckDate!.difference(DateTime.now()).inDays} days',
-                          style: const TextStyle(fontSize: 10),
-                        ),
-                        backgroundColor: Colors.orange,
-                        labelStyle: const TextStyle(color: Colors.white),
-                        padding: EdgeInsets.zero,
-                        visualDensity: VisualDensity.compact,
-                      ),
-                  ],
-                ),
-                
-                const Divider(height: 24),
-                
-                if (vehicle.storeId != null) ...[
-                  _buildInfoRow(
-                    'Store',
-                    DatabaseService.getStore(vehicle.storeId!)?.name ?? 'Unknown',
+                    ],
                   ),
-                  const SizedBox(height: 8),
-                ],
-                
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton.icon(
-                      onPressed: () {
-                        _showVehicleDialog(context, vehicle: vehicle);
-                      },
-                      icon: const Icon(Icons.edit),
-                      label: const Text('Edit'),
-                    ),
-                    TextButton.icon(
-                      onPressed: () {
-                        _deleteVehicle(context, vehicle);
-                      },
-                      icon: const Icon(Icons.delete),
-                      label: const Text('Delete'),
-                      style: TextButton.styleFrom(
-                        foregroundColor: Colors.red,
-                      ),
-                    ),
-                  ],
+                ),
+                if (hasAlerts)
+                  const Icon(Icons.error_outline, color: Color(0xFFFF5252), size: 24),
+              ],
+            ),
+          ),
+          const Divider(height: 1, color: Colors.white10),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: Column(
+              children: [
+                _buildStatusRow(
+                  'WOF', 
+                  vehicle.wofExpiryDate != null ? dateFormat.format(vehicle.wofExpiryDate!) : 'NOT SET',
+                  vehicle.isWofExpired ? const Color(0xFFFF5252) : (vehicle.isWofExpiringSoon ? Colors.orangeAccent : Colors.white70),
+                ),
+                const SizedBox(height: 12),
+                _buildStatusRow(
+                  'REGO', 
+                  vehicle.regoExpiryDate != null ? dateFormat.format(vehicle.regoExpiryDate!) : 'NOT SET',
+                  vehicle.isRegoExpired ? const Color(0xFFFF5252) : (vehicle.isRegoExpiringSoon ? Colors.orangeAccent : Colors.white70),
+                ),
+                const SizedBox(height: 12),
+                _buildStatusRow(
+                  'SERVICE', 
+                  vehicle.serviceDueDate != null ? dateFormat.format(vehicle.serviceDueDate!) : 'NOT SET',
+                  vehicle.isServiceOverdue ? const Color(0xFFFF5252) : (vehicle.isServiceDueSoon ? Colors.orangeAccent : Colors.white70),
+                ),
+                const SizedBox(height: 12),
+                _buildStatusRow(
+                  'TYRES', 
+                  vehicle.tyreCheckDate != null ? dateFormat.format(vehicle.tyreCheckDate!) : 'NOT SET',
+                  vehicle.isTyreCheckOverdue ? const Color(0xFFFF5252) : (vehicle.isTyreCheckDueSoon ? Colors.orangeAccent : Colors.white70),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.05),
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(28),
+                bottomRight: Radius.circular(28),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton.icon(
+                  onPressed: () => _showVehicleDialog(context, vehicle: vehicle),
+                  icon: const Icon(Icons.tune, size: 18),
+                  label: const Text('TUNE'),
+                ),
+                TextButton.icon(
+                  onPressed: () => _deleteVehicle(context, vehicle),
+                  icon: const Icon(Icons.delete_outline, size: 18),
+                  label: const Text('SCRAP'),
+                  style: TextButton.styleFrom(foregroundColor: const Color(0xFFFF5252)),
                 ),
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildStatusRow(String label, String value, Color valueColor) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w900,
+            color: Colors.white38,
+            letterSpacing: 1.5,
+          ),
+        ),
+        Text(
+          value.toUpperCase(),
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: valueColor,
+          ),
+        ),
+      ],
     );
   }
 
@@ -496,209 +391,198 @@ class _VehicleDialogState extends State<VehicleDialog> {
   @override
   Widget build(BuildContext context) {
     final stores = DatabaseService.getAllStores();
-    final dateFormat = DateFormat('dd/MM/yyyy');
+    final dateFormat = DateFormat('dd MMM yyyy');
 
-    return AlertDialog(
-      title: Text(widget.vehicle == null ? 'Add Vehicle' : 'Edit Vehicle'),
-      content: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                controller: _regNoController,
-                decoration: const InputDecoration(
-                  labelText: 'Registration No *',
-                  border: OutlineInputBorder(),
+    return Dialog(
+      backgroundColor: const Color(0xFF0D1117),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      widget.vehicle == null ? 'NEW RIG' : 'TUNE RIG',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -1,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(Icons.close, color: Colors.white38),
+                    ),
+                  ],
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Required';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _makeController,
-                decoration: const InputDecoration(
-                  labelText: 'Make',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _modelController,
-                decoration: const InputDecoration(
-                  labelText: 'Model',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _yearController,
-                decoration: const InputDecoration(
-                  labelText: 'Year',
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.number,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _odometerController,
-                decoration: const InputDecoration(
-                  labelText: 'Odometer (km)',
-                  border: OutlineInputBorder(),
-                  suffixText: 'km',
-                ),
-                keyboardType: TextInputType.number,
-              ),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<String>(
-                value: _selectedStoreId,
-                decoration: const InputDecoration(
-                  labelText: 'Store',
-                  border: OutlineInputBorder(),
-                ),
-                items: stores.map((store) {
-                  return DropdownMenuItem(
-                    value: store.id,
-                    child: Text(store.name),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedStoreId = value;
-                  });
-                },
-              ),
-              const SizedBox(height: 12),
-              InkWell(
-                onTap: () async {
-                  final date = await showDatePicker(
-                    context: context,
-                    initialDate: _wofExpiryDate ?? DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2030),
-                  );
-                  if (date != null) {
-                    setState(() {
-                      _wofExpiryDate = date;
-                    });
-                  }
-                },
-                child: InputDecorator(
+                const SizedBox(height: 24),
+                TextFormField(
+                  controller: _regNoController,
+                  textCapitalization: TextCapitalization.characters,
                   decoration: const InputDecoration(
-                    labelText: 'WOF Expiry Date',
-                    border: OutlineInputBorder(),
-                    suffixIcon: Icon(Icons.calendar_today),
+                    labelText: 'REGISTRATION NO',
+                    prefixIcon: Icon(Icons.badge_outlined),
                   ),
-                  child: Text(
-                    _wofExpiryDate != null
-                        ? dateFormat.format(_wofExpiryDate!)
-                        : 'Select date',
-                  ),
+                  validator: (value) => (value == null || value.isEmpty) ? 'REQUIRED' : null,
                 ),
-              ),
-              const SizedBox(height: 12),
-              InkWell(
-                onTap: () async {
-                  final date = await showDatePicker(
-                    context: context,
-                    initialDate: _regoExpiryDate ?? DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2030),
-                  );
-                  if (date != null) {
-                    setState(() {
-                      _regoExpiryDate = date;
-                    });
-                  }
-                },
-                child: InputDecorator(
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: _makeController,
+                        decoration: const InputDecoration(labelText: 'MAKE'),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: TextFormField(
+                        controller: _modelController,
+                        decoration: const InputDecoration(labelText: 'MODEL'),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: _yearController,
+                        decoration: const InputDecoration(labelText: 'YEAR'),
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: TextFormField(
+                        controller: _odometerController,
+                        decoration: const InputDecoration(
+                          labelText: 'ODOMETER',
+                          suffixText: 'KM',
+                        ),
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  value: _selectedStoreId,
                   decoration: const InputDecoration(
-                    labelText: 'Registration Expiry Date',
-                    border: OutlineInputBorder(),
-                    suffixIcon: Icon(Icons.calendar_today),
+                    labelText: 'BASE HUB',
+                    prefixIcon: Icon(Icons.store_outlined),
                   ),
-                  child: Text(
-                    _regoExpiryDate != null
-                        ? dateFormat.format(_regoExpiryDate!)
-                        : 'Select date',
+                  dropdownColor: const Color(0xFF161B22),
+                  items: stores.map((store) {
+                    return DropdownMenuItem(
+                      value: store.id,
+                      child: Text(store.name.toUpperCase()),
+                    );
+                  }).toList(),
+                  onChanged: (value) => setState(() => _selectedStoreId = value),
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  'MAINTENANCE LOGS',
+                  style: TextStyle(
+                    color: Color(0xFF4FC3F7),
+                    fontSize: 10,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 2,
                   ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              InkWell(
-                onTap: () async {
-                  final date = await showDatePicker(
-                    context: context,
-                    initialDate: _serviceDueDate ?? DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2030),
-                  );
-                  if (date != null) {
-                    setState(() {
-                      _serviceDueDate = date;
-                    });
-                  }
-                },
-                child: InputDecorator(
-                  decoration: const InputDecoration(
-                    labelText: 'Service Due Date',
-                    border: OutlineInputBorder(),
-                    suffixIcon: Icon(Icons.build),
-                  ),
-                  child: Text(
-                    _serviceDueDate != null
-                        ? dateFormat.format(_serviceDueDate!)
-                        : 'Select date',
-                  ),
+                const SizedBox(height: 12),
+                _buildDatePickerTile(
+                  'WOF EXPIRY',
+                  _wofExpiryDate,
+                  (date) => setState(() => _wofExpiryDate = date),
+                  dateFormat,
                 ),
-              ),
-              const SizedBox(height: 12),
-              InkWell(
-                onTap: () async {
-                  final date = await showDatePicker(
-                    context: context,
-                    initialDate: _tyreCheckDate ?? DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2030),
-                  );
-                  if (date != null) {
-                    setState(() {
-                      _tyreCheckDate = date;
-                    });
-                  }
-                },
-                child: InputDecorator(
-                  decoration: const InputDecoration(
-                    labelText: 'Tyre Check Date',
-                    border: OutlineInputBorder(),
-                    suffixIcon: Icon(Icons.tire_repair),
-                  ),
-                  child: Text(
-                    _tyreCheckDate != null
-                        ? dateFormat.format(_tyreCheckDate!)
-                        : 'Select date',
-                  ),
+                const SizedBox(height: 12),
+                _buildDatePickerTile(
+                  'REGISTRATION EXPIRY',
+                  _regoExpiryDate,
+                  (date) => setState(() => _regoExpiryDate = date),
+                  dateFormat,
                 ),
-              ),
-            ],
+                const SizedBox(height: 12),
+                _buildDatePickerTile(
+                  'NEXT SERVICE',
+                  _serviceDueDate,
+                  (date) => setState(() => _serviceDueDate = date),
+                  dateFormat,
+                ),
+                const SizedBox(height: 12),
+                _buildDatePickerTile(
+                  'TYRE CHECK',
+                  _tyreCheckDate,
+                  (date) => setState(() => _tyreCheckDate = date),
+                  dateFormat,
+                ),
+                const SizedBox(height: 32),
+                ElevatedButton(
+                  onPressed: _saveVehicle,
+                  child: Text(widget.vehicle == null ? 'ADD TO GARAGE' : 'SAVE TUNING'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+    );
+  }
+
+  Widget _buildDatePickerTile(
+    String label,
+    DateTime? value,
+    Function(DateTime) onSelected,
+    DateFormat format,
+  ) {
+    return InkWell(
+      onTap: () async {
+        final date = await showDatePicker(
+          context: context,
+          initialDate: value ?? DateTime.now(),
+          firstDate: DateTime(2000),
+          lastDate: DateTime(2030),
+        );
+        if (date != null) onSelected(date);
+      },
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.white10),
         ),
-        ElevatedButton(
-          onPressed: _saveVehicle,
-          child: const Text('Save'),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              value != null ? format.format(value).toUpperCase() : 'SET DATE',
+              style: TextStyle(
+                color: value != null ? const Color(0xFF4FC3F7) : Colors.white24,
+                fontWeight: FontWeight.w900,
+                fontSize: 12,
+              ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 

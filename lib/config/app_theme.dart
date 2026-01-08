@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:animations/animations.dart';
 
 class AppTheme {
   // Domino's Brand Colors
@@ -35,9 +36,17 @@ class AppTheme {
       colorScheme: lightScheme,
       scaffoldBackgroundColor: const Color(0xFFF8F9FF),
       
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android: ZoomPageTransitionsBuilder(),
+          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.macOS: ZoomPageTransitionsBuilder(),
+        },
+      ),
+
       textTheme: const TextTheme(
-        displayLarge: TextStyle(fontWeight: FontWeight.bold),
-        displayMedium: TextStyle(fontWeight: FontWeight.bold),
+        displayLarge: TextStyle(fontWeight: FontWeight.bold, letterSpacing: -1),
+        displayMedium: TextStyle(fontWeight: FontWeight.bold, letterSpacing: -0.5),
         displaySmall: TextStyle(fontWeight: FontWeight.bold),
         headlineMedium: TextStyle(fontWeight: FontWeight.bold),
         titleLarge: TextStyle(fontWeight: FontWeight.bold),
@@ -52,6 +61,7 @@ class AppTheme {
           color: Color(0xFF1A1C1E),
           fontSize: 22,
           fontWeight: FontWeight.bold,
+          letterSpacing: -0.5,
         ),
       ),
       
@@ -66,10 +76,10 @@ class AppTheme {
       ),
       
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        elevation: 4,
+        elevation: 6,
         backgroundColor: dominosBlue,
         foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
       ),
       
       inputDecorationTheme: InputDecorationTheme(
@@ -87,53 +97,62 @@ class AppTheme {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           backgroundColor: dominosBlue,
           foregroundColor: Colors.white,
+          elevation: 2,
         ),
       ),
       
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: dominosBlue,
+          textStyle: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: dominosBlue,
-          side: const BorderSide(color: dominosBlue),
+          side: const BorderSide(color: dominosBlue, width: 2),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),
       ),
     );
   }
   
-  // Dark Theme - Domino's Style
+  // Dark Theme - Neon Stealth Edition
   static ThemeData get darkTheme {
-    final ColorScheme darkScheme = ColorScheme.fromSeed(
-      seedColor: dominosBlue,
-      brightness: Brightness.dark,
-      primary: dominosLightBlue,
-      onPrimary: Colors.white,
-      secondary: dominosRed,
-      onSecondary: Colors.white,
-      surface: const Color(0xFF111318),
-      onSurface: const Color(0xFFE2E2E6),
-      surfaceContainerHighest: const Color(0xFF262626),
-      onSurfaceVariant: const Color(0xFFC4C6D0),
-      outline: const Color(0xFF8E9099),
-    );
+    const primaryColor = Color(0xFF4FC3F7); // Neon Blue
+    const accentColor = Color(0xFFFF5252); // Turbo Red
+    const surfaceColor = Color(0xFF161B22); // Carbon Dark
+    const backgroundColor = Color(0xFF0D1117); // Stealth Deep
 
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      colorScheme: darkScheme,
-      scaffoldBackgroundColor: const Color(0xFF0E1014),
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: primaryColor,
+        brightness: Brightness.dark,
+        primary: primaryColor,
+        secondary: accentColor,
+        surface: backgroundColor,
+        onSurface: const Color(0xFFE2E2E6),
+        outline: const Color(0xFF30363D),
+      ),
+      scaffoldBackgroundColor: backgroundColor,
       
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android: ZoomPageTransitionsBuilder(),
+          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.macOS: ZoomPageTransitionsBuilder(),
+        },
+      ),
+
       textTheme: const TextTheme(
-        displayLarge: TextStyle(fontWeight: FontWeight.bold),
-        displayMedium: TextStyle(fontWeight: FontWeight.bold),
-        displaySmall: TextStyle(fontWeight: FontWeight.bold),
-        headlineMedium: TextStyle(fontWeight: FontWeight.bold),
-        titleLarge: TextStyle(fontWeight: FontWeight.bold),
+        displayLarge: TextStyle(fontWeight: FontWeight.w900, letterSpacing: -1, color: Colors.white),
+        displayMedium: TextStyle(fontWeight: FontWeight.w900, letterSpacing: -0.5, color: Colors.white),
+        displaySmall: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        headlineMedium: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        titleLarge: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: -0.5),
       ),
       
       appBarTheme: const AppBarTheme(
@@ -144,56 +163,71 @@ class AppTheme {
         titleTextStyle: TextStyle(
           color: Color(0xFFE2E2E6),
           fontSize: 22,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w900,
+          letterSpacing: -1,
         ),
       ),
       
       cardTheme: CardThemeData(
         elevation: 0,
-        color: const Color(0xFF1A1C22),
+        color: surfaceColor,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-          side: const BorderSide(color: Color(0xFF2D3036)),
+          borderRadius: BorderRadius.circular(28),
+          side: const BorderSide(color: Colors.white12, width: 0.5),
         ),
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       ),
       
-      floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        elevation: 4,
-        backgroundColor: dominosLightBlue,
-        foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        elevation: 8,
+        backgroundColor: primaryColor,
+        foregroundColor: Colors.black,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       ),
 
       inputDecorationTheme: InputDecorationTheme(
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Color(0xFF2D3036)),
-        ),
         filled: true,
-        fillColor: const Color(0xFF1A1C22),
+        fillColor: const Color(0xFF0D1117),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: const BorderSide(color: Colors.white10),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: const BorderSide(color: Colors.white10),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: const BorderSide(color: primaryColor, width: 2),
+        ),
+        labelStyle: const TextStyle(color: Colors.white70, fontWeight: FontWeight.bold),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       ),
 
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          backgroundColor: dominosLightBlue,
-          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 18),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          backgroundColor: primaryColor,
+          foregroundColor: Colors.black,
+          elevation: 0,
+          textStyle: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1, fontSize: 16),
         ),
       ),
       
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: dominosLightBlue,
+          foregroundColor: primaryColor,
+          textStyle: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 0.5),
         ),
       ),
       
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: dominosLightBlue,
-          side: const BorderSide(color: dominosLightBlue),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          foregroundColor: primaryColor,
+          side: const BorderSide(color: primaryColor, width: 2),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          textStyle: const TextStyle(fontWeight: FontWeight.w900),
         ),
       ),
     );

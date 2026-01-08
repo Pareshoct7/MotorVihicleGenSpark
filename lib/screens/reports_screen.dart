@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/inspection.dart';
@@ -12,7 +13,7 @@ class ReportsScreen extends StatefulWidget {
   State<ReportsScreen> createState() => _ReportsScreenState();
 }
 
-class _ReportsScreenState extends State<ReportsScreen> {
+class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProviderStateMixin {
   String? _selectedVehicleId;
   String? _selectedStoreId;
   String? _selectedDriverId;
@@ -27,10 +28,33 @@ class _ReportsScreenState extends State<ReportsScreen> {
   
   bool get _isSelectionMode => _explicitSelectionMode || _selectedReportIds.isNotEmpty;
 
+  late AnimationController _entranceController;
+  final List<Animation<double>> _staggeredAnimations = [];
+
   @override
   void initState() {
     super.initState();
+    _entranceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    );
+
+    for (int i = 0; i < 10; i++) {
+      _staggeredAnimations.add(
+        CurvedAnimation(
+          parent: _entranceController,
+          curve: Interval(i * 0.1, 0.6 + (i * 0.04), curve: Curves.easeOutCubic),
+        ),
+      );
+    }
     _applyFilters();
+    _entranceController.forward();
+  }
+
+  @override
+  void dispose() {
+    _entranceController.dispose();
+    super.dispose();
   }
 
   void _applyFilters() {
@@ -82,8 +106,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
 
     setState(() {
       _filteredInspections = inspections;
-      // Clear selection if items are filtered out, or keep? 
-      // safer to clear to avoid deleting unseen items
       _selectedReportIds.clear(); 
     });
   }
@@ -176,17 +198,20 @@ class _ReportsScreenState extends State<ReportsScreen> {
     final vehicles = DatabaseService.getAllVehicles();
     final stores = DatabaseService.getAllStores();
     final drivers = DatabaseService.getAllDrivers();
-    final dateFormat = DateFormat('dd/MM/yyyy');
+    final dateFormat = DateFormat('dd MMM yyyy');
 
     return Scaffold(
-      appBar: _isSelectionMode
-          ? AppBar(
+      body: CustomScrollView(
+        slivers: [
+          if (_isSelectionMode)
+            SliverAppBar.medium(
+              pinned: true,
               leading: IconButton(
                 icon: const Icon(Icons.close),
                 onPressed: _clearSelection,
               ),
-              title: Text('${_selectedReportIds.length} Selected'),
-              backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+              title: Text('${_selectedReportIds.length} SELECTED'),
+              backgroundColor: const Color(0xFF161B22),
               actions: [
                 IconButton(
                   icon: Icon(
@@ -195,329 +220,197 @@ class _ReportsScreenState extends State<ReportsScreen> {
                         : Icons.select_all,
                   ),
                   onPressed: _selectAll,
-                  tooltip: _selectedReportIds.length < _filteredInspections.length
-                      ? 'Select All'
-                      : 'Deselect All',
                 ),
                 IconButton(
-                  icon: const Icon(Icons.delete),
+                  icon: const Icon(Icons.delete_outline, color: Color(0xFFFF5252)),
                   onPressed: _deleteSelectedReports,
-                  tooltip: 'Delete Selected',
                 ),
+                const SizedBox(width: 8),
               ],
             )
-          : AppBar(
-              title: const Text('Inspection Reports'),
-              backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          else
+            SliverAppBar.large(
+            automaticallyImplyLeading: true,
+            leading: Navigator.canPop(context) ? const BackButton() : null,
+            expandedHeight: 140,
+              floating: false,
+              pinned: true,
+              title: const Text('INSPECTIONS'),
               actions: [
-                /// Edit/Select Button
                 IconButton(
-                  icon: const Icon(Icons.checklist),
-                  onPressed: () {
-                    setState(() {
-                      _explicitSelectionMode = true;
-                    });
-                  },
-                  tooltip: 'Select Reports',
+                  icon: const Icon(Icons.checklist, size: 28),
+                  onPressed: () => setState(() => _explicitSelectionMode = true),
                 ),
                 if (_filteredInspections.isNotEmpty)
                   IconButton(
-                    icon: const Icon(Icons.picture_as_pdf),
+                    icon: const Icon(Icons.picture_as_pdf_outlined, size: 28),
                     onPressed: _generateBulkPdfs,
-                    tooltip: 'Generate All PDFs',
                   ),
+                const SizedBox(width: 8),
               ],
             ),
-      body: Column(
-        children: [
-          // Filter Section (Hide in selection mode or keep? Keeping for context)
-          if (!_isSelectionMode)
-          Card(
-            margin: const EdgeInsets.all(16),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+          
+          SliverToBoxAdapter(
+            child: ExpansionTile(
+              title: Row(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Filters',
-                        style:
-                            Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                      ),
-                      TextButton.icon(
-                        onPressed: _clearFilters,
-                        icon: const Icon(Icons.clear),
-                        label: const Text('Clear'),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Vehicle Filter
-                  DropdownButtonFormField<String>(
-                    value: _selectedVehicleId,
-                    decoration: const InputDecoration(
-                      labelText: 'Vehicle',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.directions_car),
-                      isDense: true,
-                    ),
-                    items: [
-                      const DropdownMenuItem<String>(
-                        value: null,
-                        child: Text('All Vehicles'),
-                      ),
-                      ...vehicles.map((vehicle) {
-                        return DropdownMenuItem(
-                          value: vehicle.id,
-                          child: Text(vehicle.registrationNo),
-                        );
-                      }),
-                    ],
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedVehicleId = value;
-                      });
-                      _applyFilters();
-                    },
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Store Filter
-                  DropdownButtonFormField<String>(
-                    value: _selectedStoreId,
-                    decoration: const InputDecoration(
-                      labelText: 'Store',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.store),
-                      isDense: true,
-                    ),
-                    items: [
-                      const DropdownMenuItem<String>(
-                        value: null,
-                        child: Text('All Stores'),
-                      ),
-                      ...stores.map((store) {
-                        return DropdownMenuItem(
-                          value: store.id,
-                          child: Text(store.name),
-                        );
-                      }),
-                    ],
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedStoreId = value;
-                      });
-                      _applyFilters();
-                    },
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Driver Filter
-                  DropdownButtonFormField<String>(
-                    value: _selectedDriverId,
-                    decoration: const InputDecoration(
-                      labelText: 'Driver/Employee',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.person),
-                      isDense: true,
-                    ),
-                    items: [
-                      const DropdownMenuItem<String>(
-                        value: null,
-                        child: Text('All Drivers'),
-                      ),
-                      ...drivers.map((driver) {
-                        return DropdownMenuItem(
-                          value: driver.id,
-                          child: Text(driver.name),
-                        );
-                      }),
-                    ],
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedDriverId = value;
-                      });
-                      _applyFilters();
-                    },
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Date Range
-                  Row(
-                    children: [
-                      Expanded(
-                        child: InkWell(
-                          onTap: () async {
-                            final date = await showDatePicker(
-                              context: context,
-                              initialDate: _startDate ?? DateTime.now(),
-                              firstDate: DateTime(2020),
-                              lastDate: DateTime.now(),
-                            );
-                            if (date != null) {
-                              setState(() {
-                                _startDate = date;
-                              });
-                              _applyFilters();
-                            }
-                          },
-                          child: InputDecorator(
-                            decoration: const InputDecoration(
-                              labelText: 'Start Date',
-                              border: OutlineInputBorder(),
-                              isDense: true,
-                            ),
-                            child: Text(
-                              _startDate != null
-                                  ? dateFormat.format(_startDate!)
-                                  : 'All',
-                              style: TextStyle(
-                                color: _startDate != null
-                                    ? null
-                                    : Colors.grey.shade600,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: InkWell(
-                          onTap: () async {
-                            final date = await showDatePicker(
-                              context: context,
-                              initialDate: _endDate ?? DateTime.now(),
-                              firstDate: _startDate ?? DateTime(2020),
-                              lastDate: DateTime.now(),
-                            );
-                            if (date != null) {
-                              setState(() {
-                                _endDate = date;
-                              });
-                              _applyFilters();
-                            }
-                          },
-                          child: InputDecorator(
-                            decoration: const InputDecoration(
-                              labelText: 'End Date',
-                              border: OutlineInputBorder(),
-                              isDense: true,
-                            ),
-                            child: Text(
-                              _endDate != null
-                                  ? dateFormat.format(_endDate!)
-                                  : 'All',
-                              style: TextStyle(
-                                color: _endDate != null
-                                    ? null
-                                    : Colors.grey.shade600,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // Results Count
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .primary
-                          .withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.assignment,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          '${_filteredInspections.length} Reports Found',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                        ),
-                      ],
+                   const Icon(Icons.tune, size: 18, color: Color(0xFF4FC3F7)),
+                   const SizedBox(width: 12),
+                   const Text(
+                    'FILTERS',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 2,
+                      color: Color(0xFF4FC3F7),
                     ),
                   ),
+                  const Spacer(),
+                  if (_selectedVehicleId != null || _selectedStoreId != null || _selectedDriverId != null || _startDate != null || _endDate != null)
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF4FC3F7),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
                 ],
               ),
+              childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+              backgroundColor: const Color(0xFF0D1117),
+              collapsedBackgroundColor: const Color(0xFF0D1117),
+              iconColor: const Color(0xFF4FC3F7),
+              collapsedIconColor: Colors.white24,
+              children: [
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  value: _selectedVehicleId,
+                  decoration: const InputDecoration(labelText: 'VEHICLE', prefixIcon: Icon(Icons.directions_car_outlined)),
+                  dropdownColor: const Color(0xFF161B22),
+                  items: [
+                    const DropdownMenuItem(value: null, child: Text('ALL VEHICLES')),
+                    ...vehicles.map((v) => DropdownMenuItem(value: v.id, child: Text(v.registrationNo))),
+                  ],
+                  onChanged: (val) { setState(() => _selectedVehicleId = val); _applyFilters(); },
+                ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  value: _selectedStoreId,
+                  decoration: const InputDecoration(labelText: 'STORE HUB', prefixIcon: Icon(Icons.store_outlined)),
+                  dropdownColor: const Color(0xFF161B22),
+                  items: [
+                    const DropdownMenuItem(value: null, child: Text('ALL HUBS')),
+                    ...stores.map((s) => DropdownMenuItem(value: s.id, child: Text(s.name.toUpperCase()))),
+                  ],
+                  onChanged: (val) { setState(() => _selectedStoreId = val); _applyFilters(); },
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: InkWell(
+                        onTap: () async {
+                          final date = await showDatePicker(
+                            context: context,
+                            initialDate: _startDate ?? DateTime.now(),
+                            firstDate: DateTime(2020),
+                            lastDate: DateTime.now(),
+                          );
+                          if (date != null) { setState(() => _startDate = date); _applyFilters(); }
+                        },
+                        child: InputDecorator(
+                          decoration: const InputDecoration(labelText: 'FROM'),
+                          child: Text(_startDate != null ? dateFormat.format(_startDate!).toUpperCase() : 'ANYTIME'),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () async {
+                          final date = await showDatePicker(
+                            context: context,
+                            initialDate: _endDate ?? DateTime.now(),
+                            firstDate: _startDate ?? DateTime(2020),
+                            lastDate: DateTime.now(),
+                          );
+                          if (date != null) { setState(() => _endDate = date); _applyFilters(); }
+                        },
+                        child: InputDecorator(
+                          decoration: const InputDecoration(labelText: 'TO'),
+                          child: Text(_endDate != null ? dateFormat.format(_endDate!).toUpperCase() : 'ANYTIME'),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                TextButton.icon(
+                  onPressed: _clearFilters,
+                  icon: const Icon(Icons.refresh, size: 18),
+                  label: const Text('RESET FILTERS'),
+                  style: TextButton.styleFrom(minimumSize: const Size(double.infinity, 50)),
+                ),
+              ],
             ),
           ),
 
-          // Results List
-          Expanded(
-            child: _filteredInspections.isEmpty
-                ? Center(
+          _filteredInspections.isEmpty
+              ? SliverFillRemaining(
+                  child: Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
-                          Icons.search_off,
-                          size: 80,
-                          color: Colors.grey.shade400,
+                        const Icon(Icons.analytics_outlined, size: 80, color: Colors.white10),
+                        const SizedBox(height: 24),
+                        const Text(
+                          'NO TELEMETRY DATA FOUND',
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 2, color: Colors.white38),
                         ),
                         const SizedBox(height: 16),
-                        Text(
-                          'No reports found',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Try adjusting your filters',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey.shade500,
-                          ),
-                        ),
+                        TextButton(onPressed: _clearFilters, child: const Text('RESET FILTERS')),
                       ],
                     ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: _filteredInspections.length,
-                    itemBuilder: (context, index) {
-                      final inspection = _filteredInspections[index];
-                      return _buildInspectionCard(context, inspection);
-                    },
                   ),
-          ),
+                )
+              : SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final inspection = _filteredInspections[index];
+                        final animation = _staggeredAnimations[math.min(index, 9)];
+                        return FadeTransition(
+                          opacity: animation,
+                          child: SlideTransition(
+                            position: animation.drive(Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero)),
+                            child: _buildInspectionCard(context, inspection),
+                          ),
+                        );
+                      },
+                      childCount: _filteredInspections.length,
+                    ),
+                  ),
+                ),
         ],
       ),
     );
   }
-
   Widget _buildInspectionCard(BuildContext context, Inspection inspection) {
     final dateFormat = DateFormat('dd MMM yyyy');
     final isSelected = _selectedReportIds.contains(inspection.id);
+    const accentColor = Color(0xFF4FC3F7);
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      clipBehavior: Clip.antiAlias,
-      elevation: isSelected ? 4 : 1,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: isSelected
-            ? BorderSide(color: Theme.of(context).colorScheme.primary, width: 2)
-            : BorderSide.none,
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF161B22),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: isSelected ? accentColor : accentColor.withValues(alpha: 0.1),
+          width: isSelected ? 2 : 1,
+        ),
       ),
       child: InkWell(
         onLongPress: () => _toggleSelection(inspection.id),
@@ -525,57 +418,95 @@ class _ReportsScreenState extends State<ReportsScreen> {
           if (_isSelectionMode) {
             _toggleSelection(inspection.id);
           } else {
-             // Normal View Action
-             Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => InspectionFormScreen(
-                    inspection: inspection,
-                    isViewOnly: true,
-                  ),
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => InspectionFormScreen(
+                  inspection: inspection,
+                  isViewOnly: true,
                 ),
-              );
+              ),
+            );
           }
         },
-        child: ListTile(
-          leading: _isSelectionMode
-              ? Checkbox(
+        borderRadius: BorderRadius.circular(24),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Row(
+            children: [
+              if (_isSelectionMode) ...[
+                Checkbox(
                   value: isSelected,
                   onChanged: (val) => _toggleSelection(inspection.id),
-                )
-              : CircleAvatar(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  child: Text(
-                    '${inspection.completionPercentage.toInt()}%',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
+                  activeColor: accentColor,
+                ),
+                const SizedBox(width: 8),
+              ] else ...[
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: accentColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Center(
+                    child: Text(
+                      '${inspection.completionPercentage.toInt()}%',
+                      style: const TextStyle(
+                        color: accentColor,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w900,
+                      ),
                     ),
                   ),
                 ),
-          title: Text(
-            inspection.vehicleRegistrationNo,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(dateFormat.format(inspection.inspectionDate)),
-              Text('${inspection.storeName} • ${inspection.employeeName}'),
-            ],
-          ),
-          trailing: _isSelectionMode
-              ? null
-              : PopupMenuButton(
+                const SizedBox(width: 16),
+              ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      inspection.vehicleRegistrationNo.toUpperCase(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${dateFormat.format(inspection.inspectionDate).toUpperCase()} • ${inspection.employeeName.toUpperCase()}',
+                      style: const TextStyle(
+                        color: Colors.white38,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      inspection.storeName.toUpperCase(),
+                      style: const TextStyle(
+                        color: Colors.white24,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (!_isSelectionMode)
+                PopupMenuButton(
+                  icon: const Icon(Icons.more_vert, color: Colors.white30),
+                  color: const Color(0xFF161B22),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   itemBuilder: (context) => [
                     const PopupMenuItem(
                       value: 'view',
                       child: Row(
                         children: [
-                          Icon(Icons.visibility),
-                          SizedBox(width: 8),
-                          Text('View'),
+                          Icon(Icons.visibility_outlined, size: 18),
+                          SizedBox(width: 12),
+                          Text('VIEW', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                         ],
                       ),
                     ),
@@ -583,9 +514,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
                       value: 'pdf',
                       child: Row(
                         children: [
-                          Icon(Icons.picture_as_pdf),
-                          SizedBox(width: 8),
-                          Text('Generate PDF'),
+                          Icon(Icons.picture_as_pdf_outlined, size: 18),
+                          SizedBox(width: 12),
+                          Text('EXPORT PDF', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                         ],
                       ),
                     ),
@@ -602,11 +533,12 @@ class _ReportsScreenState extends State<ReportsScreen> {
                         ),
                       );
                     } else if (value == 'pdf') {
-                      await PdfService.shareTemplateMatchingInspection(
-                          inspection);
+                      await PdfService.shareTemplateMatchingInspection(inspection);
                     }
                   },
                 ),
+            ],
+          ),
         ),
       ),
     );

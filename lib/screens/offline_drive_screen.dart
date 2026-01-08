@@ -16,7 +16,10 @@ class OfflineDriveScreen extends StatefulWidget {
   State<OfflineDriveScreen> createState() => _OfflineDriveScreenState();
 }
 
-class _OfflineDriveScreenState extends State<OfflineDriveScreen> {
+class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTickerProviderStateMixin {
+  late AnimationController _entranceController;
+  late List<Animation<double>> _staggeredAnimations;
+  
   Directory? _currentDir;
   List<FileSystemEntity> _contents = [];
   bool _isLoading = true;
@@ -32,11 +35,32 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> {
   String _searchQuery = '';
   String _sortBy = 'name'; // 'name', 'date', 'type'
   bool _sortAscending = true;
-
   @override
   void initState() {
     super.initState();
+    _initAnimations();
     _initializeDirectory();
+  }
+
+  void _initAnimations() {
+    _entranceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    );
+
+    _staggeredAnimations = List.generate(
+      20,
+      (index) => CurvedAnimation(
+        parent: _entranceController,
+        curve: Interval(
+          0.1 + (index * 0.03),
+          0.6 + (index * 0.03),
+          curve: Curves.easeOutCubic,
+        ),
+      ),
+    );
+
+    _entranceController.forward();
   }
 
   Future<void> _initializeDirectory() async {
@@ -112,20 +136,48 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> {
   Future<void> _deleteSelected() async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Selected'),
-        content: Text('Delete ${_selectedPaths.length} item(s)?\\n\\nThis action cannot be undone.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+      builder: (context) => Dialog(
+        backgroundColor: const Color(0xFF0D1117),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.delete_sweep_outlined, color: Color(0xFFFF5252), size: 48),
+              const SizedBox(height: 24),
+              const Text(
+                'DELETE',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 1),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Permanently delete ${_selectedPaths.length} items from the system? This action is irreversible.',
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.white70, height: 1.5),
+              ),
+              const SizedBox(height: 32),
+              Row(
+                children: [
+                   Expanded(
+                     child: TextButton(
+                       onPressed: () => Navigator.pop(context, false),
+                       child: const Text('ABORT'),
+                     ),
+                   ),
+                   const SizedBox(width: 16),
+                   Expanded(
+                     child: ElevatedButton(
+                       onPressed: () => Navigator.pop(context, true),
+                       style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF5252), foregroundColor: Colors.white),
+                       child: const Text('DELETE'),
+                     ),
+                   ),
+                ],
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Delete'),
-          ),
-        ],
+        ),
       ),
     );
 
@@ -183,15 +235,28 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const AlertDialog(
-        title: Text('Combining PDFs...'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            LinearProgressIndicator(),
-            SizedBox(height: 16),
-            Text('Processing selected files...'),
-          ],
+      builder: (context) => Dialog(
+        backgroundColor: const Color(0xFF0D1117),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CircularProgressIndicator(color: Color(0xFFE91E63)),
+              const SizedBox(height: 24),
+              const Text(
+                'COMPILING DATA',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 2),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Merging selected units into master log...',
+                style: TextStyle(color: Colors.white38, fontSize: 12),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -265,21 +330,48 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> {
   Future<void> _runBackfill() async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Sync & Backfill Drive'),
-        content: const Text(
-          'This will scan for missing reports (last 1 year) and generate them automatically if they don\'t exist.\\n\\nThis may take a minute.',
+      builder: (context) => Dialog(
+        backgroundColor: const Color(0xFF0D1117),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.sync_alt, color: Color(0xFFFFD700), size: 48),
+              const SizedBox(height: 24),
+              const Text(
+                'DRIVE SYNC',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 1),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Initiate system-wide backfill? This will scan historical telemetry for the past year and generate missing reports.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white70, height: 1.5),
+              ),
+              const SizedBox(height: 32),
+              Row(
+                children: [
+                   Expanded(
+                     child: TextButton(
+                       onPressed: () => Navigator.pop(context, false),
+                       child: const Text('LATER'),
+                     ),
+                   ),
+                   const SizedBox(width: 16),
+                   Expanded(
+                     child: ElevatedButton(
+                       onPressed: () => Navigator.pop(context, true),
+                       style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFD700), foregroundColor: Colors.black),
+                       child: const Text('INITIALIZE'),
+                     ),
+                   ),
+                ],
+              ),
+            ],
+          ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Start'),
-          ),
-        ],
       ),
     );
 
@@ -293,20 +385,29 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setStateDialog) {
-            return AlertDialog(
-              title: const Text('Syncing...'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: const [
-                   LinearProgressIndicator(),
-                   SizedBox(height: 16),
-                   Text('Processing vehicle history...'),
-                ],
-              ),
-            );
-          }
+        return Dialog(
+          backgroundColor: const Color(0xFF0D1117),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+          child: Padding(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const CircularProgressIndicator(color: Color(0xFFFFD700)),
+                const SizedBox(height: 24),
+                const Text(
+                  'SYNCING DRIVE',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 2),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Reconstructing telemetry history...',
+                  style: TextStyle(color: Colors.white38, fontSize: 12),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
         );
       },
     );
@@ -339,11 +440,6 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> {
     }
   }
 
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
 
   List<FileSystemEntity> get _filteredAndSortedContents {
     List<FileSystemEntity> result = _contents;
@@ -377,204 +473,201 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> {
   @override
   Widget build(BuildContext context) {
     if (_currentDir == null) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('Offline Drive')),
-        body: const Center(child: CircularProgressIndicator()),
+      return const Scaffold(
+        backgroundColor: Color(0xFF0D1117),
+        body: Center(child: CircularProgressIndicator(color: Color(0xFF4FC3F7))),
       );
     }
     
     final folderName = _currentDir!.path.split('/').last.isEmpty 
-        ? 'Offline Drive' 
-        : _currentDir!.path.split('/').last;
+        ? 'DRIVE' 
+        : _currentDir!.path.split('/').last.toUpperCase();
 
     return Scaffold(
-      appBar: AppBar(
-        title: _isSelectionMode
-            ? Text('${_selectedPaths.length} selected')
-            : _isSearchMode
-                ? TextField(
-                    controller: _searchController,
-                    autofocus: true,
-                    style: const TextStyle(color: Colors.black),
-                    decoration: const InputDecoration(
-                      hintText: 'Search folders or files...',
-                      border: InputBorder.none,
-                      hintStyle: TextStyle(color: Colors.black54),
+      backgroundColor: const Color(0xFF0D1117),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar.large(
+            expandedHeight: 160,
+            floating: false,
+            pinned: true,
+            backgroundColor: const Color(0xFF0D1117),
+            title: _isSelectionMode
+                ? Text('${_selectedPaths.length} SELECTED', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900))
+                : _isSearchMode
+                    ? TextField(
+                        controller: _searchController,
+                        autofocus: true,
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        decoration: const InputDecoration(hintText: 'SCANNING...'),
+                        onChanged: (val) => setState(() => _searchQuery = val.toLowerCase()),
+                      )
+                    : Text(folderName),
+            leading: _isSelectionMode
+                ? IconButton(icon: const Icon(Icons.close), onPressed: _exitSelectionMode)
+                : _isSearchMode
+                    ? IconButton(icon: const Icon(Icons.arrow_back), onPressed: () {
+                        setState(() { _isSearchMode = false; _searchQuery = ''; _searchController.clear(); });
+                      })
+                    : (Navigator.canPop(context) ? const BackButton() : null),
+            actions: _isSelectionMode
+                ? [
+                    IconButton(icon: const Icon(Icons.select_all), onPressed: _selectAll, tooltip: 'Select All'),
+                    IconButton(icon: const Icon(Icons.share_outlined), onPressed: _shareSelected, tooltip: 'Share'),
+                    IconButton(icon: const Icon(Icons.picture_as_pdf_outlined), onPressed: _combineSelected, tooltip: 'Combine PDFs'),
+                    IconButton(icon: const Icon(Icons.delete_outline, color: Color(0xFFFF5252)), onPressed: _deleteSelected, tooltip: 'Delete'),
+                  ]
+                : [
+                    if (!_isSearchMode) ...[
+                      if (folderName == 'DATA DRIVE' || folderName == 'OFFLINE DRIVE')
+                        IconButton(icon: const Icon(Icons.sync_outlined), onPressed: _isBackfilling ? null : _runBackfill, tooltip: 'Sync'),
+                      IconButton(icon: const Icon(Icons.search_outlined), onPressed: () => setState(() => _isSearchMode = true), tooltip: 'Search'),
+                      IconButton(icon: const Icon(Icons.library_books_outlined), onPressed: _combinePdfs, tooltip: 'Combine All'),
+                      PopupMenuButton<String>(
+                        icon: const Icon(Icons.sort_outlined),
+                        color: const Color(0xFF161B22),
+                        onSelected: (value) => value == 'toggle_order' ? setState(() => _sortAscending = !_sortAscending) : setState(() => _sortBy = value),
+                        itemBuilder: (context) => [
+                          _buildSortItem('name', Icons.sort_by_alpha, 'Name'),
+                          _buildSortItem('date', Icons.calendar_today_outlined, 'Date'),
+                          _buildSortItem('type', Icons.category_outlined, 'Type'),
+                          const PopupMenuDivider(height: 1),
+                          PopupMenuItem(
+                            value: 'toggle_order',
+                            child: Row(children: [Icon(_sortAscending ? Icons.arrow_upward : Icons.arrow_downward, size: 18), const SizedBox(width: 8), Text(_sortAscending ? 'ASCENDING' : 'DESCENDING', style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold))]),
+                          ),
+                        ],
+                      ),
+                      if (_contents.isNotEmpty)
+                        IconButton(icon: const Icon(Icons.checklist_outlined), onPressed: () => _enterSelectionMode(''), tooltip: 'Select'),
+                    ]
+                  ],
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(40),
+              child: _buildBreadcrumbs(),
+            ),
+          ),
+          
+          if (_isLoading)
+            const SliverFillRemaining(child: Center(child: CircularProgressIndicator(color: Color(0xFF4FC3F7))))
+          else if (_filteredAndSortedContents.isEmpty)
+            SliverFillRemaining(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.folder_off_outlined, size: 64, color: Colors.white.withValues(alpha: 0.05)),
+                    const SizedBox(height: 16),
+                    Text(
+                      _searchQuery.isEmpty ? 'EMPTY SYSTEM HUB' : 'NO TELEMETRY MATCHES',
+                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 2, color: Colors.white24),
                     ),
-                    onChanged: (value) {
-                      setState(() {
-                        _searchQuery = value.toLowerCase();
-                      });
-                    },
-                  )
-                : Text(folderName),
-        backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
-        leading: _isSelectionMode
-            ? IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: _exitSelectionMode,
-              )
-            : _isSearchMode
-                ? IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () {
-                      setState(() {
-                        _isSearchMode = false;
-                        _searchQuery = '';
-                        _searchController.clear();
-                      });
-                    },
-                  )
-                : null,
-        actions: _isSelectionMode
-            ? [
-                IconButton(
-                  icon: const Icon(Icons.select_all),
-                  onPressed: _selectAll,
-                  tooltip: 'Select All',
+                  ],
                 ),
-                IconButton(
-                  icon: const Icon(Icons.share),
-                  onPressed: _shareSelected,
-                  tooltip: 'Share',
-                ),
-                IconButton(
-                  icon: const Icon(Icons.picture_as_pdf),
-                  onPressed: _combineSelected,
-                  tooltip: 'Combine PDFs',
-                ),
-                IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: _deleteSelected,
-                  tooltip: 'Delete',
-                ),
-              ]
-            : [
-                if (!_isSearchMode) ...[
-                  if (folderName == 'Offline Drive' || folderName == 'OfflineDrive')
-                    IconButton(
-                      icon: const Icon(Icons.sync),
-                      onPressed: _isBackfilling ? null : _runBackfill,
-                      tooltip: 'Sync & Backfill',
-                    ),
-                  IconButton(
-                    icon: const Icon(Icons.search),
-                    onPressed: () => setState(() => _isSearchMode = true),
-                    tooltip: 'Search',
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.library_books),
-                    onPressed: _combinePdfs,
-                    tooltip: 'Combine All PDFs',
-                  ),
-                  PopupMenuButton<String>(
-                    icon: const Icon(Icons.sort),
-                    onSelected: (value) {
-                      if (value == 'toggle_order') {
-                        setState(() => _sortAscending = !_sortAscending);
-                      } else {
-                        setState(() => _sortBy = value);
-                      }
-                    },
-                    itemBuilder: (context) => [
-                      PopupMenuItem(
-                        value: 'name',
-                        child: Row(
-                          children: [
-                            Icon(Icons.sort_by_alpha, color: _sortBy == 'name' ? Theme.of(context).primaryColor : null),
-                            const SizedBox(width: 8),
-                            const Text('Sort by Name'),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem(
-                        value: 'date',
-                        child: Row(
-                          children: [
-                            Icon(Icons.calendar_today, color: _sortBy == 'date' ? Theme.of(context).primaryColor : null),
-                            const SizedBox(width: 8),
-                            const Text('Sort by Date'),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem(
-                        value: 'type',
-                        child: Row(
-                          children: [
-                            Icon(Icons.category, color: _sortBy == 'type' ? Theme.of(context).primaryColor : null),
-                            const SizedBox(width: 8),
-                            const Text('Sort by Type'),
-                          ],
-                        ),
-                      ),
-                      const PopupMenuDivider(),
-                      PopupMenuItem(
-                        value: 'toggle_order',
-                        child: Row(
-                          children: [
-                            Icon(_sortAscending ? Icons.arrow_upward : Icons.arrow_downward),
-                            const SizedBox(width: 8),
-                            Text(_sortAscending ? 'Ascending' : 'Descending'),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (_contents.isNotEmpty)
-                    IconButton(
-                      icon: const Icon(Icons.checklist),
-                      onPressed: () => _enterSelectionMode(''),
-                      tooltip: 'Select',
-                    ),
-                ]
-              ],
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _filteredAndSortedContents.isEmpty
-              ? Center(
-                  child: Text(_searchQuery.isEmpty ? 'Empty Folder' : 'No matches found'),
-                )
-              : ListView.builder(
-                  itemCount: _filteredAndSortedContents.length,
-                  itemBuilder: (context, index) {
+              ),
+            )
+          else
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
                     final item = _filteredAndSortedContents[index];
                     final name = item.path.split('/').last;
                     final isDir = item is Directory;
                     final isSelected = _selectedPaths.contains(item.path);
+                    
+                    final animation = _staggeredAnimations[index % 20];
 
-                    return ListTile(
-                      leading: _isSelectionMode
-                          ? Checkbox(
-                              value: isSelected,
-                              onChanged: (_) => _toggleSelection(item.path),
-                            )
-                          : Icon(
-                              isDir ? Icons.folder : Icons.picture_as_pdf,
-                              color: isDir ? Colors.amber : Colors.red,
-                              size: 32,
+                    return FadeTransition(
+                      opacity: animation,
+                      child: SlideTransition(
+                        position: animation.drive(Tween<Offset>(begin: const Offset(0.1, 0), end: Offset.zero)),
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF161B22),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: isSelected ? const Color(0xFF4FC3F7) : Colors.white.withValues(alpha: 0.05),
+                              width: isSelected ? 2 : 1,
                             ),
-                      title: Text(name),
-                      subtitle: _sortBy == 'date' && !isDir 
-                        ? Text('Date: ${DateFormat('dd MMM yyyy HH:mm').format(item.statSync().modified)}')
-                        : null,
-                      trailing: isDir && !_isSelectionMode ? const Icon(Icons.chevron_right) : null,
-                      selected: isSelected,
-                      onLongPress: () => _enterSelectionMode(item.path),
-                      onTap: () {
-                        if (_isSelectionMode) {
-                          _toggleSelection(item.path);
-                        } else {
-                          if (isDir) {
-                            _navigateTo(item as Directory);
-                          } else {
-                            _openFile(item as File);
-                          }
-                        }
-                      },
+                          ),
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                            leading: isDir
+                                ? Container(
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(color: const Color(0xFF1C222D), borderRadius: BorderRadius.circular(12)),
+                                    child: const Icon(Icons.folder_open_outlined, color: Color(0xFF4FC3F7), size: 24),
+                                  )
+                                : Container(
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(color: const Color(0xFF1C222D), borderRadius: BorderRadius.circular(12)),
+                                    child: const Icon(Icons.description_outlined, color: Color(0xFFE91E63), size: 24),
+                                  ),
+                            title: Text(
+                              name.toUpperCase(),
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 0.5,
+                                color: isSelected ? const Color(0xFF4FC3F7) : Colors.white70,
+                              ),
+                            ),
+                            subtitle: Text(
+                              isDir ? 'FOLDER' : 'REPORT PDF',
+                              style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white24, letterSpacing: 1),
+                            ),
+                            trailing: isDir && !_isSelectionMode 
+                                ? const Icon(Icons.chevron_right, color: Colors.white10) 
+                                : _isSelectionMode
+                                    ? Icon(
+                                        isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
+                                        color: isSelected ? const Color(0xFF4FC3F7) : Colors.white10,
+                                      )
+                                    : null,
+                            onLongPress: () => _enterSelectionMode(item.path),
+                            onTap: () {
+                              if (_isSelectionMode) {
+                                _toggleSelection(item.path);
+                              } else {
+                                if (isDir) {
+                                  _navigateTo(item as Directory);
+                                } else {
+                                  _openFile(item as File);
+                                }
+                              }
+                            },
+                          ),
+                        ),
+                      ),
                     );
                   },
+                  childCount: _filteredAndSortedContents.length,
                 ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  PopupMenuItem<String> _buildSortItem(String value, IconData icon, String label) {
+    final isSelected = _sortBy == value;
+    return PopupMenuItem(
+      value: value,
+      child: Row(
+        children: [
+          Icon(icon, size: 18, color: isSelected ? const Color(0xFF4FC3F7) : Colors.white24),
+          const SizedBox(width: 8),
+          Text(label.toUpperCase(), style: TextStyle(
+            fontSize: 10, 
+            fontWeight: FontWeight.bold,
+            color: isSelected ? const Color(0xFF4FC3F7) : Colors.white70,
+          )),
+        ],
+      ),
     );
   }
 
@@ -584,21 +677,47 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> {
     
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Combine All PDFs'),
-        content: const Text(
-          'This will combine all PDFs in this folder and its subfolders into a single PDF.\\n\\nContinue?',
+      builder: (context) => Dialog(
+        backgroundColor: const Color(0xFF0D1117),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.library_books_outlined, color: Color(0xFF4FC3F7), size: 48),
+              const SizedBox(height: 24),
+              const Text(
+                'COMBINE ALL',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 1),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Combine all PDFs in this hub and its sub-sectors into a single master log?',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white70, height: 1.5),
+              ),
+              const SizedBox(height: 32),
+              Row(
+                children: [
+                   Expanded(
+                     child: TextButton(
+                       onPressed: () => Navigator.pop(context, false),
+                       child: const Text('ABORT'),
+                     ),
+                   ),
+                   const SizedBox(width: 16),
+                   Expanded(
+                     child: ElevatedButton(
+                       onPressed: () => Navigator.pop(context, true),
+                       child: const Text('PROCEED'),
+                     ),
+                   ),
+                ],
+              ),
+            ],
+          ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Combine'),
-          ),
-        ],
       ),
     );
 
@@ -608,15 +727,28 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const AlertDialog(
-        title: Text('Combining PDFs...'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            LinearProgressIndicator(),
-            SizedBox(height: 16),
-            Text('Processing PDFs...'),
-          ],
+      builder: (context) => Dialog(
+        backgroundColor: const Color(0xFF0D1117),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CircularProgressIndicator(color: Color(0xFF4FC3F7)),
+              const SizedBox(height: 24),
+              const Text(
+                'COMPILING HUB',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 2),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Scanning and merging all sub-sector telemetry...',
+                style: TextStyle(color: Colors.white38, fontSize: 12),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -654,5 +786,79 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> {
 
   String _sanitizeName(String input) {
     return input.replaceAll(RegExp(r'[<>:"/\\|?*]'), '_').trim();
+  }
+
+  Widget _buildBreadcrumbs() {
+    return FutureBuilder<Directory>(
+      future: OfflineDriveService.getRootDirectory(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return const SizedBox.shrink();
+        
+        final rootPath = snapshot.data!.path;
+        final relativePath = _currentDir!.path.replaceFirst(rootPath, '');
+        final parts = relativePath.split('/').where((p) => p.isNotEmpty).toList();
+        
+        return Container(
+          height: 40,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            children: [
+              _buildBreadcrumbItem('DRIVE', () async {
+                final rootDir = await OfflineDriveService.getRootDirectory();
+                if (_currentDir?.path != rootDir.path) {
+                  _navigateTo(rootDir);
+                }
+              }),
+              ...parts.asMap().entries.map((entry) {
+                final index = entry.key;
+                final name = entry.value;
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.chevron_right, size: 14, color: Colors.white10),
+                    _buildBreadcrumbItem(name.toUpperCase(), () {
+                      // Construct path to this point
+                      String path = rootPath;
+                      for (int i = 0; i <= index; i++) {
+                        path += '/${parts[i]}';
+                      }
+                      _navigateTo(Directory(path));
+                    }),
+                  ],
+                );
+              }),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildBreadcrumbItem(String label, VoidCallback onTap) {
+    return TextButton(
+      onPressed: onTap,
+      style: TextButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        minimumSize: Size.zero,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w900,
+          color: Color(0xFF4FC3F7),
+          letterSpacing: 1,
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _entranceController.dispose();
+    super.dispose();
   }
 }

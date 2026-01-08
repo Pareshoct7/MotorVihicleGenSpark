@@ -38,276 +38,256 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
     final drivers = DatabaseService.getAllDrivers();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Bulk Backdated Reports'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      ),
       body: Form(
         key: _formKey,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Generate Multiple Inspections',
-                        style:
-                            Theme.of(context).textTheme.titleLarge?.copyWith(
-                                  fontWeight: FontWeight.bold,
+        child: CustomScrollView(
+          slivers: [
+            SliverAppBar.large(
+              leading: Navigator.canPop(context) ? const BackButton() : null,
+              expandedHeight: 140,
+              floating: false,
+              pinned: true,
+              title: const Text('BATCH GENERATOR'),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.all(24),
+              sliver: SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF161B22),
+                        borderRadius: BorderRadius.circular(32),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Row(
+                            children: [
+                              Icon(Icons.bolt, color: Color(0xFFFFD700)),
+                              SizedBox(width: 12),
+                              Text(
+                                'BATCH PARAMETERS',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 2,
+                                  color: Colors.white70,
                                 ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 24),
+                          
+                          // Mode Selection
+                          _buildPremiumSegmentedButton(),
+                          const SizedBox(height: 32),
+
+                          // Vehicle Selection
+                          DropdownButtonFormField<String>(
+                            value: _selectedVehicleId,
+                            decoration: const InputDecoration(
+                              labelText: 'TARGET VEHICLE',
+                              prefixIcon: Icon(Icons.directions_car_outlined),
+                            ),
+                            dropdownColor: const Color(0xFF161B22),
+                            items: vehicles.map((v) => DropdownMenuItem(value: v.id, child: Text(v.registrationNo))).toList(),
+                            onChanged: (val) => setState(() => _selectedVehicleId = val),
+                            validator: (val) => val == null ? 'REQUIRED' : null,
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Store Selection
+                          DropdownButtonFormField<String>(
+                            value: _selectedStoreId,
+                            decoration: const InputDecoration(
+                              labelText: 'BASE HUB',
+                              prefixIcon: Icon(Icons.store_outlined),
+                            ),
+                            dropdownColor: const Color(0xFF161B22),
+                            items: stores.map((s) => DropdownMenuItem(value: s.id, child: Text(s.name.toUpperCase()))).toList(),
+                            onChanged: (val) => setState(() => _selectedStoreId = val),
+                            validator: (val) => val == null ? 'REQUIRED' : null,
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Driver Selection
+                          DropdownButtonFormField<String>(
+                            value: _selectedDriverId,
+                            decoration: const InputDecoration(
+                              labelText: 'ASSIGNED DRIVER',
+                              prefixIcon: Icon(Icons.person_outline),
+                            ),
+                            dropdownColor: const Color(0xFF161B22),
+                            items: drivers.map((d) => DropdownMenuItem(value: d.id, child: Text(d.name.toUpperCase()))).toList(),
+                            onChanged: (val) => setState(() => _selectedDriverId = val),
+                            validator: (val) => val == null ? 'REQUIRED' : null,
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Mode Specific Inputs
+                          if (_selectedMode == BulkReportMode.count)
+                            TextFormField(
+                              controller: _numberOfReportsController,
+                              decoration: const InputDecoration(
+                                labelText: 'BATCH COUNT (MONDAYS)',
+                                prefixIcon: Icon(Icons.tag),
+                                helperText: 'Enter 1-50 past Mondays',
+                                helperStyle: TextStyle(color: Colors.white24),
+                              ),
+                              keyboardType: TextInputType.number,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) return 'REQUIRED';
+                                final num = int.tryParse(value);
+                                if (num == null || num < 1 || num > 50) return 'MAX 50';
+                                return null;
+                              },
+                            ),
+                          
+                          if (_selectedMode == BulkReportMode.dateRange) ...[
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: InkWell(
+                                    onTap: () async {
+                                      final date = await showDatePicker(
+                                        context: context,
+                                        initialDate: _startDate,
+                                        firstDate: DateTime(2020),
+                                        lastDate: DateTime.now(),
+                                      );
+                                      if (date != null) {
+                                        setState(() {
+                                          _startDate = date;
+                                          if (_startDate.isAfter(_endDate)) _endDate = _startDate;
+                                        });
+                                      }
+                                    },
+                                    child: InputDecorator(
+                                      decoration: const InputDecoration(labelText: 'START DATE'),
+                                      child: Text(DateFormat('dd/MM/yyyy').format(_startDate)),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: InkWell(
+                                    onTap: () async {
+                                      final date = await showDatePicker(
+                                        context: context,
+                                        initialDate: _endDate,
+                                        firstDate: _startDate,
+                                        lastDate: DateTime.now(),
+                                      );
+                                      if (date != null) setState(() => _endDate = date);
+                                    },
+                                    child: InputDecorator(
+                                      decoration: const InputDecoration(labelText: 'END DATE'),
+                                      child: Text(DateFormat('dd/MM/yyyy').format(_endDate)),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+
+                    // Generate Button
+                    ElevatedButton(
+                      onPressed: _isGenerating ? null : _generateBulkReports,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFFD700), // Gold for Nitro
+                        foregroundColor: Colors.black,
+                        minimumSize: const Size(double.infinity, 64),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                        elevation: 0,
+                      ).copyWith(
+                        backgroundColor: WidgetStateProperty.resolveWith((states) {
+                          if (states.contains(WidgetState.disabled)) return Colors.white10;
+                          return const Color(0xFFFFD700);
+                        }),
+                      ),
+                      child: _isGenerating
+                          ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(strokeWidth: 3, valueColor: AlwaysStoppedAnimation<Color>(Colors.black)),
+                            )
+                          : const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.bolt, size: 24),
+                                SizedBox(width: 12),
+                                Text(
+                                  'GENERATE BATCH',
+                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 1),
+                                ),
+                              ],
+                            ),
+                    ),
+
+                    const SizedBox(height: 16),
+                    if (!_isGenerating)
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('CANCEL', style: TextStyle(color: Colors.white24, fontSize: 12, letterSpacing: 1, fontWeight: FontWeight.bold)),
+                      ),
+                    
+                    if (_isGenerating) ...[
+                      const SizedBox(height: 16),
+                      const Center(
+                        child: Text(
+                          'INJECTING DATA...',
+                          style: TextStyle(color: Color(0xFFFFD700), fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 2),
+                        ),
                       ),
                       const SizedBox(height: 8),
-                      Text(
-                        'Create multiple backdated inspection reports for Mondays.',
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                          fontSize: 14,
-                        ),
+                      const LinearProgressIndicator(
+                        backgroundColor: Colors.white10,
+                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFD700)),
+                        minHeight: 2,
                       ),
-                      const SizedBox(height: 24),
-
-                      // Mode Selection
-                      SegmentedButton<BulkReportMode>(
-                        segments: const [
-                          ButtonSegment<BulkReportMode>(
-                            value: BulkReportMode.dateRange,
-                            label: Text('By Date Range'),
-                            icon: Icon(Icons.date_range),
-                          ),
-                          ButtonSegment<BulkReportMode>(
-                            value: BulkReportMode.count,
-                            label: Text('By Count'),
-                            icon: Icon(Icons.numbers),
-                          ),
-                        ],
-                        selected: <BulkReportMode>{_selectedMode},
-                        onSelectionChanged: (Set<BulkReportMode> newSelection) {
-                          setState(() {
-                            _selectedMode = newSelection.first;
-                          });
-                        },
-                      ),
-                      const SizedBox(height: 24),
-
-                      // Vehicle Selection
-                      DropdownButtonFormField<String>(
-                        value: _selectedVehicleId,
-                        decoration: const InputDecoration(
-                          labelText: 'Vehicle *',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.directions_car),
-                        ),
-                        items: vehicles.map((vehicle) {
-                          return DropdownMenuItem(
-                            value: vehicle.id,
-                            child: Text(vehicle.registrationNo),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedVehicleId = value;
-                          });
-                        },
-                        validator: (value) {
-                          if (value == null) return 'Required';
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Store Selection
-                      DropdownButtonFormField<String>(
-                        value: _selectedStoreId,
-                        decoration: const InputDecoration(
-                          labelText: 'Store *',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.store),
-                        ),
-                        items: stores.map((store) {
-                          return DropdownMenuItem(
-                            value: store.id,
-                            child: Text(store.name),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedStoreId = value;
-                          });
-                        },
-                        validator: (value) {
-                          if (value == null) return 'Required';
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Driver Selection
-                      DropdownButtonFormField<String>(
-                        value: _selectedDriverId,
-                        decoration: const InputDecoration(
-                          labelText: 'Driver/Employee *',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.person),
-                        ),
-                        items: drivers.map((driver) {
-                          return DropdownMenuItem(
-                            value: driver.id,
-                            child: Text(driver.name),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedDriverId = value;
-                          });
-                        },
-                        validator: (value) {
-                          if (value == null) return 'Required';
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Mode Specific Inputs
-                      if (_selectedMode == BulkReportMode.count)
-                        TextFormField(
-                          controller: _numberOfReportsController,
-                          decoration: const InputDecoration(
-                            labelText: 'Number of Reports (Mondays) *',
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.numbers),
-                            helperText: 'How many past Mondays to include',
-                          ),
-                          keyboardType: TextInputType.number,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Required';
-                            }
-                            final num = int.tryParse(value);
-                            if (num == null || num < 1 || num > 50) {
-                              return 'Enter number between 1-50';
-                            }
-                            return null;
-                          },
-                        ),
-                      
-                      if (_selectedMode == BulkReportMode.dateRange) ...[
-                        // Start Date
-                        InkWell(
-                          onTap: () async {
-                            final date = await showDatePicker(
-                              context: context,
-                              initialDate: _startDate,
-                              firstDate: DateTime(2020),
-                              lastDate: DateTime.now(),
-                            );
-                            if (date != null) {
-                              setState(() {
-                                _startDate = date;
-                                if (_startDate.isAfter(_endDate)) {
-                                  _endDate = _startDate;
-                                }
-                              });
-                            }
-                          },
-                          child: InputDecorator(
-                            decoration: const InputDecoration(
-                              labelText: 'Start Date *',
-                              border: OutlineInputBorder(),
-                              prefixIcon: Icon(Icons.calendar_today),
-                            ),
-                            child: Text(
-                              DateFormat('dd/MM/yyyy').format(_startDate),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-
-                        // End Date
-                        InkWell(
-                          onTap: () async {
-                            final date = await showDatePicker(
-                              context: context,
-                              initialDate: _endDate,
-                              firstDate: _startDate,
-                              lastDate: DateTime.now(),
-                            );
-                            if (date != null) {
-                              setState(() {
-                                _endDate = date;
-                              });
-                            }
-                          },
-                          child: InputDecorator(
-                            decoration: const InputDecoration(
-                              labelText: 'End Date *',
-                              border: OutlineInputBorder(),
-                              prefixIcon: Icon(Icons.calendar_today),
-                            ),
-                            child: Text(
-                              DateFormat('dd/MM/yyyy').format(_endDate),
-                            ),
-                          ),
-                        ),
-                      ],
                     ],
-                  ),
+                  ],
                 ),
               ),
-
-              const SizedBox(height: 24),
-
-              // Generate Button
-              ElevatedButton.icon(
-                onPressed: _isGenerating ? null : _generateBulkReports,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Colors.white,
-                ),
-                icon: _isGenerating
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
-                      )
-                    : const Icon(Icons.auto_awesome),
-                label: Text(
-                  _isGenerating
-                      ? 'Generating Reports...'
-                      : 'Generate Bulk Reports',
-                  style: const TextStyle(fontSize: 16),
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              if (_isGenerating)
-                const LinearProgressIndicator()
-              else
-                OutlinedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  child: const Text(
-                    'Cancel',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
+    );
+  }
+
+  Widget _buildPremiumSegmentedButton() {
+    return SegmentedButton<BulkReportMode>(
+      style: SegmentedButton.styleFrom(
+        backgroundColor: const Color(0xFF0D1117),
+        selectedBackgroundColor: const Color(0xFF1F2937),
+        selectedForegroundColor: const Color(0xFFFFD700),
+        foregroundColor: Colors.white38,
+        side: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      ),
+      segments: const [
+        ButtonSegment<BulkReportMode>(
+          value: BulkReportMode.dateRange,
+          label: Text('RANGE', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1)),
+          icon: Icon(Icons.date_range_outlined, size: 16),
+        ),
+        ButtonSegment<BulkReportMode>(
+          value: BulkReportMode.count,
+          label: Text('COUNT', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1)),
+          icon: Icon(Icons.tag_outlined, size: 16),
+        ),
+      ],
+      selected: <BulkReportMode>{_selectedMode},
+      onSelectionChanged: (val) => setState(() => _selectedMode = val.first),
     );
   }
 
@@ -339,17 +319,41 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
         if (mounted) {
            showDialog(
             context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('Odometer Outdated'),
-              content: const Text(
-                'The vehicle odometer reading is older than 30 days. Please update the vehicle details with the current odometer reading before generating reports.',
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('OK'),
+            builder: (context) => Dialog(
+              backgroundColor: const Color(0xFF0D1117),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.speed, color: Color(0xFFFF5252), size: 48),
+                    const SizedBox(height: 24),
+                    const Text(
+                      'OUTDATED ODOMETER',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'The vehicle odometer reading is older than 30 days. Please update the vehicle details with current telemetry before activating Nitro.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.white70, height: 1.5),
+                    ),
+                    const SizedBox(height: 32),
+                    ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 50),
+                      ),
+                      child: const Text('ACKNOWLEDGE'),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           );
         }
@@ -468,21 +472,51 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
         // Ask if user wants to generate PDFs
         final generatePdfs = await showDialog<bool>(
           context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Success!'),
-            content: Text(
-              'Inspections created successfully for ${targetDates.length} Mondays!\n\nWould you like to generate PDFs for all reports now?',
+          builder: (context) => Dialog(
+            backgroundColor: const Color(0xFF0D1117),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+            child: Padding(
+              padding: const EdgeInsets.all(32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.check_circle_outline, color: Color(0xFF4FC3F7), size: 48),
+                  const SizedBox(height: 24),
+                  const Text(
+                    'BATCH COMPLETE',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    '${targetDates.length} reports injected into the system. High-speed generation complete.',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: Colors.white70, height: 1.5),
+                  ),
+                  const SizedBox(height: 32),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextButton(
+                          onPressed: () => Navigator.pop(context, false),
+                          child: const Text('LATER'),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () => Navigator.pop(context, true),
+                          child: const Text('EXPORT PDFs'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Later'),
-              ),
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text('Generate PDFs'),
-              ),
-            ],
           ),
         );
 
@@ -526,15 +560,31 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Text('Generating PDFs'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const CircularProgressIndicator(),
-            const SizedBox(height: 16),
-            Text('Processing ${recentInspections.length} reports...'),
-          ],
+      builder: (context) => Dialog(
+        backgroundColor: const Color(0xFF0D1117),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CircularProgressIndicator(color: Color(0xFF4FC3F7)),
+              const SizedBox(height: 24),
+              const Text(
+                'EXPORTING TELEMETRY',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 2,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Processing ${recentInspections.length} units...',
+                style: const TextStyle(color: Colors.white38, fontSize: 12),
+              ),
+            ],
+          ),
         ),
       ),
     );

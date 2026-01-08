@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'dart:math' as math;
 import '../services/database_service.dart';
 import '../services/usage_service.dart';
 import '../models/vehicle.dart';
@@ -24,14 +25,38 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+  late AnimationController _entranceController;
+  final List<Animation<double>> _staggeredAnimations = [];
   List<String> _topFeatures = [];
   bool _isLoadingUsage = true;
 
   @override
   void initState() {
     super.initState();
+    _entranceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    );
+
+    // Create 6 staggered animations
+    for (int i = 0; i < 6; i++) {
+      _staggeredAnimations.add(
+        CurvedAnimation(
+          parent: _entranceController,
+          curve: Interval(i * 0.1, 0.6 + (i * 0.05), curve: Curves.easeOutCubic),
+        ),
+      );
+    }
+    
     _loadUsageData();
+    _entranceController.forward();
+  }
+
+  @override
+  void dispose() {
+    _entranceController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadUsageData() async {
@@ -80,12 +105,13 @@ class _HomeScreenState extends State<HomeScreen> {
             pinned: true,
             backgroundColor: colorScheme.surface,
             flexibleSpace: FlexibleSpaceBar(
-              titlePadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              titlePadding: const EdgeInsets.only(left: 72, bottom: 16, right: 24),
               title: Text(
                 _getGreeting(),
                 style: TextStyle(
                   color: colorScheme.onSurface,
                   fontWeight: FontWeight.bold,
+                  letterSpacing: -1,
                 ),
               ),
               background: Container(
@@ -120,59 +146,88 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Dashboard Stats
-                  _buildDashboard(context, allInspections.length),
+                  FadeTransition(
+                    opacity: _staggeredAnimations[0],
+                    child: SlideTransition(
+                      position: _staggeredAnimations[0].drive(
+                        Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero),
+                      ),
+                      child: _buildDashboard(context, allInspections.length),
+                    ),
+                  ),
 
                   const SizedBox(height: 32),
 
                   // Smart Suggestions / Alerts
                   if (vehiclesNeedingAttention.isNotEmpty)
-                    _buildAlertsSection(context, vehiclesNeedingAttention),
+                    FadeTransition(
+                      opacity: _staggeredAnimations[1],
+                      child: _buildAlertsSection(context, vehiclesNeedingAttention),
+                    ),
 
                   const SizedBox(height: 32),
 
                   // Dynamic Top Actions
-                  Text(
-                    'Top Actions',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                  FadeTransition(
+                    opacity: _staggeredAnimations[2],
+                    child: Text(
+                      'Top Actions',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: -1,
+                          ),
+                    ),
                   ),
                   const SizedBox(height: 16),
                   _isLoadingUsage
                       ? const Center(child: CircularProgressIndicator())
-                      : _buildDynamicActions(),
+                      : FadeTransition(
+                          opacity: _staggeredAnimations[2],
+                          child: _buildDynamicActions(),
+                        ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 32),
                   
                   // Secondary Actions (Horizontal Scroll)
-                  _buildSecondaryActions(),
+                  FadeTransition(
+                    opacity: _staggeredAnimations[3],
+                    child: _buildSecondaryActions(),
+                  ),
 
                   const SizedBox(height: 32),
 
                   // Recent Activity
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Recent Inspections',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                      TextButton(
-                        onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const InspectionHistoryScreen()),
-                        ).then((_) => setState(() {})),
-                        child: const Text('View All'),
-                      ),
-                    ],
+                  FadeTransition(
+                    opacity: _staggeredAnimations[4],
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Inspection History',
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: -0.5,
+                              ),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const InspectionHistoryScreen()),
+                          ).then((_) => setState(() {})),
+                          child: const Text('FULL LOG'),
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 12),
-                  if (recentInspections.isEmpty)
-                    _buildEmptyState()
-                  else
-                    ...recentInspections.map((i) => _buildRecentInspectionItem(context, i)),
+                  FadeTransition(
+                    opacity: _staggeredAnimations[5],
+                    child: recentInspections.isEmpty
+                        ? _buildEmptyState()
+                        : Column(
+                            children: recentInspections.map((i) => _buildRecentInspectionItem(context, i)).toList(),
+                          ),
+                  ),
                   
                   const SizedBox(height: 100), // Space for bottom
                 ],
@@ -187,76 +242,153 @@ class _HomeScreenState extends State<HomeScreen> {
           UsageService.featureNewInspection,
           const InspectionFormScreen(),
         ),
-        icon: const Icon(Icons.add),
-        label: const Text('New Inspection'),
+        icon: const Icon(Icons.speed),
+        label: const Text('Speed Check'),
       ),
     );
   }
 
   Widget _buildDashboard(BuildContext context, int totalInspections) {
-    final colorScheme = Theme.of(context).colorScheme;
+    // Today inspections for visual effect
+    const todayInspections = 3; 
+    
     return Container(
-      padding: const EdgeInsets.all(24),
+      height: 220,
       decoration: BoxDecoration(
-        color: colorScheme.primary,
+        color: const Color(0xFF161B22),
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.primary.withValues(alpha: 0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+            color: Colors.blue.withValues(alpha: 0.15),
+            blurRadius: 30,
+            spreadRadius: -10,
           ),
         ],
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF1A1F26),
+            Color(0xFF0D1117),
+          ],
+        ),
       ),
-      child: Row(
+      child: Stack(
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          Positioned.fill(
+            child: Opacity(
+              opacity: 0.05,
+              child: CustomPaint(painter: CarbonFiberPainter()),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Row(
               children: [
-                const Text(
-                  'Fleet Status',
-                  style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w500),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '$totalInspections Reports',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  flex: 3,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'FLEET POWER',
+                        style: TextStyle(
+                          color: Color(0xFF4FC3F7),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 2,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        '$totalInspections',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 48,
+                          fontWeight: FontWeight.w900,
+                          height: 1,
+                        ),
+                      ),
+                      const Text(
+                        'TOTAL RUNS',
+                        style: TextStyle(
+                          color: Colors.white54,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      InkWell(
+                        onTap: () => _handleFeatureTap(
+                          UsageService.featureReportsAnalytics,
+                          const ReportsScreen(),
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF4FC3F7).withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: const Color(0xFF4FC3F7).withValues(alpha: 0.3)),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.analytics, color: Color(0xFF4FC3F7), size: 16),
+                              SizedBox(width: 8),
+                              Text(
+                                'PERFORMANCE',
+                                style: TextStyle(
+                                  color: Color(0xFF4FC3F7),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 12),
-                InkWell(
-                  onTap: () => _handleFeatureTap(
-                    UsageService.featureReportsAnalytics,
-                    const ReportsScreen(),
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Text(
-                      'View Analytics',
-                      style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                Expanded(
+                  flex: 2,
+                  child: Center(
+                    child: TweenAnimationBuilder<double>(
+                      tween: Tween<double>(begin: 0, end: 0.7), 
+                      duration: const Duration(milliseconds: 2000),
+                      curve: Curves.elasticOut,
+                      builder: (context, value, child) {
+                        return CustomPaint(
+                          size: const Size(120, 120),
+                          painter: SpeedometerPainter(value),
+                          child: Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  '$todayInspections',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
+                                const Text(
+                                  'TODAY',
+                                  style: TextStyle(color: Colors.white54, fontSize: 8),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ),
               ],
             ),
-          ),
-          Container(
-            height: 80,
-            width: 80,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.analytics_outlined, color: Colors.white, size: 40),
           ),
         ],
       ),
@@ -269,22 +401,22 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         Row(
           children: [
-            const Icon(Icons.notification_important, color: Colors.redAccent, size: 20),
+            const Icon(Icons.notification_important, color: Colors.orangeAccent, size: 20),
             const SizedBox(width: 8),
-            Text(
-              'ATTENTION REQUIRED',
+            const Text(
+              'ALERT HUB',
               style: TextStyle(
-                color: Colors.redAccent,
-                fontWeight: FontWeight.bold,
+                color: Colors.orangeAccent,
+                fontWeight: FontWeight.w900,
                 fontSize: 12,
-                letterSpacing: 1.2,
+                letterSpacing: 2,
               ),
             ),
           ],
         ),
         const SizedBox(height: 12),
         SizedBox(
-          height: 110,
+          height: 120,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: vehicles.length,
@@ -295,9 +427,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 margin: const EdgeInsets.only(right: 12),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.redAccent.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.redAccent.withValues(alpha: 0.2)),
+                  color: const Color(0xFF161B22),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: Colors.orangeAccent.withValues(alpha: 0.3)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -305,12 +437,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     Text(
                       v.registrationNo,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      v.isWofExpired ? 'WOF Expired' : 'Rego Expired',
-                      style: const TextStyle(color: Colors.redAccent, fontSize: 13),
+                      v.isWofExpired ? 'WOF EXPIRED' : 'REGO EXPIRED',
+                      style: const TextStyle(color: Colors.orangeAccent, fontSize: 10, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -330,7 +462,7 @@ class _HomeScreenState extends State<HomeScreen> {
         crossAxisCount: 2,
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
-        childAspectRatio: 1.5,
+        childAspectRatio: 1.4,
       ),
       itemCount: _topFeatures.length,
       itemBuilder: (context, index) {
@@ -342,6 +474,7 @@ class _HomeScreenState extends State<HomeScreen> {
           IconData(meta['icon'], fontFamily: 'MaterialIcons'),
           _getFeatureScreen(featureId),
           featureId,
+          Color(meta['color'] ?? 0xFF4FC3F7),
         );
       },
     );
@@ -353,31 +486,37 @@ class _HomeScreenState extends State<HomeScreen> {
         .toList();
 
     return SizedBox(
-      height: 100,
+      height: 110,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: unusedFeatures.length,
         itemBuilder: (context, index) {
           final featureId = unusedFeatures[index];
           final meta = UsageService.getFeatureMeta(featureId);
+          final color = Color(meta['color'] ?? 0xFF4FC3F7);
           return GestureDetector(
             onTap: () => _handleFeatureTap(featureId, _getFeatureScreen(featureId)),
             child: Container(
               margin: const EdgeInsets.only(right: 24),
               child: Column(
                 children: [
-                  CircleAvatar(
-                    radius: 28,
-                    backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: color.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: color.withValues(alpha: 0.2)),
+                    ),
                     child: Icon(
                       IconData(meta['icon'], fontFamily: 'MaterialIcons'),
-                      color: Theme.of(context).colorScheme.primary,
+                      color: color,
+                      size: 28,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     meta['title'],
-                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white70),
                   ),
                 ],
               ),
@@ -394,26 +533,42 @@ class _HomeScreenState extends State<HomeScreen> {
     IconData icon,
     Widget screen,
     String featureId,
+    Color color,
   ) {
     return InkWell(
       onTap: () => _handleFeatureTap(featureId, screen),
-      borderRadius: BorderRadius.circular(24),
+      borderRadius: BorderRadius.circular(28),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Theme.of(context).cardTheme.color,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+          color: const Color(0xFF161B22),
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(color: color.withValues(alpha: 0.1)),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              color.withValues(alpha: 0.1),
+              Colors.transparent,
+            ],
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: Theme.of(context).colorScheme.primary, size: 28),
-            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: color, size: 28),
+            ),
+            const SizedBox(height: 16),
             Text(
-              title,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              title.toUpperCase(),
+              style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: Colors.white, letterSpacing: 0.5),
             ),
           ],
         ),
@@ -446,32 +601,40 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildRecentInspectionItem(BuildContext context, Inspection inspection) {
     final dateFormat = DateFormat('MMM dd, yyyy');
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF161B22),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+      ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         leading: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(12),
+            color: const Color(0xFF4FC3F7).withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(16),
           ),
-          child: Icon(Icons.assignment_outlined, color: Theme.of(context).colorScheme.primary),
+          child: const Icon(Icons.flag, color: Color(0xFF4FC3F7)),
         ),
         title: Text(
           inspection.vehicleRegistrationNo,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
-        subtitle: Text('By ${inspection.employeeName} • ${inspection.storeName}'),
+        subtitle: Text(
+          '${inspection.employeeName} • ${inspection.storeName}',
+          style: const TextStyle(color: Colors.white54, fontSize: 12),
+        ),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text(
               dateFormat.format(inspection.inspectionDate),
-              style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.outline),
+              style: const TextStyle(fontSize: 10, color: Colors.white38, fontWeight: FontWeight.bold),
             ),
-            const Icon(Icons.chevron_right, size: 16),
+            const Icon(Icons.chevron_right, size: 16, color: Colors.white24),
           ],
         ),
         onTap: () {
@@ -492,12 +655,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildEmptyState() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32.0),
+        padding: const EdgeInsets.all(48.0),
         child: Column(
           children: [
-            Icon(Icons.history_toggle_off, size: 64, color: Colors.grey.withValues(alpha: 0.3)),
+            Icon(Icons.timer_off_outlined, size: 64, color: Colors.white.withValues(alpha: 0.1)),
             const SizedBox(height: 16),
-            const Text('No recent inspections found', style: TextStyle(color: Colors.grey)),
+            const Text('NO TRACK DATA FOUND', style: TextStyle(color: Colors.white24, fontWeight: FontWeight.bold, letterSpacing: 1)),
           ],
         ),
       ),
@@ -506,49 +669,52 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildDrawer(BuildContext context) {
     return Drawer(
+      backgroundColor: const Color(0xFF0D1117),
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
           DrawerHeader(
-            decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary),
+            decoration: const BoxDecoration(
+              color: Color(0xFF161B22),
+              border: Border(bottom: BorderSide(color: Colors.white12)),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                const CircleAvatar(
-                  backgroundColor: Colors.white24,
-                  radius: 30,
-                  child: Icon(Icons.local_pizza, color: Colors.white, size: 30),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF4FC3F7).withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.speed, color: Color(0xFF4FC3F7), size: 30),
                 ),
                 const SizedBox(height: 16),
                 const Text(
-                  'Vehicle Inspection',
-                  style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                  'TURBO INSPECT',
+                  style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: 1),
                 ),
               ],
             ),
           ),
+          _buildThemedDrawerItem(context, 'Home', Icons.home_outlined, 'home', const SizedBox()),
+          const Divider(color: Colors.white12),
+          _buildThemedDrawerItem(context, 'Speed Check', Icons.speed, UsageService.featureNewInspection, const InspectionFormScreen()),
+          _buildThemedDrawerItem(context, 'History', Icons.history, 'history', const InspectionHistoryScreen()),
+          _buildThemedDrawerItem(context, 'Drive', Icons.drive_file_move_outlined, UsageService.featureOfflineDrive, const OfflineDriveScreen()),
+          const Divider(color: Colors.white12),
+          _buildThemedDrawerItem(context, 'Quick Reports', Icons.bolt, UsageService.featureBulkReports, const BulkReportsScreen()),
+          _buildThemedDrawerItem(context, 'Performance', Icons.assessment_outlined, UsageService.featureReportsAnalytics, const ReportsScreen()),
+          const Divider(color: Colors.white12),
+          _buildThemedDrawerItem(context, 'Vehicles', Icons.directions_car_outlined, UsageService.featureManageVehicles, const VehiclesScreen()),
+          _buildThemedDrawerItem(context, 'Stores', Icons.store_outlined, UsageService.featureManageStores, const StoresScreen()),
+          _buildThemedDrawerItem(context, 'Drivers', Icons.person_outline, UsageService.featureManageDrivers, const DriversScreen()),
+          const Divider(color: Colors.white12),
+          _buildThemedDrawerItem(context, 'Alert Hub', Icons.notification_important_outlined, UsageService.featureReminders, const RemindersScreen()),
           ListTile(
-            leading: const Icon(Icons.home_outlined),
-            title: const Text('Home'),
-            onTap: () => Navigator.pop(context),
-          ),
-          const Divider(),
-          _buildDrawerItem(context, 'New Inspection', Icons.add_task, UsageService.featureNewInspection, const InspectionFormScreen()),
-          _buildDrawerItem(context, 'History', Icons.history, 'history', const InspectionHistoryScreen()),
-          _buildDrawerItem(context, 'Offline Drive', Icons.folder_shared_outlined, UsageService.featureOfflineDrive, const OfflineDriveScreen()),
-          const Divider(),
-          _buildDrawerItem(context, 'Bulk Reports', Icons.auto_awesome_outlined, UsageService.featureBulkReports, const BulkReportsScreen()),
-          _buildDrawerItem(context, 'Analytics', Icons.assessment_outlined, UsageService.featureReportsAnalytics, const ReportsScreen()),
-          const Divider(),
-          _buildDrawerItem(context, 'Vehicles', Icons.directions_car_outlined, UsageService.featureManageVehicles, const VehiclesScreen()),
-          _buildDrawerItem(context, 'Stores', Icons.store_outlined, UsageService.featureManageStores, const StoresScreen()),
-          _buildDrawerItem(context, 'Drivers', Icons.person_outline, UsageService.featureManageDrivers, const DriversScreen()),
-          const Divider(),
-          _buildDrawerItem(context, 'Reminders', Icons.notification_important_outlined, UsageService.featureReminders, const RemindersScreen()),
-          ListTile(
-            leading: const Icon(Icons.settings_outlined),
-            title: const Text('Settings'),
+            leading: const Icon(Icons.settings_outlined, color: Colors.white70),
+            title: const Text('Settings', style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold)),
             onTap: () {
               Navigator.pop(context);
               Navigator.push(
@@ -562,12 +728,13 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildDrawerItem(BuildContext context, String title, IconData icon, String featureId, Widget screen) {
+  Widget _buildThemedDrawerItem(BuildContext context, String title, IconData icon, String featureId, Widget screen) {
     return ListTile(
-      leading: Icon(icon),
-      title: Text(title),
+      leading: Icon(icon, color: Colors.white70),
+      title: Text(title, style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.bold, fontSize: 13)),
       onTap: () {
         Navigator.pop(context);
+        if (featureId == 'home') return;
         if (featureId != 'history') {
            _handleFeatureTap(featureId, screen);
         } else {
@@ -579,4 +746,88 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
+}
+
+class CarbonFiberPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white.withValues(alpha: 0.1)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.5;
+
+    const step = 4.0;
+    for (double i = -size.height; i < size.width; i += step) {
+      canvas.drawLine(Offset(i, 0), Offset(i + size.height, size.height), paint);
+    }
+    for (double i = 0; i < size.width + size.height; i += step) {
+      canvas.drawLine(Offset(i, 0), Offset(i - size.height, size.height), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class SpeedometerPainter extends CustomPainter {
+  final double value; // 0.0 to 1.0
+
+  SpeedometerPainter(this.value);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2;
+    
+    final bgPaint = Paint()
+      ..color = Colors.white10
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 8
+      ..strokeCap = StrokeCap.round;
+
+    final progressPaint = Paint()
+      ..shader = const SweepGradient(
+        colors: [Color(0xFF4FC3F7), Color(0xFFFF5252), Color(0xFF4FC3F7)],
+        stops: [0.0, 0.5, 1.0],
+      ).createShader(Rect.fromCircle(center: center, radius: radius))
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 10
+      ..strokeCap = StrokeCap.round;
+
+    // Background arc
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius - 5),
+      math.pi * 0.8,
+      math.pi * 1.4,
+      false,
+      bgPaint,
+    );
+
+    // Progress arc
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius - 5),
+      math.pi * 0.8,
+      math.pi * 1.4 * value,
+      false,
+      progressPaint,
+    );
+    
+    // Needle
+    final needleAngle = math.pi * 0.8 + (math.pi * 1.4 * value);
+    final needlePaint = Paint()
+      ..color = Colors.white
+      ..strokeWidth = 3
+      ..strokeCap = StrokeCap.round;
+      
+    canvas.drawLine(
+      center,
+      center + Offset(math.cos(needleAngle), math.sin(needleAngle)) * (radius - 15),
+      needlePaint,
+    );
+    
+    canvas.drawCircle(center, 5, Paint()..color = Colors.white);
+  }
+
+  @override
+  bool shouldRepaint(SpeedometerPainter oldDelegate) => oldDelegate.value != value;
 }
