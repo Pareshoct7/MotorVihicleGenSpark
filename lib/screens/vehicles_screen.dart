@@ -534,6 +534,7 @@ class _VehicleDialogState extends State<VehicleDialog> {
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
                   value: _selectedStoreId,
+                  isExpanded: true,
                   decoration: const InputDecoration(
                     labelText: 'BASE HUB',
                     prefixIcon: Icon(Icons.store_outlined),
@@ -542,7 +543,7 @@ class _VehicleDialogState extends State<VehicleDialog> {
                   items: stores.map((store) {
                     return DropdownMenuItem(
                       value: store.id,
-                      child: Text(store.name.toUpperCase()),
+                      child: Text(store.name.toUpperCase(), overflow: TextOverflow.ellipsis),
                     );
                   }).toList(),
                   onChanged: (value) => setState(() => _selectedStoreId = value),

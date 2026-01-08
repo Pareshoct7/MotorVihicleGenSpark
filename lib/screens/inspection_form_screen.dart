@@ -250,17 +250,25 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                   _buildAnimatedSection(0, 'TELEMETRY', [
                     DropdownButtonFormField<String>(
                       value: _selectedVehicleId,
+                      isExpanded: true,
                       decoration: const InputDecoration(labelText: 'TARGET VEHICLE', prefixIcon: Icon(Icons.directions_car_outlined)),
                       dropdownColor: const Color(0xFF161B22),
-                      items: vehicles.map((v) => DropdownMenuItem(value: v.id, child: Text(v.registrationNo))).toList(),
+                      items: vehicles.map((v) => DropdownMenuItem(
+                        value: v.id, 
+                        child: Text(v.registrationNo.toUpperCase(), overflow: TextOverflow.ellipsis)
+                      )).toList(),
                       onChanged: widget.isViewOnly ? null : (val) => setState(() => _selectedVehicleId = val),
                     ),
                     const SizedBox(height: 16),
                     DropdownButtonFormField<String>(
                       value: _selectedStoreId,
+                      isExpanded: true,
                       decoration: const InputDecoration(labelText: 'STAGING HUB', prefixIcon: Icon(Icons.store_outlined)),
                       dropdownColor: const Color(0xFF161B22),
-                      items: stores.map((s) => DropdownMenuItem(value: s.id, child: Text(s.name.toUpperCase()))).toList(),
+                      items: stores.map((s) => DropdownMenuItem(
+                        value: s.id, 
+                        child: Text(s.name.toUpperCase(), overflow: TextOverflow.ellipsis)
+                      )).toList(),
                       onChanged: widget.isViewOnly ? null : (val) async {
                         setState(() => _selectedStoreId = val);
                         if (val != null && _selectedVehicleId != null) {
@@ -324,10 +332,19 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                     const SizedBox(height: 16),
                     DropdownButtonFormField<String>(
                       value: _selectedDriverId,
+                      isExpanded: true,
                       decoration: const InputDecoration(labelText: 'OPERATOR', prefixIcon: Icon(Icons.person_outline)),
                       dropdownColor: const Color(0xFF161B22),
-                      items: drivers.map((d) => DropdownMenuItem(value: d.id, child: Text(d.name.toUpperCase()))).toList(),
-                      onChanged: widget.isViewOnly ? null : (val) => setState(() => _selectedDriverId = val),
+                      items: drivers.map((d) => DropdownMenuItem(
+                        value: d.id, 
+                        child: Text(d.name.toUpperCase(), overflow: TextOverflow.ellipsis)
+                      )).toList(),
+                      onChanged: widget.isViewOnly ? null : (val) async {
+                        setState(() => _selectedDriverId = val);
+                        if (val != null && _selectedVehicleId != null) {
+                          await UsageService.trackSelection(_selectedVehicleId!, driverId: val);
+                        }
+                      },
                     ),
                   ]),
 

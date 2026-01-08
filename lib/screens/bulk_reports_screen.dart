@@ -122,12 +122,16 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
                           // Vehicle Selection
                           DropdownButtonFormField<String>(
                             value: _selectedVehicleId,
+                            isExpanded: true,
                             decoration: const InputDecoration(
                               labelText: 'TARGET VEHICLE',
                               prefixIcon: Icon(Icons.directions_car_outlined),
                             ),
                             dropdownColor: const Color(0xFF161B22),
-                            items: vehicles.map((v) => DropdownMenuItem(value: v.id, child: Text(v.registrationNo))).toList(),
+                            items: vehicles.map((v) => DropdownMenuItem(
+                              value: v.id, 
+                              child: Text(v.registrationNo.toUpperCase(), overflow: TextOverflow.ellipsis)
+                            )).toList(),
                             onChanged: (val) async {
                               setState(() => _selectedVehicleId = val);
                               if (val != null) {
@@ -147,13 +151,17 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
 
                           // Store Selection
                           DropdownButtonFormField<String>(
+                            isExpanded: true,
                             value: _selectedStoreId,
                             decoration: const InputDecoration(
                               labelText: 'BASE HUB',
                               prefixIcon: Icon(Icons.store_outlined),
                             ),
                             dropdownColor: const Color(0xFF161B22),
-                            items: stores.map((s) => DropdownMenuItem(value: s.id, child: Text(s.name.toUpperCase()))).toList(),
+                            items: stores.map((s) => DropdownMenuItem(
+                              value: s.id, 
+                              child: Text(s.name.toUpperCase(), overflow: TextOverflow.ellipsis)
+                            )).toList(),
                             onChanged: (val) async {
                               setState(() => _selectedStoreId = val);
                               if (val != null && _selectedVehicleId != null) {
@@ -166,13 +174,17 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
 
                           // Driver Selection
                           DropdownButtonFormField<String>(
+                            isExpanded: true,
                             value: _selectedDriverId,
                             decoration: const InputDecoration(
                               labelText: 'ASSIGNED DRIVER',
                               prefixIcon: Icon(Icons.person_outline),
                             ),
                             dropdownColor: const Color(0xFF161B22),
-                            items: drivers.map((d) => DropdownMenuItem(value: d.id, child: Text(d.name.toUpperCase()))).toList(),
+                            items: drivers.map((d) => DropdownMenuItem(
+                              value: d.id, 
+                              child: Text(d.name.toUpperCase(), overflow: TextOverflow.ellipsis)
+                            )).toList(),
                             onChanged: (val) async {
                               setState(() => _selectedDriverId = val);
                               if (val != null && _selectedVehicleId != null) {

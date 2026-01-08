@@ -608,6 +608,7 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
                                   ),
                             title: Text(
                               name.toUpperCase(),
+                              overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w900,

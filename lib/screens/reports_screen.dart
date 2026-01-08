@@ -478,6 +478,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                     const SizedBox(height: 4),
                     Text(
                       '${dateFormat.format(inspection.inspectionDate).toUpperCase()} • ${inspection.employeeName.toUpperCase()}',
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         color: Colors.white38,
                         fontSize: 10,
@@ -486,6 +487,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                     ),
                     Text(
                       inspection.storeName.toUpperCase(),
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         color: Colors.white24,
                         fontSize: 10,
