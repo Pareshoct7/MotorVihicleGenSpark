@@ -274,16 +274,18 @@ class _BulkReportsScreenState extends State<BulkReportsScreen> {
                               height: 24,
                               child: CircularProgressIndicator(strokeWidth: 3, valueColor: AlwaysStoppedAnimation<Color>(Colors.black)),
                             )
-                          : const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.bolt, size: 24),
-                                SizedBox(width: 12),
-                                Text(
-                                  'GENERATE BATCH',
-                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 1),
-                                ),
-                              ],
+                          : FittedBox(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(Icons.bolt, size: 24),
+                                  const SizedBox(width: 12),
+                                  const Text(
+                                    'GENERATE BATCH',
+                                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 1),
+                                  ),
+                                ],
+                              ),
                             ),
                     ),
 

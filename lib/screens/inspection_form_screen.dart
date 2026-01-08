@@ -277,20 +277,29 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                             decoration: InputDecoration(
                               labelText: 'ODOMETER', 
                               prefixIcon: const Icon(Icons.speed_outlined),
-                              suffixIcon: widget.isViewOnly ? null : Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.auto_awesome, color: Color(0xFF00E676), size: 20),
-                                    tooltip: 'MAGIC ESTIMATE',
-                                    onPressed: _magicEstimateOdometer,
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.camera_alt_outlined, color: Color(0xFF4FC3F7), size: 20),
-                                    tooltip: 'SCAN ODOMETER',
-                                    onPressed: _scanOdometer,
-                                  ),
-                                ],
+                              suffixIcon: widget.isViewOnly ? null : SizedBox(
+                                width: 84, // Explicit width to prevent overflow
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    IconButton(
+                                      padding: EdgeInsets.zero,
+                                      constraints: const BoxConstraints(),
+                                      icon: const Icon(Icons.auto_awesome, color: Color(0xFF00E676), size: 20),
+                                      tooltip: 'MAGIC ESTIMATE',
+                                      onPressed: _magicEstimateOdometer,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    IconButton(
+                                      padding: EdgeInsets.zero,
+                                      constraints: const BoxConstraints(),
+                                      icon: const Icon(Icons.camera_alt_outlined, color: Color(0xFF4FC3F7), size: 20),
+                                      tooltip: 'SCAN ODOMETER',
+                                      onPressed: _scanOdometer,
+                                    ),
+                                    const SizedBox(width: 12),
+                                  ],
+                                ),
                               ),
                             ),
                             keyboardType: TextInputType.number,

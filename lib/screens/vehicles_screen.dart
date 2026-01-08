@@ -330,12 +330,17 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
             letterSpacing: 1.5,
           ),
         ),
-        Text(
-          value.toUpperCase(),
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-            color: valueColor,
+        const SizedBox(width: 12),
+        Flexible(
+          child: Text(
+            value.toUpperCase(),
+            textAlign: TextAlign.end,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: valueColor,
+            ),
           ),
         ),
       ],

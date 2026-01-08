@@ -107,11 +107,16 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: const EdgeInsets.only(left: 72, bottom: 16, right: 24),
               title: Text(
-                _getGreeting(),
-                style: TextStyle(
-                  color: colorScheme.onSurface,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: -1,
+              title: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.bottomLeft,
+                child: Text(
+                  _getGreeting(),
+                  style: TextStyle(
+                    color: colorScheme.onSurface,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: -1,
+                  ),
                 ),
               ),
               background: Container(
@@ -768,7 +773,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       onPressed: () => _handleFeatureTap(UsageService.featureNewInspection, const InspectionFormScreen()),
       backgroundColor: const Color(0xFF4FC3F7),
       icon: const Icon(Icons.speed, color: Colors.white),
-      label: const Text('Speed Check', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+      label: FittedBox(child: const Text('Speed Check', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white))),
     );
   }
 }
