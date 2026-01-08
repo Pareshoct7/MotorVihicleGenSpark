@@ -5,6 +5,7 @@ import '../models/inspection.dart';
 import '../services/database_service.dart';
 import '../services/pdf_service.dart';
 import '../services/preferences_service.dart';
+import 'ai_scanner_overlay.dart';
 
 class InspectionFormScreen extends StatefulWidget {
   final Inspection? inspection;
@@ -255,7 +256,14 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                         Expanded(
                           child: TextFormField(
                             controller: _odometerController,
-                            decoration: const InputDecoration(labelText: 'ODOMETER', prefixIcon: Icon(Icons.speed_outlined)),
+                            decoration: InputDecoration(
+                              labelText: 'ODOMETER', 
+                              prefixIcon: const Icon(Icons.speed_outlined),
+                              suffixIcon: widget.isViewOnly ? null : IconButton(
+                                icon: const Icon(Icons.camera_alt_outlined, color: Color(0xFF4FC3F7)),
+                                onPressed: _scanOdometer,
+                              ),
+                            ),
                             keyboardType: TextInputType.number,
                             readOnly: widget.isViewOnly,
                           ),
@@ -599,6 +607,18 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
         ),
       );
       Navigator.pop(context);
+    }
+  }
+
+  Future<void> _scanOdometer() async {
+    final result = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(builder: (context) => const AiScannerView(mode: 'odometer')),
+    );
+    if (result != null) {
+      setState(() {
+        _odometerController.text = result;
+      });
     }
   }
 

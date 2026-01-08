@@ -6,6 +6,7 @@ import '../models/vehicle.dart';
 import '../services/database_service.dart';
 import '../services/preferences_service.dart';
 import '../services/notification_service.dart';
+import 'ai_scanner_overlay.dart';
 
 class VehiclesScreen extends StatefulWidget {
   const VehiclesScreen({super.key});
@@ -17,6 +18,8 @@ class VehiclesScreen extends StatefulWidget {
 class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProviderStateMixin {
   late AnimationController _entranceController;
   final List<Animation<double>> _staggeredAnimations = [];
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
 
   @override
   void initState() {
@@ -45,7 +48,14 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
 
   @override
   Widget build(BuildContext context) {
-    final vehicles = DatabaseService.getAllVehicles();
+    var vehicles = DatabaseService.getAllVehicles();
+    if (_searchQuery.isNotEmpty) {
+      vehicles = vehicles.where((v) => 
+        v.registrationNo.toUpperCase().contains(_searchQuery) ||
+        (v.make?.toUpperCase().contains(_searchQuery) ?? false) ||
+        (v.model?.toUpperCase().contains(_searchQuery) ?? false)
+      ).toList();
+    }
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
@@ -57,6 +67,35 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
             floating: false,
             pinned: true,
             title: const Text('GARAGE'),
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(80),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.05),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.white10),
+                  ),
+                  child: TextField(
+                    controller: _searchController,
+                    onChanged: (val) => setState(() => _searchQuery = val.toUpperCase()),
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    decoration: InputDecoration(
+                      hintText: 'SEARCH RIG...',
+                      prefixIcon: const Icon(Icons.search, color: Color(0xFF4FC3F7)),
+                      border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.camera_alt_outlined, color: Color(0xFF4FC3F7)),
+                        onPressed: _scanPlate,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
             actions: [
               IconButton(
                 onPressed: () => _showVehicleDialog(context),
@@ -123,6 +162,19 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
         ],
       ),
     );
+  }
+
+  Future<void> _scanPlate() async {
+    final result = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(builder: (context) => const AiScannerView(mode: 'plate')),
+    );
+    if (result != null) {
+      setState(() {
+        _searchQuery = result.toUpperCase();
+        _searchController.text = _searchQuery;
+      });
+    }
   }
 
   Widget _buildVehicleCard(BuildContext context, Vehicle vehicle) {
