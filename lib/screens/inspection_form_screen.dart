@@ -286,26 +286,26 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                               labelText: 'ODOMETER', 
                               prefixIcon: const Icon(Icons.speed_outlined),
                               suffixIcon: widget.isViewOnly ? null : SizedBox(
-                                width: 84, // Explicit width to prevent overflow
+                                width: 64, // Reduced width to prevent overflow
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
                                     IconButton(
                                       padding: EdgeInsets.zero,
                                       constraints: const BoxConstraints(),
-                                      icon: const Icon(Icons.auto_awesome, color: Color(0xFF00E676), size: 20),
+                                      icon: const Icon(Icons.auto_awesome, color: Color(0xFF00E676), size: 18),
                                       tooltip: 'MAGIC ESTIMATE',
                                       onPressed: _magicEstimateOdometer,
                                     ),
-                                    const SizedBox(width: 8),
+                                    const SizedBox(width: 6),
                                     IconButton(
                                       padding: EdgeInsets.zero,
                                       constraints: const BoxConstraints(),
-                                      icon: const Icon(Icons.camera_alt_outlined, color: Color(0xFF4FC3F7), size: 20),
+                                      icon: const Icon(Icons.camera_alt_outlined, color: Color(0xFF4FC3F7), size: 18),
                                       tooltip: 'SCAN ODOMETER',
                                       onPressed: _scanOdometer,
                                     ),
-                                    const SizedBox(width: 12),
+                                    const SizedBox(width: 8),
                                   ],
                                 ),
                               ),

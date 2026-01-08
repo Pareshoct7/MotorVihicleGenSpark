@@ -106,7 +106,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             backgroundColor: colorScheme.surface,
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: const EdgeInsets.only(left: 72, bottom: 16, right: 24),
-              title: Text(
               title: FittedBox(
                 fit: BoxFit.scaleDown,
                 alignment: Alignment.bottomLeft,
@@ -208,7 +207,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Inspection History',
+                          'TRACK HISTORY',
                           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: -0.5,
