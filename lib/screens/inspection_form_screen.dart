@@ -284,11 +284,11 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                             controller: _odometerController,
                             decoration: InputDecoration(
                               labelText: 'ODOMETER', 
-                              prefixIcon: const Icon(Icons.speed_outlined),
                               suffixIcon: widget.isViewOnly ? null : SizedBox(
-                                width: 64, // Reduced width to prevent overflow
+                                width: 110, // Sufficient width for two icons
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
                                     IconButton(
                                       padding: EdgeInsets.zero,
@@ -323,7 +323,11 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                             },
                             child: InputDecorator(
                               decoration: const InputDecoration(labelText: 'SCAN DATE'),
-                              child: Text(DateFormat('dd / MM / yyyy').format(_inspectionDate)),
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.centerLeft,
+                                child: Text(DateFormat('dd / MM / yyyy').format(_inspectionDate)),
+                              ),
                             ),
                           ),
                         ),
