@@ -15,6 +15,7 @@ import 'reports_screen.dart';
 import 'bulk_reports_screen.dart';
 import 'settings_screen.dart';
 import 'offline_drive_screen.dart';
+import '../widgets/agent_fab.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -261,7 +262,15 @@ class _HomeScreenState extends State<HomeScreen>
         ],
       ),
       drawer: _buildDrawer(context),
-      floatingActionButton: _buildSmartFab(context, vehiclesNeedingAttention),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          const AgentFloatingButton(),
+          const SizedBox(height: 16),
+          _buildSmartFab(context, vehiclesNeedingAttention),
+        ],
+      ),
     );
   }
 

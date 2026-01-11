@@ -7,6 +7,7 @@ import '../services/database_service.dart';
 import '../services/preferences_service.dart';
 import '../services/notification_service.dart';
 import 'ai_scanner_overlay.dart';
+import '../widgets/agent_fab.dart';
 
 class VehiclesScreen extends StatefulWidget {
   const VehiclesScreen({super.key});
@@ -187,6 +188,7 @@ class _VehiclesScreenState extends State<VehiclesScreen>
                 ),
         ],
       ),
+      floatingActionButton: const AgentFloatingButton(),
     );
   }
 

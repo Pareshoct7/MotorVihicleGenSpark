@@ -7,7 +7,16 @@ import '../services/pdf_service.dart';
 import 'inspection_form_screen.dart';
 
 class ReportsScreen extends StatefulWidget {
-  const ReportsScreen({super.key});
+  final String? initialStoreId;
+  final DateTime? initialStartDate;
+  final DateTime? initialEndDate;
+
+  const ReportsScreen({
+    super.key,
+    this.initialStoreId,
+    this.initialStartDate,
+    this.initialEndDate,
+  });
 
   @override
   State<ReportsScreen> createState() => _ReportsScreenState();
@@ -53,6 +62,19 @@ class _ReportsScreenState extends State<ReportsScreen>
         ),
       );
     }
+
+    // Apply initial filters from constructor if provided
+    if (widget.initialStoreId != null) {
+      _selectedStoreId = widget.initialStoreId;
+    }
+
+    if (widget.initialStartDate != null) {
+      _startDate = widget.initialStartDate;
+    }
+    if (widget.initialEndDate != null) {
+      _endDate = widget.initialEndDate;
+    }
+
     _applyFilters();
     _entranceController.forward();
   }

@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 import '../models/vehicle.dart';
@@ -42,117 +44,57 @@ class DatabaseService {
     final isPopulated = await PreferencesService.isInitialDataPopulated();
     if (isPopulated) return;
 
-    // Create Stores
-    final store1 = Store(
-      id: 'store_1',
-      name: 'Dominos Koutu 98683',
-      address: 'Koutu',
-      phone: '98683', 
-    );
-    final store2 = Store(
-      id: 'store_2',
-      name: 'Dominos Redwoods 98683',
-      address: 'Redwoods',
-      phone: '98683',
-    );
-    
-    await addStore(store1);
-    await addStore(store2);
+    try {
+      final jsonString =
+          await rootBundle.loadString('assets/initial_data.json');
+      final Map<String, dynamic> data = json.decode(jsonString);
 
-    // Create Vehicles
-    /*
-    KUC487: 2007 Nissan March, Rego 25/05/26, WOF 13/10/26.
-    MTC133: 2008 Nissan March, Rego 01/04/26, WOF 13/10/26.
-    QNE411: 2006 Suzuki Swift, Rego 09/04/26, WOF 18/03/26.
-    CLD968: 2004 Nissan March, Rego 31/03/26, WOF 01/01/26.
-    MTC133: 2008 Nissan March, Rego 02/06/26, WOF 27/05/26.
-    */
-    
-    final vehicles = [
-      Vehicle(
-        id: 'vehicle_1',
-        registrationNo: 'KUC487',
-        make: 'Nissan',
-        model: 'March',
-        year: 2007,
-        regoExpiryDate: DateTime(2026, 5, 25),
-        wofExpiryDate: DateTime(2026, 10, 13),
-        storeId: store1.id, // Randomly assigning store 1
-      ),
-      Vehicle(
-        id: 'vehicle_2',
-        registrationNo: 'MTC133',
-        make: 'Nissan',
-        model: 'March',
-        year: 2008,
-        regoExpiryDate: DateTime(2026, 4, 1),
-        wofExpiryDate: DateTime(2026, 10, 13),
-        storeId: store1.id,
-      ),
-      Vehicle(
-        id: 'vehicle_3',
-        registrationNo: 'QNE411',
-        make: 'Suzuki',
-        model: 'Swift',
-        year: 2006,
-        regoExpiryDate: DateTime(2026, 4, 9),
-        wofExpiryDate: DateTime(2026, 3, 18),
-        storeId: store2.id, // Assigning store 2
-      ),
-      Vehicle(
-        id: 'vehicle_4',
-        registrationNo: 'CLD968',
-        make: 'Nissan',
-        model: 'March',
-        year: 2004,
-        regoExpiryDate: DateTime(2026, 3, 31),
-        wofExpiryDate: DateTime(2026, 1, 1),
-        storeId: store2.id,
-      ),
-      Vehicle(
-        id: 'vehicle_5',
-        registrationNo: 'MTC133', // Duplicate plate as requested
-        make: 'Nissan',
-        model: 'March',
-        year: 2008,
-        regoExpiryDate: DateTime(2026, 6, 2),
-        wofExpiryDate: DateTime(2026, 5, 27),
-        storeId: store1.id,
-      ),
-    ];
+      // Vehicles
+      if (data['vehicles'] != null) {
+        final vehiclesList = (data['vehicles'] as List)
+            .map((i) => Vehicle.fromJson(i))
+            .toList();
+        for (var v in vehiclesList) {
+          await addVehicle(v);
+        }
+        if (vehiclesList.isNotEmpty) {
+          await PreferencesService.setDefaultVehicle(vehiclesList.first.id);
+        }
+      }
 
-    for (final vehicle in vehicles) {
-      await addVehicle(vehicle);
+      // Stores
+      if (data['stores'] != null) {
+        final storesList =
+            (data['stores'] as List).map((i) => Store.fromJson(i)).toList();
+        for (var s in storesList) {
+          await addStore(s);
+        }
+      }
+
+      // Drivers
+      if (data['drivers'] != null) {
+        final driversList =
+            (data['drivers'] as List).map((i) => Driver.fromJson(i)).toList();
+        for (var d in driversList) {
+          await addDriver(d);
+        }
+      }
+
+      // Inspections
+      if (data['inspections'] != null) {
+        final inspectionsList = (data['inspections'] as List)
+            .map((i) => Inspection.fromJson(i))
+            .toList();
+        for (var i in inspectionsList) {
+          await addInspection(i);
+        }
+      }
+
+      await PreferencesService.setInitialDataPopulated(true);
+      print('Initial data populated successfully from JSON.');
+    } catch (e) {
+      print("Error seeding database: $e");
     }
-
-    if (vehicles.isNotEmpty) {
-      await PreferencesService.setDefaultVehicle(vehicles.first.id);
-    }
-
-    // Create Drivers
-    final drivers = [
-      // Koutu Drivers (Store 1)
-      Driver(id: 'driver_k1', name: 'Paresh Patil'),
-      Driver(id: 'driver_k2', name: 'Janmesh Patel'),
-      Driver(id: 'driver_k3', name: 'Shradhadha Joshi'),
-      Driver(id: 'driver_k4', name: 'Vijaypala Thisara'),
-      Driver(id: 'driver_k5', name: 'Rikin Patel'),
-      
-      // Redwoods Drivers (Store 2)
-      // Note: In current model Driver doesn't explicitly link to Store, 
-      // but we populate them so they are available for selection.
-      Driver(id: 'driver_r1', name: 'Abhishek Joshi'),
-      Driver(id: 'driver_r2', name: 'Jatin Surati'),
-      Driver(id: 'driver_r3', name: 'Parthkumar Pandya'),
-      Driver(id: 'driver_r4', name: 'Raj Soni'),
-      Driver(id: 'driver_r5', name: 'Kashish Joshi'),
-    ];
-
-    for (final driver in drivers) {
-      await addDriver(driver); // Assuming addDriver exists (checking below)
-    }
-
-    await PreferencesService.setInitialDataPopulated(true);
   }
 
   // Inspection operations
