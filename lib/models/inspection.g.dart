@@ -51,6 +51,8 @@ class InspectionAdapter extends TypeAdapter<Inspection> {
       spareKeys: fields[30] as bool?,
       correctiveActions: fields[31] as String?,
       signature: fields[32] as String?,
+      managerSignature: fields[36] as String?,
+      managerSignOffDate: fields[37] as DateTime?,
       createdAt: fields[33] as DateTime?,
       updatedAt: fields[34] as DateTime?,
     );
@@ -59,7 +61,7 @@ class InspectionAdapter extends TypeAdapter<Inspection> {
   @override
   void write(BinaryWriter writer, Inspection obj) {
     writer
-      ..writeByte(36)
+      ..writeByte(38)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -131,7 +133,11 @@ class InspectionAdapter extends TypeAdapter<Inspection> {
       ..writeByte(34)
       ..write(obj.updatedAt)
       ..writeByte(35)
-      ..write(obj.storeNumber);
+      ..write(obj.storeNumber)
+      ..writeByte(36)
+      ..write(obj.managerSignature)
+      ..writeByte(37)
+      ..write(obj.managerSignOffDate);
   }
 
   @override

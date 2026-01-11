@@ -14,8 +14,6 @@ import 'reminders_screen.dart';
 import 'reports_screen.dart';
 import 'bulk_reports_screen.dart';
 import 'settings_screen.dart';
-import 'introduction_screen.dart';
-import 'about_developer_screen.dart';
 import 'offline_drive_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -25,7 +23,8 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _entranceController;
   final List<Animation<double>> _staggeredAnimations = [];
   List<String> _topFeatures = [];
@@ -44,11 +43,15 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       _staggeredAnimations.add(
         CurvedAnimation(
           parent: _entranceController,
-          curve: Interval(i * 0.1, 0.6 + (i * 0.05), curve: Curves.easeOutCubic),
+          curve: Interval(
+            i * 0.1,
+            0.6 + (i * 0.05),
+            curve: Curves.easeOutCubic,
+          ),
         ),
       );
     }
-    
+
     _loadUsageData();
     _entranceController.forward();
   }
@@ -90,7 +93,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-    final vehiclesNeedingAttention = DatabaseService.getVehiclesNeedingAttention();
+    final vehiclesNeedingAttention =
+        DatabaseService.getVehiclesNeedingAttention();
     final allInspections = DatabaseService.getAllInspections();
     final recentInspections = allInspections.take(3).toList();
     final colorScheme = Theme.of(context).colorScheme;
@@ -135,7 +139,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               IconButton(
                 onPressed: () => Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const SettingsScreen()),
+                  MaterialPageRoute(
+                    builder: (context) => const SettingsScreen(),
+                  ),
                 ).then((_) => setState(() {})),
                 icon: Icon(Icons.settings_outlined),
               ),
@@ -154,7 +160,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     opacity: _staggeredAnimations[0],
                     child: SlideTransition(
                       position: _staggeredAnimations[0].drive(
-                        Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero),
+                        Tween<Offset>(
+                          begin: const Offset(0, 0.2),
+                          end: Offset.zero,
+                        ),
                       ),
                       child: _buildDashboard(context, allInspections.length),
                     ),
@@ -166,7 +175,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   if (vehiclesNeedingAttention.isNotEmpty)
                     FadeTransition(
                       opacity: _staggeredAnimations[1],
-                      child: _buildAlertsSection(context, vehiclesNeedingAttention),
+                      child: _buildAlertsSection(
+                        context,
+                        vehiclesNeedingAttention,
+                      ),
                     ),
 
                   const SizedBox(height: 32),
@@ -177,9 +189,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     child: Text(
                       'Top Actions',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: -1,
-                          ),
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: -1,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -191,7 +203,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         ),
 
                   const SizedBox(height: 32),
-                  
+
                   // Secondary Actions (Horizontal Scroll)
                   FadeTransition(
                     opacity: _staggeredAnimations[3],
@@ -208,7 +220,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       children: [
                         Text(
                           'TRACK HISTORY',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          style: Theme.of(context).textTheme.titleLarge
+                              ?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: -0.5,
                               ),
@@ -216,7 +229,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         TextButton(
                           onPressed: () => Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const InspectionHistoryScreen()),
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const InspectionHistoryScreen(),
+                            ),
                           ).then((_) => setState(() {})),
                           child: Text('FULL LOG'),
                         ),
@@ -229,10 +245,14 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     child: recentInspections.isEmpty
                         ? _buildEmptyState()
                         : Column(
-                            children: recentInspections.map((i) => _buildRecentInspectionItem(context, i)).toList(),
+                            children: recentInspections
+                                .map(
+                                  (i) => _buildRecentInspectionItem(context, i),
+                                )
+                                .toList(),
                           ),
                   ),
-                  
+
                   const SizedBox(height: 100), // Space for bottom
                 ],
               ),
@@ -247,8 +267,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
   Widget _buildDashboard(BuildContext context, int totalInspections) {
     // Today inspections for visual effect
-    const todayInspections = 3; 
-    
+    const todayInspections = 3;
+
     return Container(
       height: 220,
       decoration: BoxDecoration(
@@ -264,10 +284,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF1A1F26),
-            Color(0xFF0D1117),
-          ],
+          colors: [Color(0xFF1A1F26), Color(0xFF0D1117)],
         ),
       ),
       child: Stack(
@@ -326,16 +343,29 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         ),
                         borderRadius: BorderRadius.circular(20),
                         child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF4FC3F7).withValues(alpha: 0.2),
+                            color: const Color(
+                              0xFF4FC3F7,
+                            ).withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: const Color(0xFF4FC3F7).withValues(alpha: 0.3)),
+                            border: Border.all(
+                              color: const Color(
+                                0xFF4FC3F7,
+                              ).withValues(alpha: 0.3),
+                            ),
                           ),
                           child: const Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.analytics, color: Color(0xFF4FC3F7), size: 16),
+                              Icon(
+                                Icons.analytics,
+                                color: Color(0xFF4FC3F7),
+                                size: 16,
+                              ),
                               SizedBox(width: 8),
                               Text(
                                 'PERFORMANCE',
@@ -356,7 +386,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   flex: 2,
                   child: Center(
                     child: TweenAnimationBuilder<double>(
-                      tween: Tween<double>(begin: 0, end: 0.7), 
+                      tween: Tween<double>(begin: 0, end: 0.7),
                       duration: const Duration(milliseconds: 2000),
                       curve: Curves.elasticOut,
                       builder: (context, value, child) {
@@ -377,7 +407,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                 ),
                                 Text(
                                   'TODAY',
-                                  style: TextStyle(color: Colors.white54, fontSize: 8),
+                                  style: TextStyle(
+                                    color: Colors.white54,
+                                    fontSize: 8,
+                                  ),
                                 ),
                               ],
                             ),
@@ -401,7 +434,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       children: [
         Row(
           children: [
-            Icon(Icons.notification_important, color: Colors.orangeAccent, size: 20),
+            Icon(
+              Icons.notification_important,
+              color: Colors.orangeAccent,
+              size: 20,
+            ),
             const SizedBox(width: 8),
             Text(
               'ALERT HUB',
@@ -429,7 +466,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: Colors.orangeAccent.withValues(alpha: 0.3)),
+                  border: Border.all(
+                    color: Colors.orangeAccent.withValues(alpha: 0.3),
+                  ),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -437,12 +476,20 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   children: [
                     Text(
                       v.registrationNo,
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: Colors.white,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       v.isWofExpired ? 'WOF EXPIRED' : 'REGO EXPIRED',
-                      style: TextStyle(color: Colors.orangeAccent, fontSize: 10, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        color: Colors.orangeAccent,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ],
                 ),
@@ -495,7 +542,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           final meta = UsageService.getFeatureMeta(featureId);
           final color = Color(meta['color'] ?? 0xFF4FC3F7);
           return GestureDetector(
-            onTap: () => _handleFeatureTap(featureId, _getFeatureScreen(featureId)),
+            onTap: () =>
+                _handleFeatureTap(featureId, _getFeatureScreen(featureId)),
             child: Container(
               margin: EdgeInsets.only(right: 24),
               child: Column(
@@ -516,7 +564,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   const SizedBox(height: 8),
                   Text(
                     meta['title'],
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white70),
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white70,
+                    ),
                   ),
                 ],
               ),
@@ -547,10 +599,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              color.withValues(alpha: 0.1),
-              Colors.transparent,
-            ],
+            colors: [color.withValues(alpha: 0.1), Colors.transparent],
           ),
         ),
         child: Column(
@@ -568,7 +617,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             const SizedBox(height: 16),
             Text(
               title.toUpperCase(),
-              style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: Colors.white, letterSpacing: 0.5),
+              style: TextStyle(
+                fontWeight: FontWeight.w900,
+                fontSize: 12,
+                color: Colors.white,
+                letterSpacing: 0.5,
+              ),
             ),
           ],
         ),
@@ -599,7 +653,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     }
   }
 
-  Widget _buildRecentInspectionItem(BuildContext context, Inspection inspection) {
+  Widget _buildRecentInspectionItem(
+    BuildContext context,
+    Inspection inspection,
+  ) {
     final dateFormat = DateFormat('MMM dd, yyyy');
     return Container(
       margin: EdgeInsets.only(bottom: 12),
@@ -632,7 +689,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           children: [
             Text(
               dateFormat.format(inspection.inspectionDate),
-              style: TextStyle(fontSize: 10, color: Colors.white38, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 10,
+                color: Colors.white38,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             Icon(Icons.chevron_right, size: 16, color: Colors.white24),
           ],
@@ -658,9 +719,20 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         padding: EdgeInsets.all(48.0),
         child: Column(
           children: [
-            Icon(Icons.timer_off_outlined, size: 64, color: Colors.white.withValues(alpha: 0.1)),
+            Icon(
+              Icons.timer_off_outlined,
+              size: 64,
+              color: Colors.white.withValues(alpha: 0.1),
+            ),
             const SizedBox(height: 16),
-            Text('NO TRACK DATA FOUND', style: TextStyle(color: Colors.white24, fontWeight: FontWeight.bold, letterSpacing: 1)),
+            Text(
+              'NO TRACK DATA FOUND',
+              style: TextStyle(
+                color: Colors.white24,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1,
+              ),
+            ),
           ],
         ),
       ),
@@ -693,28 +765,99 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 const SizedBox(height: 16),
                 Text(
                   'TURBO INSPECT',
-                  style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: 1),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1,
+                  ),
                 ),
               ],
             ),
           ),
-          _buildThemedDrawerItem(context, 'Home', Icons.home_outlined, 'home', const SizedBox()),
+          _buildThemedDrawerItem(
+            context,
+            'Home',
+            Icons.home_outlined,
+            'home',
+            const SizedBox(),
+          ),
           const Divider(color: Colors.white12),
-          _buildThemedDrawerItem(context, 'Speed Check', Icons.speed, UsageService.featureNewInspection, const InspectionFormScreen()),
-          _buildThemedDrawerItem(context, 'History', Icons.history, 'history', const InspectionHistoryScreen()),
-          _buildThemedDrawerItem(context, 'Drive', Icons.drive_file_move_outlined, UsageService.featureOfflineDrive, const OfflineDriveScreen()),
+          _buildThemedDrawerItem(
+            context,
+            'Speed Check',
+            Icons.speed,
+            UsageService.featureNewInspection,
+            const InspectionFormScreen(),
+          ),
+          _buildThemedDrawerItem(
+            context,
+            'History',
+            Icons.history,
+            'history',
+            const InspectionHistoryScreen(),
+          ),
+          _buildThemedDrawerItem(
+            context,
+            'Drive',
+            Icons.drive_file_move_outlined,
+            UsageService.featureOfflineDrive,
+            const OfflineDriveScreen(),
+          ),
           const Divider(color: Colors.white12),
-          _buildThemedDrawerItem(context, 'Quick Reports', Icons.bolt, UsageService.featureBulkReports, const BulkReportsScreen()),
-          _buildThemedDrawerItem(context, 'Performance', Icons.assessment_outlined, UsageService.featureReportsAnalytics, const ReportsScreen()),
+          _buildThemedDrawerItem(
+            context,
+            'Quick Reports',
+            Icons.bolt,
+            UsageService.featureBulkReports,
+            const BulkReportsScreen(),
+          ),
+          _buildThemedDrawerItem(
+            context,
+            'Performance',
+            Icons.assessment_outlined,
+            UsageService.featureReportsAnalytics,
+            const ReportsScreen(),
+          ),
           const Divider(color: Colors.white12),
-          _buildThemedDrawerItem(context, 'Vehicles', Icons.directions_car_outlined, UsageService.featureManageVehicles, const VehiclesScreen()),
-          _buildThemedDrawerItem(context, 'Stores', Icons.store_outlined, UsageService.featureManageStores, const StoresScreen()),
-          _buildThemedDrawerItem(context, 'Drivers', Icons.person_outline, UsageService.featureManageDrivers, const DriversScreen()),
+          _buildThemedDrawerItem(
+            context,
+            'Vehicles',
+            Icons.directions_car_outlined,
+            UsageService.featureManageVehicles,
+            const VehiclesScreen(),
+          ),
+          _buildThemedDrawerItem(
+            context,
+            'Stores',
+            Icons.store_outlined,
+            UsageService.featureManageStores,
+            const StoresScreen(),
+          ),
+          _buildThemedDrawerItem(
+            context,
+            'Drivers',
+            Icons.person_outline,
+            UsageService.featureManageDrivers,
+            const DriversScreen(),
+          ),
           const Divider(color: Colors.white12),
-          _buildThemedDrawerItem(context, 'Alert Hub', Icons.notification_important_outlined, UsageService.featureReminders, const RemindersScreen()),
+          _buildThemedDrawerItem(
+            context,
+            'Alert Hub',
+            Icons.notification_important_outlined,
+            UsageService.featureReminders,
+            const RemindersScreen(),
+          ),
           ListTile(
             leading: Icon(Icons.settings_outlined, color: Colors.white70),
-            title: Text('Settings', style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold)),
+            title: Text(
+              'Settings',
+              style: TextStyle(
+                color: Colors.white70,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             onTap: () {
               Navigator.pop(context);
               Navigator.push(
@@ -728,17 +871,30 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     );
   }
 
-  Widget _buildThemedDrawerItem(BuildContext context, String title, IconData icon, String featureId, Widget screen) {
+  Widget _buildThemedDrawerItem(
+    BuildContext context,
+    String title,
+    IconData icon,
+    String featureId,
+    Widget screen,
+  ) {
     return ListTile(
       leading: Icon(icon, color: Colors.white70),
-      title: Text(title, style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold, fontSize: 13)),
+      title: Text(
+        title,
+        style: TextStyle(
+          color: Colors.white70,
+          fontWeight: FontWeight.bold,
+          fontSize: 13,
+        ),
+      ),
       onTap: () {
         Navigator.pop(context);
         if (featureId == 'home') return;
         if (featureId != 'history') {
-           _handleFeatureTap(featureId, screen);
+          _handleFeatureTap(featureId, screen);
         } else {
-           Navigator.push(
+          Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => screen),
           ).then((_) => setState(() {}));
@@ -746,33 +902,58 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       },
     );
   }
+
   Widget _buildSmartFab(BuildContext context, List<Vehicle> alerts) {
-    final bool hasUrgentAlarms = alerts.any((v) => v.isWofExpired || v.isRegoExpired);
-    final bool hasUpcomingAlerts = alerts.any((v) => v.isWofExpiringSoon || v.isRegoExpiringSoon || v.isServiceDueSoon);
+    final bool hasUrgentAlarms = alerts.any(
+      (v) => v.isWofExpired || v.isRegoExpired,
+    );
+    final bool hasUpcomingAlerts = alerts.any(
+      (v) => v.isWofExpiringSoon || v.isRegoExpiringSoon || v.isServiceDueSoon,
+    );
 
     if (hasUrgentAlarms) {
       return FloatingActionButton.extended(
-        onPressed: () => _handleFeatureTap(UsageService.featureManageVehicles, const VehiclesScreen()),
+        onPressed: () => _handleFeatureTap(
+          UsageService.featureManageVehicles,
+          const VehiclesScreen(),
+        ),
         backgroundColor: const Color(0xFFFF5252),
         icon: Icon(Icons.warning_amber_rounded, color: Colors.white),
-        label: Text('FIX ALERTS', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        label: Text(
+          'FIX ALERTS',
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
       );
     }
 
     if (hasUpcomingAlerts) {
       return FloatingActionButton.extended(
-        onPressed: () => _handleFeatureTap(UsageService.featureNewInspection, const InspectionFormScreen()),
+        onPressed: () => _handleFeatureTap(
+          UsageService.featureNewInspection,
+          const InspectionFormScreen(),
+        ),
         backgroundColor: const Color(0xFFFF9800),
         icon: Icon(Icons.speed, color: Colors.white),
-        label: Text('DUE SOON: SCAN', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        label: Text(
+          'DUE SOON: SCAN',
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
       );
     }
 
     return FloatingActionButton.extended(
-      onPressed: () => _handleFeatureTap(UsageService.featureNewInspection, const InspectionFormScreen()),
+      onPressed: () => _handleFeatureTap(
+        UsageService.featureNewInspection,
+        const InspectionFormScreen(),
+      ),
       backgroundColor: const Color(0xFF4FC3F7),
       icon: Icon(Icons.speed, color: Colors.white),
-      label: FittedBox(child: Text('Speed Check', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white))),
+      label: FittedBox(
+        child: Text(
+          'Speed Check',
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+      ),
     );
   }
 }
@@ -787,10 +968,18 @@ class CarbonFiberPainter extends CustomPainter {
 
     const step = 4.0;
     for (double i = -size.height; i < size.width; i += step) {
-      canvas.drawLine(Offset(i, 0), Offset(i + size.height, size.height), paint);
+      canvas.drawLine(
+        Offset(i, 0),
+        Offset(i + size.height, size.height),
+        paint,
+      );
     }
     for (double i = 0; i < size.width + size.height; i += step) {
-      canvas.drawLine(Offset(i, 0), Offset(i - size.height, size.height), paint);
+      canvas.drawLine(
+        Offset(i, 0),
+        Offset(i - size.height, size.height),
+        paint,
+      );
     }
   }
 
@@ -807,7 +996,7 @@ class SpeedometerPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = size.width / 2;
-    
+
     final bgPaint = Paint()
       ..color = Colors.white10
       ..style = PaintingStyle.stroke
@@ -840,23 +1029,25 @@ class SpeedometerPainter extends CustomPainter {
       false,
       progressPaint,
     );
-    
+
     // Needle
     final needleAngle = math.pi * 0.8 + (math.pi * 1.4 * value);
     final needlePaint = Paint()
       ..color = Colors.white
       ..strokeWidth = 3
       ..strokeCap = StrokeCap.round;
-      
+
     canvas.drawLine(
       center,
-      center + Offset(math.cos(needleAngle), math.sin(needleAngle)) * (radius - 15),
+      center +
+          Offset(math.cos(needleAngle), math.sin(needleAngle)) * (radius - 15),
       needlePaint,
     );
-    
+
     canvas.drawCircle(center, 5, Paint()..color = Colors.white);
   }
 
   @override
-  bool shouldRepaint(SpeedometerPainter oldDelegate) => oldDelegate.value != value;
+  bool shouldRepaint(SpeedometerPainter oldDelegate) =>
+      oldDelegate.value != value;
 }

@@ -62,22 +62,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   Text(
                     'Appearance',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Customize app appearance',
-                    style: TextStyle(
-                      color: Colors.grey.shade600,
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
                   ),
                   const SizedBox(height: 24),
                   Consumer<ThemeProvider>(
                     builder: (context, themeProvider, child) {
                       return DropdownButtonFormField<ThemeMode>(
-                        value: themeProvider.themeMode,
+                        initialValue: themeProvider.themeMode,
                         decoration: InputDecoration(
                           labelText: 'Theme Mode',
                           border: OutlineInputBorder(),
@@ -101,9 +98,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           if (value != null) {
                             themeProvider.setThemeMode(value);
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Theme updated'),
-                              ),
+                              const SnackBar(content: Text('Theme updated')),
                             );
                           }
                         },
@@ -115,7 +110,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          
+
           // Default Selections Card
           Card(
             child: Padding(
@@ -126,22 +121,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   Text(
                     'Default Selections',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Set default values for new inspections',
-                    style: TextStyle(
-                      color: Colors.grey.shade600,
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
                   ),
                   const SizedBox(height: 24),
 
                   // Default Vehicle
                   DropdownButtonFormField<String>(
-                    value: _defaultVehicleId,
+                    initialValue: _defaultVehicleId,
                     decoration: InputDecoration(
                       labelText: 'Default Vehicle',
                       border: OutlineInputBorder(),
@@ -177,7 +169,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                   // Default Store
                   DropdownButtonFormField<String>(
-                    value: _defaultStoreId,
+                    initialValue: _defaultStoreId,
                     decoration: InputDecoration(
                       labelText: 'Default Store',
                       border: OutlineInputBorder(),
@@ -213,7 +205,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                   // Default Driver
                   DropdownButtonFormField<String>(
-                    value: _defaultDriverId,
+                    initialValue: _defaultDriverId,
                     decoration: InputDecoration(
                       labelText: 'Default Driver/Employee',
                       border: OutlineInputBorder(),
@@ -261,19 +253,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   Text(
                     'Data Management',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Backup and restore your data',
-                    style: TextStyle(
-                      color: Colors.grey.shade600,
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
                   ),
                   const SizedBox(height: 24),
-                  
+
                   // Export Button
                   SizedBox(
                     width: double.infinity,
@@ -283,7 +272,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           await DataBackupService.exportDatabase();
                           if (mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Database exported successfully')),
+                              const SnackBar(
+                                content: Text('Database exported successfully'),
+                              ),
                             );
                           }
                         } catch (e) {
@@ -299,21 +290,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  
+
                   // Import Button
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton.icon(
                       onPressed: () async {
                         try {
-                          final success = await DataBackupService.importDatabase();
+                          final success =
+                              await DataBackupService.importDatabase();
                           if (success && mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Database imported successfully')),
+                              const SnackBar(
+                                content: Text('Database imported successfully'),
+                              ),
                             );
                             // Refresh UI if needed, though Hive updates should be reactive if using ValueListenableBuilder
                             // But here we might want to reload defaults if they were overwritten
-                            _loadDefaults(); 
+                            _loadDefaults();
                           }
                         } catch (e) {
                           if (mounted) {

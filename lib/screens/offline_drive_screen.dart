@@ -16,15 +16,16 @@ class OfflineDriveScreen extends StatefulWidget {
   State<OfflineDriveScreen> createState() => _OfflineDriveScreenState();
 }
 
-class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTickerProviderStateMixin {
+class _OfflineDriveScreenState extends State<OfflineDriveScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _entranceController;
   late List<Animation<double>> _staggeredAnimations;
-  
+
   Directory? _currentDir;
   List<FileSystemEntity> _contents = [];
   bool _isLoading = true;
   bool _isBackfilling = false;
-  
+
   // Selection state
   bool _isSelectionMode = false;
   Set<String> _selectedPaths = {};
@@ -64,7 +65,8 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
   }
 
   Future<void> _initializeDirectory() async {
-    final rootDir = widget.initialDirectory ?? await OfflineDriveService.getRootDirectory();
+    final rootDir =
+        widget.initialDirectory ?? await OfflineDriveService.getRootDirectory();
     if (mounted) {
       setState(() {
         _currentDir = rootDir;
@@ -76,12 +78,12 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
   Future<void> _loadContents() async {
     final currentDir = _currentDir;
     if (currentDir == null) return;
-    
+
     setState(() => _isLoading = true);
     try {
       final rootDir = await OfflineDriveService.getRootDirectory();
       if (rootDir.path == currentDir.path) {
-          await OfflineDriveService.syncStructure();
+        await OfflineDriveService.syncStructure();
       }
       final items = await OfflineDriveService.getContents(currentDir);
       if (mounted) {
@@ -93,9 +95,9 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading folder: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error loading folder: $e')));
       }
     }
   }
@@ -144,11 +146,19 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.delete_sweep_outlined, color: Color(0xFFFF5252), size: 48),
+              Icon(
+                Icons.delete_sweep_outlined,
+                color: Color(0xFFFF5252),
+                size: 48,
+              ),
               const SizedBox(height: 24),
               Text(
                 'DELETE',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 1),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1,
+                ),
               ),
               const SizedBox(height: 16),
               Text(
@@ -159,20 +169,23 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
               const SizedBox(height: 32),
               Row(
                 children: [
-                   Expanded(
-                     child: TextButton(
-                       onPressed: () => Navigator.pop(context, false),
-                       child: Text('ABORT'),
-                     ),
-                   ),
-                   const SizedBox(width: 16),
-                   Expanded(
-                     child: ElevatedButton(
-                       onPressed: () => Navigator.pop(context, true),
-                       style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF5252), foregroundColor: Colors.white),
-                       child: Text('DELETE'),
-                     ),
-                   ),
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: Text('ABORT'),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFF5252),
+                        foregroundColor: Colors.white,
+                      ),
+                      child: Text('DELETE'),
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -188,7 +201,7 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
         final entity = _contents.firstWhere((e) => e.path == path);
         await OfflineDriveService.deleteFileOrFolder(entity);
       }
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Deleted ${_selectedPaths.length} item(s)')),
@@ -198,33 +211,35 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error deleting: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error deleting: $e')));
       }
     }
   }
 
   Future<void> _shareSelected() async {
     try {
-      final pdfPaths = _selectedPaths.where((p) => p.toLowerCase().endsWith('.pdf')).toList();
-      
+      final pdfPaths = _selectedPaths
+          .where((p) => p.toLowerCase().endsWith('.pdf'))
+          .toList();
+
       if (pdfPaths.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No PDF files selected')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('No PDF files selected')));
         return;
       }
 
       final xFiles = pdfPaths.map((p) => XFile(p)).toList();
       await Share.shareXFiles(xFiles, text: 'Inspection Reports');
-      
+
       _exitSelectionMode();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error sharing: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error sharing: $e')));
       }
     }
   }
@@ -247,7 +262,11 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
               const SizedBox(height: 24),
               Text(
                 'COMPILING DATA',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 2),
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 2,
+                ),
               ),
               const SizedBox(height: 8),
               Text(
@@ -262,8 +281,10 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
     );
 
     try {
-      final pdfFiles = await OfflineDriveService.collectPdfsFromPaths(_selectedPaths.toList());
-      
+      final pdfFiles = await OfflineDriveService.collectPdfsFromPaths(
+        _selectedPaths.toList(),
+      );
+
       if (pdfFiles.isEmpty) {
         if (mounted) {
           Navigator.pop(context);
@@ -290,17 +311,19 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
         await Printing.sharePdf(bytes: pdfBytes, filename: filename);
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Combined ${pdfFiles.length} PDFs successfully!')),
+          SnackBar(
+            content: Text('Combined ${pdfFiles.length} PDFs successfully!'),
+          ),
         );
-        
+
         _exitSelectionMode();
       }
     } catch (e) {
       if (mounted) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error combining: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error combining: $e')));
       }
     }
   }
@@ -319,10 +342,7 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => PdfViewerScreen(
-          file: file,
-          title: name,
-        ),
+        builder: (context) => PdfViewerScreen(file: file, title: name),
       ),
     );
   }
@@ -342,7 +362,11 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
               const SizedBox(height: 24),
               Text(
                 'DRIVE SYNC',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 1),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1,
+                ),
               ),
               const SizedBox(height: 16),
               Text(
@@ -353,20 +377,23 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
               const SizedBox(height: 32),
               Row(
                 children: [
-                   Expanded(
-                     child: TextButton(
-                       onPressed: () => Navigator.pop(context, false),
-                       child: Text('LATER'),
-                     ),
-                   ),
-                   const SizedBox(width: 16),
-                   Expanded(
-                     child: ElevatedButton(
-                       onPressed: () => Navigator.pop(context, true),
-                       style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFD700), foregroundColor: Colors.black),
-                       child: Text('INITIALIZE'),
-                     ),
-                   ),
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: Text('LATER'),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFFD700),
+                        foregroundColor: Colors.black,
+                      ),
+                      child: Text('INITIALIZE'),
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -380,14 +407,16 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
     setState(() => _isBackfilling = true);
 
     if (!mounted) return;
-    
+
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) {
         return Dialog(
           backgroundColor: Theme.of(context).colorScheme.surface,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(32),
+          ),
           child: Padding(
             padding: EdgeInsets.all(32),
             child: Column(
@@ -397,7 +426,11 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
                 const SizedBox(height: 24),
                 Text(
                   'SYNCING DRIVE',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 2),
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 2,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -418,20 +451,20 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
           debugPrint('$status ($completed/$total)');
         },
       );
-      
+
       if (mounted) {
         Navigator.pop(context);
         _loadContents();
-        ScaffoldMessenger.of(context).showSnackBar(
-           const SnackBar(content: Text('Drive Sync Completed!')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Drive Sync Completed!')));
       }
     } catch (e) {
       if (mounted) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error during sync: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error during sync: $e')));
       }
     } finally {
       if (mounted) {
@@ -439,7 +472,6 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
       }
     }
   }
-
 
   List<FileSystemEntity> get _filteredAndSortedContents {
     List<FileSystemEntity> result = _contents;
@@ -456,7 +488,11 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
     result.sort((a, b) {
       int comparison = 0;
       if (_sortBy == 'name') {
-        comparison = a.path.split('/').last.toLowerCase().compareTo(b.path.split('/').last.toLowerCase());
+        comparison = a.path
+            .split('/')
+            .last
+            .toLowerCase()
+            .compareTo(b.path.split('/').last.toLowerCase());
       } else if (_sortBy == 'date') {
         comparison = a.statSync().modified.compareTo(b.statSync().modified);
       } else if (_sortBy == 'type') {
@@ -475,12 +511,14 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
     if (_currentDir == null) {
       return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
-        body: Center(child: CircularProgressIndicator(color: Color(0xFF4FC3F7))),
+        body: Center(
+          child: CircularProgressIndicator(color: Color(0xFF4FC3F7)),
+        ),
       );
     }
-    
-    final folderName = _currentDir!.path.split('/').last.isEmpty 
-        ? 'DRIVE' 
+
+    final folderName = _currentDir!.path.split('/').last.isEmpty
+        ? 'DRIVE'
         : _currentDir!.path.split('/').last.toUpperCase();
 
     return Scaffold(
@@ -493,74 +531,171 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
             pinned: true,
             backgroundColor: Theme.of(context).colorScheme.surface,
             title: _isSelectionMode
-                ? Text('${_selectedPaths.length} SELECTED', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900))
+                ? Text(
+                    '${_selectedPaths.length} SELECTED',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
+                  )
                 : _isSearchMode
-                    ? TextField(
-                        controller: _searchController,
-                        autofocus: true,
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                        decoration: InputDecoration(hintText: 'SCANNING...'),
-                        onChanged: (val) => setState(() => _searchQuery = val.toLowerCase()),
-                      )
-                    : Text(folderName),
+                ? TextField(
+                    controller: _searchController,
+                    autofocus: true,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    decoration: InputDecoration(hintText: 'SCANNING...'),
+                    onChanged: (val) =>
+                        setState(() => _searchQuery = val.toLowerCase()),
+                  )
+                : Text(folderName),
             leading: _isSelectionMode
-                ? IconButton(icon: Icon(Icons.close), onPressed: _exitSelectionMode)
+                ? IconButton(
+                    icon: Icon(Icons.close),
+                    onPressed: _exitSelectionMode,
+                  )
                 : _isSearchMode
-                    ? IconButton(icon: Icon(Icons.arrow_back), onPressed: () {
-                        setState(() { _isSearchMode = false; _searchQuery = ''; _searchController.clear(); });
-                      })
-                    : (Navigator.canPop(context) ? const BackButton() : null),
+                ? IconButton(
+                    icon: Icon(Icons.arrow_back),
+                    onPressed: () {
+                      setState(() {
+                        _isSearchMode = false;
+                        _searchQuery = '';
+                        _searchController.clear();
+                      });
+                    },
+                  )
+                : (Navigator.canPop(context) ? const BackButton() : null),
             actions: _isSelectionMode
                 ? [
-                    IconButton(icon: Icon(Icons.select_all), onPressed: _selectAll, tooltip: 'Select All'),
-                    IconButton(icon: Icon(Icons.share_outlined), onPressed: _shareSelected, tooltip: 'Share'),
-                    IconButton(icon: Icon(Icons.picture_as_pdf_outlined), onPressed: _combineSelected, tooltip: 'Combine PDFs'),
-                    IconButton(icon: Icon(Icons.delete_outline, color: Color(0xFFFF5252)), onPressed: _deleteSelected, tooltip: 'Delete'),
+                    IconButton(
+                      icon: Icon(Icons.select_all),
+                      onPressed: _selectAll,
+                      tooltip: 'Select All',
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.share_outlined),
+                      onPressed: _shareSelected,
+                      tooltip: 'Share',
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.picture_as_pdf_outlined),
+                      onPressed: _combineSelected,
+                      tooltip: 'Combine PDFs',
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        Icons.delete_outline,
+                        color: Color(0xFFFF5252),
+                      ),
+                      onPressed: _deleteSelected,
+                      tooltip: 'Delete',
+                    ),
                   ]
                 : [
                     if (!_isSearchMode) ...[
-                      if (folderName == 'DATA DRIVE' || folderName == 'OFFLINE DRIVE')
-                        IconButton(icon: Icon(Icons.sync_outlined), onPressed: _isBackfilling ? null : _runBackfill, tooltip: 'Sync'),
-                      IconButton(icon: Icon(Icons.search_outlined), onPressed: () => setState(() => _isSearchMode = true), tooltip: 'Search'),
-                      IconButton(icon: Icon(Icons.library_books_outlined), onPressed: _combinePdfs, tooltip: 'Combine All'),
+                      if (folderName == 'DATA DRIVE' ||
+                          folderName == 'OFFLINE DRIVE')
+                        IconButton(
+                          icon: Icon(Icons.sync_outlined),
+                          onPressed: _isBackfilling ? null : _runBackfill,
+                          tooltip: 'Sync',
+                        ),
+                      IconButton(
+                        icon: Icon(Icons.search_outlined),
+                        onPressed: () => setState(() => _isSearchMode = true),
+                        tooltip: 'Search',
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.library_books_outlined),
+                        onPressed: _combinePdfs,
+                        tooltip: 'Combine All',
+                      ),
                       PopupMenuButton<String>(
                         icon: Icon(Icons.sort_outlined),
-                        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                        onSelected: (value) => value == 'toggle_order' ? setState(() => _sortAscending = !_sortAscending) : setState(() => _sortBy = value),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.surfaceContainerHighest,
+                        onSelected: (value) => value == 'toggle_order'
+                            ? setState(() => _sortAscending = !_sortAscending)
+                            : setState(() => _sortBy = value),
                         itemBuilder: (context) => [
                           _buildSortItem('name', Icons.sort_by_alpha, 'Name'),
-                          _buildSortItem('date', Icons.calendar_today_outlined, 'Date'),
-                          _buildSortItem('type', Icons.category_outlined, 'Type'),
+                          _buildSortItem(
+                            'date',
+                            Icons.calendar_today_outlined,
+                            'Date',
+                          ),
+                          _buildSortItem(
+                            'type',
+                            Icons.category_outlined,
+                            'Type',
+                          ),
                           const PopupMenuDivider(height: 1),
                           PopupMenuItem(
                             value: 'toggle_order',
-                            child: Row(children: [Icon(_sortAscending ? Icons.arrow_upward : Icons.arrow_downward, size: 18), const SizedBox(width: 8), Text(_sortAscending ? 'ASCENDING' : 'DESCENDING', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold))]),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  _sortAscending
+                                      ? Icons.arrow_upward
+                                      : Icons.arrow_downward,
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  _sortAscending ? 'ASCENDING' : 'DESCENDING',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
                       if (_contents.isNotEmpty)
-                        IconButton(icon: Icon(Icons.checklist_outlined), onPressed: () => _enterSelectionMode(''), tooltip: 'Select'),
-                    ]
+                        IconButton(
+                          icon: Icon(Icons.checklist_outlined),
+                          onPressed: () => _enterSelectionMode(''),
+                          tooltip: 'Select',
+                        ),
+                    ],
                   ],
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(40),
               child: _buildBreadcrumbs(),
             ),
           ),
-          
+
           if (_isLoading)
-            const SliverFillRemaining(child: Center(child: CircularProgressIndicator(color: Color(0xFF4FC3F7))))
+            const SliverFillRemaining(
+              child: Center(
+                child: CircularProgressIndicator(color: Color(0xFF4FC3F7)),
+              ),
+            )
           else if (_filteredAndSortedContents.isEmpty)
             SliverFillRemaining(
               child: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.folder_off_outlined, size: 64, color: Colors.white.withValues(alpha: 0.05)),
+                    Icon(
+                      Icons.folder_off_outlined,
+                      size: 64,
+                      color: Colors.white.withValues(alpha: 0.05),
+                    ),
                     const SizedBox(height: 16),
                     Text(
-                      _searchQuery.isEmpty ? 'EMPTY SYSTEM HUB' : 'NO TELEMETRY MATCHES',
-                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 2, color: Colors.white24),
+                      _searchQuery.isEmpty
+                          ? 'EMPTY SYSTEM HUB'
+                          : 'NO TELEMETRY MATCHES',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 2,
+                        color: Colors.white24,
+                      ),
                     ),
                   ],
                 ),
@@ -570,83 +705,117 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
             SliverPadding(
               padding: EdgeInsets.fromLTRB(16, 8, 16, 100),
               sliver: SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final item = _filteredAndSortedContents[index];
-                    final name = item.path.split('/').last;
-                    final isDir = item is Directory;
-                    final isSelected = _selectedPaths.contains(item.path);
-                    
-                    final animation = _staggeredAnimations[index % 20];
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final item = _filteredAndSortedContents[index];
+                  final name = item.path.split('/').last;
+                  final isDir = item is Directory;
+                  final isSelected = _selectedPaths.contains(item.path);
 
-                    return FadeTransition(
-                      opacity: animation,
-                      child: SlideTransition(
-                        position: animation.drive(Tween<Offset>(begin: const Offset(0.1, 0), end: Offset.zero)),
-                        child: Container(
-                          margin: EdgeInsets.only(bottom: 8),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: isSelected ? const Color(0xFF4FC3F7) : Colors.white.withValues(alpha: 0.05),
-                              width: isSelected ? 2 : 1,
-                            ),
-                          ),
-                          child: ListTile(
-                            contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                            leading: isDir
-                                ? Container(
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(color: const Color(0xFF1C222D), borderRadius: BorderRadius.circular(12)),
-                                    child: Icon(Icons.folder_open_outlined, color: Color(0xFF4FC3F7), size: 24),
-                                  )
-                                : Container(
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(color: const Color(0xFF1C222D), borderRadius: BorderRadius.circular(12)),
-                                    child: Icon(Icons.description_outlined, color: Color(0xFFE91E63), size: 24),
-                                  ),
-                            title: Text(
-                              name.toUpperCase(),
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 0.5,
-                                color: isSelected ? const Color(0xFF4FC3F7) : Colors.white70,
-                              ),
-                            ),
-                            subtitle: Text(
-                              isDir ? 'FOLDER' : 'REPORT PDF',
-                              style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white24, letterSpacing: 1),
-                            ),
-                            trailing: isDir && !_isSelectionMode 
-                                ? Icon(Icons.chevron_right, color: Colors.white10) 
-                                : _isSelectionMode
-                                    ? Icon(
-                                        isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
-                                        color: isSelected ? const Color(0xFF4FC3F7) : Colors.white10,
-                                      )
-                                    : null,
-                            onLongPress: () => _enterSelectionMode(item.path),
-                            onTap: () {
-                              if (_isSelectionMode) {
-                                _toggleSelection(item.path);
-                              } else {
-                                if (isDir) {
-                                  _navigateTo(item as Directory);
-                                } else {
-                                  _openFile(item as File);
-                                }
-                              }
-                            },
-                          ),
+                  final animation = _staggeredAnimations[index % 20];
+
+                  return FadeTransition(
+                    opacity: animation,
+                    child: SlideTransition(
+                      position: animation.drive(
+                        Tween<Offset>(
+                          begin: const Offset(0.1, 0),
+                          end: Offset.zero,
                         ),
                       ),
-                    );
-                  },
-                  childCount: _filteredAndSortedContents.length,
-                ),
+                      child: Container(
+                        margin: EdgeInsets.only(bottom: 8),
+                        decoration: BoxDecoration(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.surfaceContainerHighest,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: isSelected
+                                ? const Color(0xFF4FC3F7)
+                                : Colors.white.withValues(alpha: 0.05),
+                            width: isSelected ? 2 : 1,
+                          ),
+                        ),
+                        child: ListTile(
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 8,
+                          ),
+                          leading: isDir
+                              ? Container(
+                                  padding: EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF1C222D),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Icon(
+                                    Icons.folder_open_outlined,
+                                    color: Color(0xFF4FC3F7),
+                                    size: 24,
+                                  ),
+                                )
+                              : Container(
+                                  padding: EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF1C222D),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Icon(
+                                    Icons.description_outlined,
+                                    color: Color(0xFFE91E63),
+                                    size: 24,
+                                  ),
+                                ),
+                          title: Text(
+                            name.toUpperCase(),
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 0.5,
+                              color: isSelected
+                                  ? const Color(0xFF4FC3F7)
+                                  : Colors.white70,
+                            ),
+                          ),
+                          subtitle: Text(
+                            isDir ? 'FOLDER' : 'REPORT PDF',
+                            style: TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white24,
+                              letterSpacing: 1,
+                            ),
+                          ),
+                          trailing: isDir && !_isSelectionMode
+                              ? Icon(Icons.chevron_right, color: Colors.white10)
+                              : _isSelectionMode
+                              ? Icon(
+                                  isSelected
+                                      ? Icons.check_circle
+                                      : Icons.radio_button_unchecked,
+                                  color: isSelected
+                                      ? const Color(0xFF4FC3F7)
+                                      : Colors.white10,
+                                )
+                              : null,
+                          onLongPress: () => _enterSelectionMode(item.path),
+                          onTap: () {
+                            if (_isSelectionMode) {
+                              _toggleSelection(item.path);
+                            } else {
+                              if (isDir) {
+                                _navigateTo(item);
+                              } else {
+                                _openFile(item as File);
+                              }
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                  );
+                }, childCount: _filteredAndSortedContents.length),
               ),
             ),
         ],
@@ -654,19 +823,30 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
     );
   }
 
-  PopupMenuItem<String> _buildSortItem(String value, IconData icon, String label) {
+  PopupMenuItem<String> _buildSortItem(
+    String value,
+    IconData icon,
+    String label,
+  ) {
     final isSelected = _sortBy == value;
     return PopupMenuItem(
       value: value,
       child: Row(
         children: [
-          Icon(icon, size: 18, color: isSelected ? const Color(0xFF4FC3F7) : Colors.white24),
+          Icon(
+            icon,
+            size: 18,
+            color: isSelected ? const Color(0xFF4FC3F7) : Colors.white24,
+          ),
           const SizedBox(width: 8),
-          Text(label.toUpperCase(), style: TextStyle(
-            fontSize: 10, 
-            fontWeight: FontWeight.bold,
-            color: isSelected ? const Color(0xFF4FC3F7) : Colors.white70,
-          )),
+          Text(
+            label.toUpperCase(),
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+              color: isSelected ? const Color(0xFF4FC3F7) : Colors.white70,
+            ),
+          ),
         ],
       ),
     );
@@ -675,7 +855,7 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
   Future<void> _combinePdfs() async {
     final currentDir = _currentDir;
     if (currentDir == null) return;
-    
+
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => Dialog(
@@ -686,11 +866,19 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.library_books_outlined, color: Color(0xFF4FC3F7), size: 48),
+              Icon(
+                Icons.library_books_outlined,
+                color: Color(0xFF4FC3F7),
+                size: 48,
+              ),
               const SizedBox(height: 24),
               Text(
                 'COMBINE ALL',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 1),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1,
+                ),
               ),
               const SizedBox(height: 16),
               Text(
@@ -701,19 +889,19 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
               const SizedBox(height: 32),
               Row(
                 children: [
-                   Expanded(
-                     child: TextButton(
-                       onPressed: () => Navigator.pop(context, false),
-                       child: Text('ABORT'),
-                     ),
-                   ),
-                   const SizedBox(width: 16),
-                   Expanded(
-                     child: ElevatedButton(
-                       onPressed: () => Navigator.pop(context, true),
-                       child: Text('PROCEED'),
-                     ),
-                   ),
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: Text('ABORT'),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      child: Text('PROCEED'),
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -740,7 +928,11 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
               const SizedBox(height: 24),
               Text(
                 'COMPILING HUB',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 2),
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 2,
+                ),
               ),
               const SizedBox(height: 8),
               Text(
@@ -778,9 +970,9 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
     } catch (e) {
       if (mounted) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     }
   }
@@ -794,11 +986,14 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen> with SingleTick
       future: OfflineDriveService.getRootDirectory(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) return const SizedBox.shrink();
-        
+
         final rootPath = snapshot.data!.path;
         final relativePath = _currentDir!.path.replaceFirst(rootPath, '');
-        final parts = relativePath.split('/').where((p) => p.isNotEmpty).toList();
-        
+        final parts = relativePath
+            .split('/')
+            .where((p) => p.isNotEmpty)
+            .toList();
+
         return Container(
           height: 40,
           padding: EdgeInsets.symmetric(horizontal: 16),

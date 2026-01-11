@@ -25,10 +25,11 @@ class InspectionFormScreen extends StatefulWidget {
   State<InspectionFormScreen> createState() => _InspectionFormScreenState();
 }
 
-class _InspectionFormScreenState extends State<InspectionFormScreen> with SingleTickerProviderStateMixin {
+class _InspectionFormScreenState extends State<InspectionFormScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _entranceController;
   late List<Animation<double>> _staggeredAnimations;
-  
+
   final _formKey = GlobalKey<FormState>();
   final _odometerController = TextEditingController();
   final _correctiveActionsController = TextEditingController();
@@ -98,11 +99,27 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
 
   double get _completionPercentage {
     final fields = [
-      _tyresTreadDepth, _wheelNuts, _cleanliness, _bodyDamage, _mirrorsWindows,
-      _signage, _engineOilWater, _brakes, _transmission, _tailLights,
-      _headlightsLowBeam, _headlightsHighBeam, _reverseLights, _brakeLights,
-      _windscreenWipers, _horn, _indicators, _seatBelts, _cabCleanliness,
-      _serviceLogBook, _spareKeys
+      _tyresTreadDepth,
+      _wheelNuts,
+      _cleanliness,
+      _bodyDamage,
+      _mirrorsWindows,
+      _signage,
+      _engineOilWater,
+      _brakes,
+      _transmission,
+      _tailLights,
+      _headlightsLowBeam,
+      _headlightsHighBeam,
+      _reverseLights,
+      _brakeLights,
+      _windscreenWipers,
+      _horn,
+      _indicators,
+      _seatBelts,
+      _cabCleanliness,
+      _serviceLogBook,
+      _spareKeys,
     ];
     final total = fields.length;
     final completed = fields.where((f) => f != null).length;
@@ -114,7 +131,7 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
     final vehicleId = await PreferencesService.getDefaultVehicle();
     final storeId = await PreferencesService.getDefaultStore();
     final driverId = await PreferencesService.getDefaultDriver();
-    
+
     setState(() {
       _selectedVehicleId = vehicleId;
       _selectedStoreId = storeId;
@@ -202,7 +219,9 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                 if (widget.inspection != null)
                   IconButton(
                     icon: Icon(Icons.picture_as_pdf_outlined, size: 28),
-                    onPressed: () => PdfService.shareTemplateMatchingInspection(widget.inspection!),
+                    onPressed: () => PdfService.shareTemplateMatchingInspection(
+                      widget.inspection!,
+                    ),
                   ),
                 const SizedBox(width: 8),
               ],
@@ -216,12 +235,21 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                             'SYSTEM READINESS',
-                             style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 2, color: Colors.white24),
+                            'SYSTEM READINESS',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 2,
+                              color: Colors.white24,
+                            ),
                           ),
                           Text(
                             '${_completionPercentage.toInt()}%',
-                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: accentColor),
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w900,
+                              color: accentColor,
+                            ),
                           ),
                         ],
                       ),
@@ -231,7 +259,9 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                         child: LinearProgressIndicator(
                           value: _completionPercentage / 100,
                           backgroundColor: Colors.white.withValues(alpha: 0.05),
-                          valueColor: AlwaysStoppedAnimation<Color>(accentColor),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            accentColor,
+                          ),
                           minHeight: 4,
                         ),
                       ),
@@ -240,7 +270,7 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                 ),
               ),
             ),
-            
+
             SliverPadding(
               padding: EdgeInsets.fromLTRB(24, 8, 24, 100),
               sliver: SliverList(
@@ -248,32 +278,63 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                   // Section 1: Telemetry
                   _buildAnimatedSection(0, 'TELEMETRY', [
                     DropdownButtonFormField<String>(
-                      value: _selectedVehicleId,
+                      initialValue: _selectedVehicleId,
                       isExpanded: true,
-                      decoration: InputDecoration(labelText: 'TARGET VEHICLE', prefixIcon: Icon(Icons.directions_car_outlined)),
-                      dropdownColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-                      items: vehicles.map((v) => DropdownMenuItem(
-                        value: v.id, 
-                        child: Text(v.registrationNo.toUpperCase(), overflow: TextOverflow.ellipsis)
-                      )).toList(),
-                      onChanged: widget.isViewOnly ? null : (val) => setState(() => _selectedVehicleId = val),
+                      decoration: InputDecoration(
+                        labelText: 'TARGET VEHICLE',
+                        prefixIcon: Icon(Icons.directions_car_outlined),
+                      ),
+                      dropdownColor: Theme.of(
+                        context,
+                      ).colorScheme.surfaceContainerHighest,
+                      items: vehicles
+                          .map(
+                            (v) => DropdownMenuItem(
+                              value: v.id,
+                              child: Text(
+                                v.registrationNo.toUpperCase(),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: widget.isViewOnly
+                          ? null
+                          : (val) => setState(() => _selectedVehicleId = val),
                     ),
                     const SizedBox(height: 16),
                     DropdownButtonFormField<String>(
-                      value: _selectedStoreId,
+                      initialValue: _selectedStoreId,
                       isExpanded: true,
-                      decoration: InputDecoration(labelText: 'STAGING HUB', prefixIcon: Icon(Icons.store_outlined)),
-                      dropdownColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-                      items: stores.map((s) => DropdownMenuItem(
-                        value: s.id, 
-                        child: Text(s.name.toUpperCase(), overflow: TextOverflow.ellipsis)
-                      )).toList(),
-                      onChanged: widget.isViewOnly ? null : (val) async {
-                        setState(() => _selectedStoreId = val);
-                        if (val != null && _selectedVehicleId != null) {
-                          await UsageService.trackSelection(_selectedVehicleId!, storeId: val);
-                        }
-                      },
+                      decoration: InputDecoration(
+                        labelText: 'STAGING HUB',
+                        prefixIcon: Icon(Icons.store_outlined),
+                      ),
+                      dropdownColor: Theme.of(
+                        context,
+                      ).colorScheme.surfaceContainerHighest,
+                      items: stores
+                          .map(
+                            (s) => DropdownMenuItem(
+                              value: s.id,
+                              child: Text(
+                                s.name.toUpperCase(),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: widget.isViewOnly
+                          ? null
+                          : (val) async {
+                              setState(() => _selectedStoreId = val);
+                              if (val != null && _selectedVehicleId != null) {
+                                await UsageService.trackSelection(
+                                  _selectedVehicleId!,
+                                  storeId: val,
+                                );
+                              }
+                            },
                     ),
                     const SizedBox(height: 16),
                     Row(
@@ -282,32 +343,44 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                           child: TextFormField(
                             controller: _odometerController,
                             decoration: InputDecoration(
-                              labelText: 'ODOMETER', 
-                              suffixIcon: widget.isViewOnly ? null : SizedBox(
-                                width: 110, // Sufficient width for two icons
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      padding: EdgeInsets.zero,
-                                      constraints: const BoxConstraints(),
-                                      icon: Icon(Icons.auto_awesome, color: Color(0xFF00E676), size: 18),
-                                      tooltip: 'MAGIC ESTIMATE',
-                                      onPressed: _magicEstimateOdometer,
+                              labelText: 'ODOMETER',
+                              suffixIcon: widget.isViewOnly
+                                  ? null
+                                  : SizedBox(
+                                      width:
+                                          110, // Sufficient width for two icons
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          IconButton(
+                                            padding: EdgeInsets.zero,
+                                            constraints: const BoxConstraints(),
+                                            icon: Icon(
+                                              Icons.auto_awesome,
+                                              color: Color(0xFF00E676),
+                                              size: 18,
+                                            ),
+                                            tooltip: 'MAGIC ESTIMATE',
+                                            onPressed: _magicEstimateOdometer,
+                                          ),
+                                          const SizedBox(width: 6),
+                                          IconButton(
+                                            padding: EdgeInsets.zero,
+                                            constraints: const BoxConstraints(),
+                                            icon: Icon(
+                                              Icons.camera_alt_outlined,
+                                              color: Color(0xFF4FC3F7),
+                                              size: 18,
+                                            ),
+                                            tooltip: 'SCAN ODOMETER',
+                                            onPressed: _scanOdometer,
+                                          ),
+                                          const SizedBox(width: 8),
+                                        ],
+                                      ),
                                     ),
-                                    const SizedBox(width: 6),
-                                    IconButton(
-                                      padding: EdgeInsets.zero,
-                                      constraints: const BoxConstraints(),
-                                      icon: Icon(Icons.camera_alt_outlined, color: Color(0xFF4FC3F7), size: 18),
-                                      tooltip: 'SCAN ODOMETER',
-                                      onPressed: _scanOdometer,
-                                    ),
-                                    const SizedBox(width: 8),
-                                  ],
-                                ),
-                              ),
                             ),
                             keyboardType: TextInputType.number,
                             readOnly: widget.isViewOnly,
@@ -316,16 +389,30 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                         const SizedBox(width: 16),
                         Expanded(
                           child: InkWell(
-                            onTap: widget.isViewOnly ? null : () async {
-                              final date = await showDatePicker(context: context, initialDate: _inspectionDate, firstDate: DateTime(2020), lastDate: DateTime(2030));
-                              if (date != null) setState(() => _inspectionDate = date);
-                            },
+                            onTap: widget.isViewOnly
+                                ? null
+                                : () async {
+                                    final date = await showDatePicker(
+                                      context: context,
+                                      initialDate: _inspectionDate,
+                                      firstDate: DateTime(2020),
+                                      lastDate: DateTime(2030),
+                                    );
+                                    if (date != null)
+                                      setState(() => _inspectionDate = date);
+                                  },
                             child: InputDecorator(
-                              decoration: InputDecoration(labelText: 'SCAN DATE'),
+                              decoration: InputDecoration(
+                                labelText: 'SCAN DATE',
+                              ),
                               child: FittedBox(
                                 fit: BoxFit.scaleDown,
                                 alignment: Alignment.centerLeft,
-                                child: Text(DateFormat('dd / MM / yyyy').format(_inspectionDate)),
+                                child: Text(
+                                  DateFormat(
+                                    'dd / MM / yyyy',
+                                  ).format(_inspectionDate),
+                                ),
                               ),
                             ),
                           ),
@@ -334,64 +421,171 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                     ),
                     const SizedBox(height: 16),
                     DropdownButtonFormField<String>(
-                      value: _selectedDriverId,
+                      initialValue: _selectedDriverId,
                       isExpanded: true,
-                      decoration: InputDecoration(labelText: 'OPERATOR', prefixIcon: Icon(Icons.person_outline)),
-                      dropdownColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-                      items: drivers.map((d) => DropdownMenuItem(
-                        value: d.id, 
-                        child: Text(d.name.toUpperCase(), overflow: TextOverflow.ellipsis)
-                      )).toList(),
-                      onChanged: widget.isViewOnly ? null : (val) async {
-                        setState(() => _selectedDriverId = val);
-                        if (val != null && _selectedVehicleId != null) {
-                          await UsageService.trackSelection(_selectedVehicleId!, driverId: val);
-                        }
-                      },
+                      decoration: InputDecoration(
+                        labelText: 'OPERATOR',
+                        prefixIcon: Icon(Icons.person_outline),
+                      ),
+                      dropdownColor: Theme.of(
+                        context,
+                      ).colorScheme.surfaceContainerHighest,
+                      items: drivers
+                          .map(
+                            (d) => DropdownMenuItem(
+                              value: d.id,
+                              child: Text(
+                                d.name.toUpperCase(),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: widget.isViewOnly
+                          ? null
+                          : (val) async {
+                              setState(() => _selectedDriverId = val);
+                              if (val != null && _selectedVehicleId != null) {
+                                await UsageService.trackSelection(
+                                  _selectedVehicleId!,
+                                  driverId: val,
+                                );
+                              }
+                            },
                     ),
                   ]),
 
                   // Section 2: Diagnostics (Checklist)
                   _buildAnimatedSection(1, 'SYSTEM DIAGNOSTICS', [
                     _buildThematicCheckGroup('TIRES & WHEELS', [
-                      _ChecklistItem('TREAD DEPTH SCAN', _tyresTreadDepth, (v) => setState(() => _tyresTreadDepth = v)),
-                      _ChecklistItem('WHEEL NUT TORQUE', _wheelNuts, (v) => setState(() => _wheelNuts = v)),
+                      _ChecklistItem(
+                        'TREAD DEPTH SCAN',
+                        _tyresTreadDepth,
+                        (v) => setState(() => _tyresTreadDepth = v),
+                      ),
+                      _ChecklistItem(
+                        'WHEEL NUT TORQUE',
+                        _wheelNuts,
+                        (v) => setState(() => _wheelNuts = v),
+                      ),
                     ]),
                     _buildThematicCheckGroup('CHASSIS & EXTERIOR', [
-                      _ChecklistItem('BODY CLEANLINESS', _cleanliness, (v) => setState(() => _cleanliness = v)),
-                      _ChecklistItem('SURFACE INTEGRITY (NO DAMAGE)', _bodyDamage, (v) => setState(() => _bodyDamage = v)),
-                      _ChecklistItem('OPTICS (MIRRORS & WINDOWS)', _mirrorsWindows, (v) => setState(() => _mirrorsWindows = v)),
-                      _ChecklistItem('LIVERY / SIGNAGE', _signage, (v) => setState(() => _signage = v)),
+                      _ChecklistItem(
+                        'BODY CLEANLINESS',
+                        _cleanliness,
+                        (v) => setState(() => _cleanliness = v),
+                      ),
+                      _ChecklistItem(
+                        'SURFACE INTEGRITY (NO DAMAGE)',
+                        _bodyDamage,
+                        (v) => setState(() => _bodyDamage = v),
+                      ),
+                      _ChecklistItem(
+                        'OPTICS (MIRRORS & WINDOWS)',
+                        _mirrorsWindows,
+                        (v) => setState(() => _mirrorsWindows = v),
+                      ),
+                      _ChecklistItem(
+                        'LIVERY / SIGNAGE',
+                        _signage,
+                        (v) => setState(() => _signage = v),
+                      ),
                     ]),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
                       child: TextFormField(
                         controller: _bodyDamageNotesController,
-                        decoration: InputDecoration(labelText: 'BODY DAMAGE LOG', hintText: 'LOG ANOMALIES...'),
+                        decoration: InputDecoration(
+                          labelText: 'BODY DAMAGE LOG',
+                          hintText: 'LOG ANOMALIES...',
+                        ),
                         maxLines: 2,
                         readOnly: widget.isViewOnly,
                       ),
                     ),
                     _buildThematicCheckGroup('ENGINE & DRIVETRAIN', [
-                      _ChecklistItem('FLUID LEVELS (OIL/WATER)', _engineOilWater, (v) => setState(() => _engineOilWater = v)),
-                      _ChecklistItem('BRAKE CALIBRATION', _brakes, (v) => setState(() => _brakes = v)),
-                      _ChecklistItem('TRANSMISSION RESPONSE', _transmission, (v) => setState(() => _transmission = v)),
+                      _ChecklistItem(
+                        'FLUID LEVELS (OIL/WATER)',
+                        _engineOilWater,
+                        (v) => setState(() => _engineOilWater = v),
+                      ),
+                      _ChecklistItem(
+                        'BRAKE CALIBRATION',
+                        _brakes,
+                        (v) => setState(() => _brakes = v),
+                      ),
+                      _ChecklistItem(
+                        'TRANSMISSION RESPONSE',
+                        _transmission,
+                        (v) => setState(() => _transmission = v),
+                      ),
                     ]),
                     _buildThematicCheckGroup('ILLUMINATION', [
-                      _ChecklistItem('TAIL LIGHT ARRAYS', _tailLights, (v) => setState(() => _tailLights = v)),
-                      _ChecklistItem('HEADLIGHT LOW BEAM', _headlightsLowBeam, (v) => setState(() => _headlightsLowBeam = v)),
-                      _ChecklistItem('HEADLIGHT HIGH BEAM', _headlightsHighBeam, (v) => setState(() => _headlightsHighBeam = v)),
-                      _ChecklistItem('REVERSE THRUST LIGHTS', _reverseLights, (v) => setState(() => _reverseLights = v)),
-                      _ChecklistItem('BRAKE LIGHT RESPONSE', _brakeLights, (v) => setState(() => _brakeLights = v)),
+                      _ChecklistItem(
+                        'TAIL LIGHT ARRAYS',
+                        _tailLights,
+                        (v) => setState(() => _tailLights = v),
+                      ),
+                      _ChecklistItem(
+                        'HEADLIGHT LOW BEAM',
+                        _headlightsLowBeam,
+                        (v) => setState(() => _headlightsLowBeam = v),
+                      ),
+                      _ChecklistItem(
+                        'HEADLIGHT HIGH BEAM',
+                        _headlightsHighBeam,
+                        (v) => setState(() => _headlightsHighBeam = v),
+                      ),
+                      _ChecklistItem(
+                        'REVERSE THRUST LIGHTS',
+                        _reverseLights,
+                        (v) => setState(() => _reverseLights = v),
+                      ),
+                      _ChecklistItem(
+                        'BRAKE LIGHT RESPONSE',
+                        _brakeLights,
+                        (v) => setState(() => _brakeLights = v),
+                      ),
                     ]),
                     _buildThematicCheckGroup('CAB & INTERIOR', [
-                      _ChecklistItem('WINDSCREEN & WIPERS', _windscreenWipers, (v) => setState(() => _windscreenWipers = v)),
-                      _ChecklistItem('ACOUSTIC HORN', _horn, (v) => setState(() => _horn = v)),
-                      _ChecklistItem('DIRECTIONAL INDICATORS', _indicators, (v) => setState(() => _indicators = v)),
-                      _ChecklistItem('SAFETY RESTRAINTS (BELTS)', _seatBelts, (v) => setState(() => _seatBelts = v)),
-                      _ChecklistItem('COCKPIT CLEANLINESS', _cabCleanliness, (v) => setState(() => _cabCleanliness = v)),
-                      _ChecklistItem('SERVICE LOGS ONBOARD', _serviceLogBook, (v) => setState(() => _serviceLogBook = v)),
-                      _ChecklistItem('AUXILIARY KEYS IN STORE', _spareKeys, (v) => setState(() => _spareKeys = v)),
+                      _ChecklistItem(
+                        'WINDSCREEN & WIPERS',
+                        _windscreenWipers,
+                        (v) => setState(() => _windscreenWipers = v),
+                      ),
+                      _ChecklistItem(
+                        'ACOUSTIC HORN',
+                        _horn,
+                        (v) => setState(() => _horn = v),
+                      ),
+                      _ChecklistItem(
+                        'DIRECTIONAL INDICATORS',
+                        _indicators,
+                        (v) => setState(() => _indicators = v),
+                      ),
+                      _ChecklistItem(
+                        'SAFETY RESTRAINTS (BELTS)',
+                        _seatBelts,
+                        (v) => setState(() => _seatBelts = v),
+                      ),
+                      _ChecklistItem(
+                        'COCKPIT CLEANLINESS',
+                        _cabCleanliness,
+                        (v) => setState(() => _cabCleanliness = v),
+                      ),
+                      _ChecklistItem(
+                        'SERVICE LOGS ONBOARD',
+                        _serviceLogBook,
+                        (v) => setState(() => _serviceLogBook = v),
+                      ),
+                      _ChecklistItem(
+                        'AUXILIARY KEYS IN STORE',
+                        _spareKeys,
+                        (v) => setState(() => _spareKeys = v),
+                      ),
                     ]),
                   ]),
 
@@ -399,7 +593,10 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                   _buildAnimatedSection(2, 'CORRECTIVE ACTIONS', [
                     TextFormField(
                       controller: _correctiveActionsController,
-                      decoration: InputDecoration(labelText: 'REACTION LOG', hintText: 'LOG CORRECTIVE MEASURES...'),
+                      decoration: InputDecoration(
+                        labelText: 'REACTION LOG',
+                        hintText: 'LOG CORRECTIVE MEASURES...',
+                      ),
                       maxLines: 4,
                       readOnly: widget.isViewOnly,
                     ),
@@ -409,14 +606,22 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                   _buildAnimatedSection(3, 'SYSTEM AUTHENTICATION', [
                     Text(
                       'I CONFIRM ALL PERFORMANCE DATA IS ACCURATE.',
-                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white24),
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white24,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _signatureController,
-                      decoration: InputDecoration(labelText: 'DIGITAL SIGNATURE', prefixIcon: Icon(Icons.history_edu_outlined)),
+                      decoration: InputDecoration(
+                        labelText: 'DIGITAL SIGNATURE',
+                        prefixIcon: Icon(Icons.history_edu_outlined),
+                      ),
                       readOnly: widget.isViewOnly,
-                      validator: (val) => (val == null || val.isEmpty) ? 'REQUIRED' : null,
+                      validator: (val) =>
+                          (val == null || val.isEmpty) ? 'REQUIRED' : null,
                     ),
                   ]),
 
@@ -429,7 +634,9 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                         backgroundColor: accentColor,
                         foregroundColor: Colors.black,
                         minimumSize: const Size(double.infinity, 64),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24),
+                        ),
                         elevation: 0,
                       ),
                       child: Row(
@@ -438,8 +645,13 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                           Icon(Icons.save_outlined),
                           const SizedBox(width: 12),
                           Text(
-                            widget.inspection != null ? 'UPDATE INSPECTION' : 'SAVE INSPECTION',
-                            style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1),
+                            widget.inspection != null
+                                ? 'UPDATE INSPECTION'
+                                : 'SAVE INSPECTION',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 1,
+                            ),
                           ),
                         ],
                       ),
@@ -447,7 +659,14 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                     const SizedBox(height: 12),
                     TextButton(
                       onPressed: () => Navigator.pop(context),
-                      child: Text('CANCEL', style: TextStyle(color: Colors.white24, fontWeight: FontWeight.bold, fontSize: 12)),
+                      child: Text(
+                        'CANCEL',
+                        style: TextStyle(
+                          color: Colors.white24,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
                     ),
                   ],
                 ]),
@@ -464,7 +683,9 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
     return FadeTransition(
       opacity: animation,
       child: SlideTransition(
-        position: animation.drive(Tween<Offset>(begin: const Offset(0, 0.05), end: Offset.zero)),
+        position: animation.drive(
+          Tween<Offset>(begin: const Offset(0, 0.05), end: Offset.zero),
+        ),
         child: Container(
           margin: EdgeInsets.only(bottom: 24),
           padding: EdgeInsets.all(24),
@@ -478,7 +699,12 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
             children: [
               Text(
                 title,
-                style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 2, color: Colors.white38),
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 2,
+                  color: Colors.white38,
+                ),
               ),
               const SizedBox(height: 24),
               ...children,
@@ -497,7 +723,12 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
           padding: EdgeInsets.symmetric(vertical: 8),
           child: Text(
             title,
-            style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: Color(0xFF4FC3F7), letterSpacing: 1),
+            style: TextStyle(
+              fontSize: 9,
+              fontWeight: FontWeight.w900,
+              color: Color(0xFF4FC3F7),
+              letterSpacing: 1,
+            ),
           ),
         ),
         ...items.map((item) {
@@ -509,31 +740,39 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
               padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
               child: Row(
                 children: [
-                   Container(
-                     width: 20,
-                     height: 20,
-                     decoration: BoxDecoration(
-                       borderRadius: BorderRadius.circular(6),
-                       border: Border.all(
-                         color: isChecked ? const Color(0xFF4ADE80) : Colors.white10,
-                         width: 2,
-                       ),
-                       color: isChecked ? const Color(0xFF4ADE80).withValues(alpha: 0.1) : Colors.transparent,
-                     ),
-                     child: isChecked ? Icon(Icons.check, size: 14, color: Color(0xFF4ADE80)) : null,
-                   ),
-                   const SizedBox(width: 16),
-                   Expanded(
-                     child: Text(
-                        item.label,
-                        style: TextStyle(
-                          color: isChecked ? Colors.white : Colors.white38,
-                          fontSize: 12,
-                          fontWeight: isChecked ? FontWeight.bold : FontWeight.normal,
-                          letterSpacing: 0.5,
-                        ),
-                     ),
-                   ),
+                  Container(
+                    width: 20,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                        color: isChecked
+                            ? const Color(0xFF4ADE80)
+                            : Colors.white10,
+                        width: 2,
+                      ),
+                      color: isChecked
+                          ? const Color(0xFF4ADE80).withValues(alpha: 0.1)
+                          : Colors.transparent,
+                    ),
+                    child: isChecked
+                        ? Icon(Icons.check, size: 14, color: Color(0xFF4ADE80))
+                        : null,
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Text(
+                      item.label,
+                      style: TextStyle(
+                        color: isChecked ? Colors.white : Colors.white38,
+                        fontSize: 12,
+                        fontWeight: isChecked
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -543,7 +782,6 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
       ],
     );
   }
-
 
   void _saveInspection() async {
     if (!_formKey.currentState!.validate()) {
@@ -566,24 +804,36 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
 
     // Check for existing inspection in the same week (only for new inspections)
     if (widget.inspection == null) {
-      final hasExisting =
-          DatabaseService.hasInspectionInSameWeek(_selectedVehicleId!, _inspectionDate);
+      final hasExisting = DatabaseService.hasInspectionInSameWeek(
+        _selectedVehicleId!,
+        _inspectionDate,
+      );
       if (hasExisting) {
         showDialog(
           context: context,
           builder: (context) => Dialog(
             backgroundColor: Theme.of(context).colorScheme.surface,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(32),
+            ),
             child: Padding(
               padding: EdgeInsets.all(32),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.warning_amber_rounded, color: Color(0xFFFF5252), size: 48),
+                  Icon(
+                    Icons.warning_amber_rounded,
+                    color: Color(0xFFFF5252),
+                    size: 48,
+                  ),
                   const SizedBox(height: 24),
                   Text(
                     'DUPLICATE ENTRY',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 1),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -594,7 +844,9 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
                   const SizedBox(height: 32),
                   ElevatedButton(
                     onPressed: () => Navigator.pop(context),
-                    style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 50)),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(double.infinity, 50),
+                    ),
                     child: Text('ACKNOWLEDGE'),
                   ),
                 ],
@@ -671,7 +923,9 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
   Future<void> _scanOdometer() async {
     final result = await Navigator.push<String>(
       context,
-      MaterialPageRoute(builder: (context) => const AiScannerView(mode: 'odometer')),
+      MaterialPageRoute(
+        builder: (context) => const AiScannerView(mode: 'odometer'),
+      ),
     );
     if (result != null) {
       setState(() {
@@ -682,12 +936,12 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
 
   void _magicEstimateOdometer() {
     if (_selectedVehicleId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('SELECT A VEHICLE FIRST')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('SELECT A VEHICLE FIRST')));
       return;
     }
-    
+
     final prediction = PredictionService.predictOdometer(_selectedVehicleId!);
     if (prediction != null) {
       setState(() {
@@ -700,7 +954,7 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> with Single
         ),
       );
     } else {
-       ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('NOT ENOUGH DATA FOR PREDICTION')),
       );
     }

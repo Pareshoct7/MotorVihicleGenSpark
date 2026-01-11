@@ -13,7 +13,8 @@ class ReportsScreen extends StatefulWidget {
   State<ReportsScreen> createState() => _ReportsScreenState();
 }
 
-class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProviderStateMixin {
+class _ReportsScreenState extends State<ReportsScreen>
+    with SingleTickerProviderStateMixin {
   String? _selectedVehicleId;
   String? _selectedStoreId;
   String? _selectedDriverId;
@@ -21,12 +22,13 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
   DateTime? _endDate;
   List<Inspection> _filteredInspections = [];
   bool _isGeneratingBulkPdf = false;
-  
+
   // Selection State
   final Set<String> _selectedReportIds = {};
   bool _explicitSelectionMode = false;
-  
-  bool get _isSelectionMode => _explicitSelectionMode || _selectedReportIds.isNotEmpty;
+
+  bool get _isSelectionMode =>
+      _explicitSelectionMode || _selectedReportIds.isNotEmpty;
 
   late AnimationController _entranceController;
   final List<Animation<double>> _staggeredAnimations = [];
@@ -43,7 +45,11 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
       _staggeredAnimations.add(
         CurvedAnimation(
           parent: _entranceController,
-          curve: Interval(i * 0.1, 0.6 + (i * 0.04), curve: Curves.easeOutCubic),
+          curve: Interval(
+            i * 0.1,
+            0.6 + (i * 0.04),
+            curve: Curves.easeOutCubic,
+          ),
         ),
       );
     }
@@ -69,22 +75,26 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
 
     // Filter by store
     if (_selectedStoreId != null) {
-      inspections =
-          inspections.where((i) => i.storeId == _selectedStoreId).toList();
+      inspections = inspections
+          .where((i) => i.storeId == _selectedStoreId)
+          .toList();
     }
 
     // Filter by driver
     if (_selectedDriverId != null) {
-      inspections =
-          inspections.where((i) => i.driverId == _selectedDriverId).toList();
+      inspections = inspections
+          .where((i) => i.driverId == _selectedDriverId)
+          .toList();
     }
 
     // Filter by date range
     if (_startDate != null) {
       inspections = inspections
-          .where((i) =>
-              i.inspectionDate.isAfter(_startDate!) ||
-              i.inspectionDate.isAtSameMomentAs(_startDate!))
+          .where(
+            (i) =>
+                i.inspectionDate.isAfter(_startDate!) ||
+                i.inspectionDate.isAtSameMomentAs(_startDate!),
+          )
           .toList();
     }
 
@@ -98,15 +108,17 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
         59,
       );
       inspections = inspections
-          .where((i) =>
-              i.inspectionDate.isBefore(endOfDay) ||
-              i.inspectionDate.isAtSameMomentAs(endOfDay))
+          .where(
+            (i) =>
+                i.inspectionDate.isBefore(endOfDay) ||
+                i.inspectionDate.isAtSameMomentAs(endOfDay),
+          )
           .toList();
     }
 
     setState(() {
       _filteredInspections = inspections;
-      _selectedReportIds.clear(); 
+      _selectedReportIds.clear();
     });
   }
 
@@ -142,7 +154,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
       }
     });
   }
-  
+
   void _clearSelection() {
     setState(() {
       _selectedReportIds.clear();
@@ -185,9 +197,9 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
     }
 
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Reports deleted')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Reports deleted')));
       _clearSelection();
       _applyFilters(); // Refresh list
     }
@@ -230,16 +242,17 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
             )
           else
             SliverAppBar.large(
-            automaticallyImplyLeading: true,
-            leading: Navigator.canPop(context) ? const BackButton() : null,
-            expandedHeight: 140,
+              automaticallyImplyLeading: true,
+              leading: Navigator.canPop(context) ? const BackButton() : null,
+              expandedHeight: 140,
               floating: false,
               pinned: true,
               title: Text('INSPECTIONS'),
               actions: [
                 IconButton(
                   icon: Icon(Icons.checklist, size: 28),
-                  onPressed: () => setState(() => _explicitSelectionMode = true),
+                  onPressed: () =>
+                      setState(() => _explicitSelectionMode = true),
                 ),
                 if (_filteredInspections.isNotEmpty)
                   IconButton(
@@ -249,14 +262,14 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                 const SizedBox(width: 8),
               ],
             ),
-          
+
           SliverToBoxAdapter(
             child: ExpansionTile(
               title: Row(
                 children: [
-                   Icon(Icons.tune, size: 18, color: Color(0xFF4FC3F7)),
-                   const SizedBox(width: 12),
-                   Text(
+                  Icon(Icons.tune, size: 18, color: Color(0xFF4FC3F7)),
+                  const SizedBox(width: 12),
+                  Text(
                     'FILTERS',
                     style: TextStyle(
                       fontSize: 10,
@@ -266,7 +279,11 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                     ),
                   ),
                   const Spacer(),
-                  if (_selectedVehicleId != null || _selectedStoreId != null || _selectedDriverId != null || _startDate != null || _endDate != null)
+                  if (_selectedVehicleId != null ||
+                      _selectedStoreId != null ||
+                      _selectedDriverId != null ||
+                      _startDate != null ||
+                      _endDate != null)
                     Container(
                       width: 8,
                       height: 8,
@@ -285,25 +302,51 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
               children: [
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
-                  value: _selectedVehicleId,
-                  decoration: InputDecoration(labelText: 'VEHICLE', prefixIcon: Icon(Icons.directions_car_outlined)),
-                  dropdownColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  initialValue: _selectedVehicleId,
+                  decoration: InputDecoration(
+                    labelText: 'VEHICLE',
+                    prefixIcon: Icon(Icons.directions_car_outlined),
+                  ),
+                  dropdownColor: Theme.of(
+                    context,
+                  ).colorScheme.surfaceContainerHighest,
                   items: [
                     DropdownMenuItem(value: null, child: Text('ALL VEHICLES')),
-                    ...vehicles.map((v) => DropdownMenuItem(value: v.id, child: Text(v.registrationNo))),
+                    ...vehicles.map(
+                      (v) => DropdownMenuItem(
+                        value: v.id,
+                        child: Text(v.registrationNo),
+                      ),
+                    ),
                   ],
-                  onChanged: (val) { setState(() => _selectedVehicleId = val); _applyFilters(); },
+                  onChanged: (val) {
+                    setState(() => _selectedVehicleId = val);
+                    _applyFilters();
+                  },
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
-                  value: _selectedStoreId,
-                  decoration: InputDecoration(labelText: 'STORE HUB', prefixIcon: Icon(Icons.store_outlined)),
-                  dropdownColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  initialValue: _selectedStoreId,
+                  decoration: InputDecoration(
+                    labelText: 'STORE HUB',
+                    prefixIcon: Icon(Icons.store_outlined),
+                  ),
+                  dropdownColor: Theme.of(
+                    context,
+                  ).colorScheme.surfaceContainerHighest,
                   items: [
                     DropdownMenuItem(value: null, child: Text('ALL HUBS')),
-                    ...stores.map((s) => DropdownMenuItem(value: s.id, child: Text(s.name.toUpperCase()))),
+                    ...stores.map(
+                      (s) => DropdownMenuItem(
+                        value: s.id,
+                        child: Text(s.name.toUpperCase()),
+                      ),
+                    ),
                   ],
-                  onChanged: (val) { setState(() => _selectedStoreId = val); _applyFilters(); },
+                  onChanged: (val) {
+                    setState(() => _selectedStoreId = val);
+                    _applyFilters();
+                  },
                 ),
                 const SizedBox(height: 16),
                 Row(
@@ -317,11 +360,18 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                             firstDate: DateTime(2020),
                             lastDate: DateTime.now(),
                           );
-                          if (date != null) { setState(() => _startDate = date); _applyFilters(); }
+                          if (date != null) {
+                            setState(() => _startDate = date);
+                            _applyFilters();
+                          }
                         },
                         child: InputDecorator(
                           decoration: InputDecoration(labelText: 'FROM'),
-                          child: Text(_startDate != null ? dateFormat.format(_startDate!).toUpperCase() : 'ANYTIME'),
+                          child: Text(
+                            _startDate != null
+                                ? dateFormat.format(_startDate!).toUpperCase()
+                                : 'ANYTIME',
+                          ),
                         ),
                       ),
                     ),
@@ -335,11 +385,18 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                             firstDate: _startDate ?? DateTime(2020),
                             lastDate: DateTime.now(),
                           );
-                          if (date != null) { setState(() => _endDate = date); _applyFilters(); }
+                          if (date != null) {
+                            setState(() => _endDate = date);
+                            _applyFilters();
+                          }
                         },
                         child: InputDecorator(
                           decoration: InputDecoration(labelText: 'TO'),
-                          child: Text(_endDate != null ? dateFormat.format(_endDate!).toUpperCase() : 'ANYTIME'),
+                          child: Text(
+                            _endDate != null
+                                ? dateFormat.format(_endDate!).toUpperCase()
+                                : 'ANYTIME',
+                          ),
                         ),
                       ),
                     ),
@@ -350,7 +407,9 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                   onPressed: _clearFilters,
                   icon: Icon(Icons.refresh, size: 18),
                   label: Text('RESET FILTERS'),
-                  style: TextButton.styleFrom(minimumSize: const Size(double.infinity, 50)),
+                  style: TextButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 50),
+                  ),
                 ),
               ],
             ),
@@ -362,14 +421,26 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.analytics_outlined, size: 80, color: Colors.white10),
+                        Icon(
+                          Icons.analytics_outlined,
+                          size: 80,
+                          color: Colors.white10,
+                        ),
                         const SizedBox(height: 24),
                         Text(
                           'NO TELEMETRY DATA FOUND',
-                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 2, color: Colors.white38),
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 2,
+                            color: Colors.white38,
+                          ),
                         ),
                         const SizedBox(height: 16),
-                        TextButton(onPressed: _clearFilters, child: Text('RESET FILTERS')),
+                        TextButton(
+                          onPressed: _clearFilters,
+                          child: Text('RESET FILTERS'),
+                        ),
                       ],
                     ),
                   ),
@@ -377,26 +448,30 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
               : SliverPadding(
                   padding: EdgeInsets.fromLTRB(16, 8, 16, 100),
                   sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final inspection = _filteredInspections[index];
-                        final animation = _staggeredAnimations[math.min(index, 9)];
-                        return FadeTransition(
-                          opacity: animation,
-                          child: SlideTransition(
-                            position: animation.drive(Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero)),
-                            child: _buildInspectionCard(context, inspection),
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      final inspection = _filteredInspections[index];
+                      final animation =
+                          _staggeredAnimations[math.min(index, 9)];
+                      return FadeTransition(
+                        opacity: animation,
+                        child: SlideTransition(
+                          position: animation.drive(
+                            Tween<Offset>(
+                              begin: const Offset(0, 0.1),
+                              end: Offset.zero,
+                            ),
                           ),
-                        );
-                      },
-                      childCount: _filteredInspections.length,
-                    ),
+                          child: _buildInspectionCard(context, inspection),
+                        ),
+                      );
+                    }, childCount: _filteredInspections.length),
                   ),
                 ),
         ],
       ),
     );
   }
+
   Widget _buildInspectionCard(BuildContext context, Inspection inspection) {
     final dateFormat = DateFormat('dd MMM yyyy');
     final isSelected = _selectedReportIds.contains(inspection.id);
@@ -488,10 +563,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                     Text(
                       inspection.storeName.toUpperCase(),
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: Colors.white24,
-                        fontSize: 10,
-                      ),
+                      style: TextStyle(color: Colors.white24, fontSize: 10),
                     ),
                   ],
                 ),
@@ -500,7 +572,9 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                 PopupMenuButton(
                   icon: Icon(Icons.more_vert, color: Colors.white30),
                   color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                   itemBuilder: (context) => [
                     const PopupMenuItem(
                       value: 'view',
@@ -508,7 +582,13 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                         children: [
                           Icon(Icons.visibility_outlined, size: 18),
                           SizedBox(width: 12),
-                          Text('VIEW', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                          Text(
+                            'VIEW',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -518,7 +598,13 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                         children: [
                           Icon(Icons.picture_as_pdf_outlined, size: 18),
                           SizedBox(width: 12),
-                          Text('EXPORT PDF', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                          Text(
+                            'EXPORT PDF',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -535,7 +621,9 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                         ),
                       );
                     } else if (value == 'pdf') {
-                      await PdfService.shareTemplateMatchingInspection(inspection);
+                      await PdfService.shareTemplateMatchingInspection(
+                        inspection,
+                      );
                     }
                   },
                 ),
@@ -611,9 +699,9 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
     } catch (e) {
       if (mounted) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error generating PDFs: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error generating PDFs: $e')));
       }
     } finally {
       setState(() {

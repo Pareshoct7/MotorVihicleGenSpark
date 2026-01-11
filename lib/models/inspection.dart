@@ -118,6 +118,12 @@ class Inspection extends HiveObject {
   @HiveField(35)
   String? storeNumber;
 
+  @HiveField(36)
+  String? managerSignature;
+
+  @HiveField(37)
+  DateTime? managerSignOffDate;
+
   Inspection({
     required this.id,
     required this.vehicleId,
@@ -153,6 +159,8 @@ class Inspection extends HiveObject {
     this.spareKeys,
     this.correctiveActions,
     this.signature,
+    this.managerSignature,
+    this.managerSignOffDate,
     DateTime? createdAt,
     DateTime? updatedAt,
   })  : createdAt = createdAt ?? DateTime.now(),
@@ -194,6 +202,8 @@ class Inspection extends HiveObject {
       'spareKeys': spareKeys,
       'correctiveActions': correctiveActions,
       'signature': signature,
+      'managerSignature': managerSignature,
+      'managerSignOffDate': managerSignOffDate?.toIso8601String(),
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
     };
@@ -235,6 +245,10 @@ class Inspection extends HiveObject {
       spareKeys: json['spareKeys'],
       correctiveActions: json['correctiveActions'],
       signature: json['signature'],
+      managerSignature: json['managerSignature'],
+      managerSignOffDate: json['managerSignOffDate'] != null
+          ? DateTime.parse(json['managerSignOffDate'])
+          : null,
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
     );

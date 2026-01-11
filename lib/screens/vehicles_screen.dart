@@ -15,7 +15,8 @@ class VehiclesScreen extends StatefulWidget {
   State<VehiclesScreen> createState() => _VehiclesScreenState();
 }
 
-class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProviderStateMixin {
+class _VehiclesScreenState extends State<VehiclesScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _entranceController;
   final List<Animation<double>> _staggeredAnimations = [];
   final TextEditingController _searchController = TextEditingController();
@@ -33,7 +34,11 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
       _staggeredAnimations.add(
         CurvedAnimation(
           parent: _entranceController,
-          curve: Interval(i * 0.1, 0.6 + (i * 0.04), curve: Curves.easeOutCubic),
+          curve: Interval(
+            i * 0.1,
+            0.6 + (i * 0.04),
+            curve: Curves.easeOutCubic,
+          ),
         ),
       );
     }
@@ -50,11 +55,14 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
   Widget build(BuildContext context) {
     var vehicles = DatabaseService.getAllVehicles();
     if (_searchQuery.isNotEmpty) {
-      vehicles = vehicles.where((v) => 
-        v.registrationNo.toUpperCase().contains(_searchQuery) ||
-        (v.make?.toUpperCase().contains(_searchQuery) ?? false) ||
-        (v.model?.toUpperCase().contains(_searchQuery) ?? false)
-      ).toList();
+      vehicles = vehicles
+          .where(
+            (v) =>
+                v.registrationNo.toUpperCase().contains(_searchQuery) ||
+                (v.make?.toUpperCase().contains(_searchQuery) ?? false) ||
+                (v.model?.toUpperCase().contains(_searchQuery) ?? false),
+          )
+          .toList();
     }
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -73,14 +81,24 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
                 padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1)),
+                    border: Border.all(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.outline.withValues(alpha: 0.1),
+                    ),
                   ),
                   child: TextField(
                     controller: _searchController,
-                    onChanged: (val) => setState(() => _searchQuery = val.toUpperCase()),
-                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
+                    onChanged: (val) =>
+                        setState(() => _searchQuery = val.toUpperCase()),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontWeight: FontWeight.bold,
+                    ),
                     decoration: InputDecoration(
                       hintText: 'SEARCH RIG...',
                       prefixIcon: Icon(Icons.search, color: Color(0xFF4FC3F7)),
@@ -88,7 +106,10 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
                       enabledBorder: InputBorder.none,
                       focusedBorder: InputBorder.none,
                       suffixIcon: IconButton(
-                        icon: Icon(Icons.camera_alt_outlined, color: Color(0xFF4FC3F7)),
+                        icon: Icon(
+                          Icons.camera_alt_outlined,
+                          color: Color(0xFF4FC3F7),
+                        ),
                         onPressed: _scanPlate,
                       ),
                     ),
@@ -113,7 +134,9 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
                         Icon(
                           Icons.directions_car_outlined,
                           size: 80,
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.1),
                         ),
                         const SizedBox(height: 24),
                         Text(
@@ -122,7 +145,9 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
                             fontSize: 14,
                             fontWeight: FontWeight.w900,
                             letterSpacing: 2,
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.38),
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -141,22 +166,23 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
               : SliverPadding(
                   padding: EdgeInsets.fromLTRB(16, 8, 16, 100),
                   sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final vehicle = vehicles[index];
-                        final animation = _staggeredAnimations[math.min(index, 9)];
-                        return FadeTransition(
-                          opacity: animation,
-                          child: SlideTransition(
-                            position: animation.drive(
-                              Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero),
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      final vehicle = vehicles[index];
+                      final animation =
+                          _staggeredAnimations[math.min(index, 9)];
+                      return FadeTransition(
+                        opacity: animation,
+                        child: SlideTransition(
+                          position: animation.drive(
+                            Tween<Offset>(
+                              begin: const Offset(0, 0.1),
+                              end: Offset.zero,
                             ),
-                            child: _buildVehicleCard(context, vehicle),
                           ),
-                        );
-                      },
-                      childCount: vehicles.length,
-                    ),
+                          child: _buildVehicleCard(context, vehicle),
+                        ),
+                      );
+                    }, childCount: vehicles.length),
                   ),
                 ),
         ],
@@ -167,7 +193,9 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
   Future<void> _scanPlate() async {
     final result = await Navigator.push<String>(
       context,
-      MaterialPageRoute(builder: (context) => const AiScannerView(mode: 'plate')),
+      MaterialPageRoute(
+        builder: (context) => const AiScannerView(mode: 'plate'),
+      ),
     );
     if (result != null) {
       setState(() {
@@ -185,17 +213,17 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
         vehicle.isServiceOverdue ||
         vehicle.isTyreCheckOverdue;
 
-    final expiringSoon = 
+    final expiringSoon =
         vehicle.isWofExpiringSoon ||
         vehicle.isRegoExpiringSoon ||
         vehicle.isServiceDueSoon ||
         vehicle.isTyreCheckDueSoon;
 
-    final Color statusColor = hasAlerts 
-        ? const Color(0xFFFF5252) 
-        : expiringSoon 
-            ? Colors.orangeAccent 
-            : const Color(0xFF4FC3F7);
+    final Color statusColor = hasAlerts
+        ? const Color(0xFFFF5252)
+        : expiringSoon
+        ? Colors.orangeAccent
+        : const Color(0xFF4FC3F7);
 
     return Container(
       margin: EdgeInsets.only(bottom: 20),
@@ -223,7 +251,11 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
                     color: statusColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: Icon(Icons.directions_car, color: statusColor, size: 28),
+                  child: Icon(
+                    Icons.directions_car,
+                    color: statusColor,
+                    size: 28,
+                  ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -239,7 +271,9 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
                         ),
                       ),
                       Text(
-                        '${vehicle.make ?? ''} ${vehicle.model ?? ''}'.trim().toUpperCase(),
+                        '${vehicle.make ?? ''} ${vehicle.model ?? ''}'
+                            .trim()
+                            .toUpperCase(),
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
@@ -261,27 +295,51 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
             child: Column(
               children: [
                 _buildStatusRow(
-                  'WOF', 
-                  vehicle.wofExpiryDate != null ? dateFormat.format(vehicle.wofExpiryDate!) : 'NOT SET',
-                  vehicle.isWofExpired ? const Color(0xFFFF5252) : (vehicle.isWofExpiringSoon ? Colors.orangeAccent : Colors.white70),
+                  'WOF',
+                  vehicle.wofExpiryDate != null
+                      ? dateFormat.format(vehicle.wofExpiryDate!)
+                      : 'NOT SET',
+                  vehicle.isWofExpired
+                      ? const Color(0xFFFF5252)
+                      : (vehicle.isWofExpiringSoon
+                            ? Colors.orangeAccent
+                            : Colors.white70),
                 ),
                 const SizedBox(height: 12),
                 _buildStatusRow(
-                  'REGO', 
-                  vehicle.regoExpiryDate != null ? dateFormat.format(vehicle.regoExpiryDate!) : 'NOT SET',
-                  vehicle.isRegoExpired ? const Color(0xFFFF5252) : (vehicle.isRegoExpiringSoon ? Colors.orangeAccent : Colors.white70),
+                  'REGO',
+                  vehicle.regoExpiryDate != null
+                      ? dateFormat.format(vehicle.regoExpiryDate!)
+                      : 'NOT SET',
+                  vehicle.isRegoExpired
+                      ? const Color(0xFFFF5252)
+                      : (vehicle.isRegoExpiringSoon
+                            ? Colors.orangeAccent
+                            : Colors.white70),
                 ),
                 const SizedBox(height: 12),
                 _buildStatusRow(
-                  'SERVICE', 
-                  vehicle.serviceDueDate != null ? dateFormat.format(vehicle.serviceDueDate!) : 'NOT SET',
-                  vehicle.isServiceOverdue ? const Color(0xFFFF5252) : (vehicle.isServiceDueSoon ? Colors.orangeAccent : Colors.white70),
+                  'SERVICE',
+                  vehicle.serviceDueDate != null
+                      ? dateFormat.format(vehicle.serviceDueDate!)
+                      : 'NOT SET',
+                  vehicle.isServiceOverdue
+                      ? const Color(0xFFFF5252)
+                      : (vehicle.isServiceDueSoon
+                            ? Colors.orangeAccent
+                            : Colors.white70),
                 ),
                 const SizedBox(height: 12),
                 _buildStatusRow(
-                  'TYRES', 
-                  vehicle.tyreCheckDate != null ? dateFormat.format(vehicle.tyreCheckDate!) : 'NOT SET',
-                  vehicle.isTyreCheckOverdue ? const Color(0xFFFF5252) : (vehicle.isTyreCheckDueSoon ? Colors.orangeAccent : Colors.white70),
+                  'TYRES',
+                  vehicle.tyreCheckDate != null
+                      ? dateFormat.format(vehicle.tyreCheckDate!)
+                      : 'NOT SET',
+                  vehicle.isTyreCheckOverdue
+                      ? const Color(0xFFFF5252)
+                      : (vehicle.isTyreCheckDueSoon
+                            ? Colors.orangeAccent
+                            : Colors.white70),
                 ),
               ],
             ),
@@ -299,7 +357,8 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 TextButton.icon(
-                  onPressed: () => _showVehicleDialog(context, vehicle: vehicle),
+                  onPressed: () =>
+                      _showVehicleDialog(context, vehicle: vehicle),
                   icon: Icon(Icons.tune, size: 18),
                   label: Text('TUNE'),
                 ),
@@ -307,7 +366,9 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
                   onPressed: () => _deleteVehicle(context, vehicle),
                   icon: Icon(Icons.delete_outline, size: 18),
                   label: Text('SCRAP'),
-                  style: TextButton.styleFrom(foregroundColor: const Color(0xFFFF5252)),
+                  style: TextButton.styleFrom(
+                    foregroundColor: const Color(0xFFFF5252),
+                  ),
                 ),
               ],
             ),
@@ -350,10 +411,7 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
   Widget _buildInfoRow(String label, String value) {
     return Row(
       children: [
-        Text(
-          '$label: ',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
+        Text('$label: ', style: TextStyle(fontWeight: FontWeight.bold)),
         Text(value),
       ],
     );
@@ -362,10 +420,8 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
   void _showVehicleDialog(BuildContext context, {Vehicle? vehicle}) {
     showDialog(
       context: context,
-      builder: (context) => VehicleDialog(
-        vehicle: vehicle,
-        onSave: () => setState(() {}),
-      ),
+      builder: (context) =>
+          VehicleDialog(vehicle: vehicle, onSave: () => setState(() {})),
     );
   }
 
@@ -419,7 +475,7 @@ class _VehicleDialogState extends State<VehicleDialog> {
   late TextEditingController _modelController;
   late TextEditingController _yearController;
   late TextEditingController _odometerController;
-  
+
   DateTime? _wofExpiryDate;
   DateTime? _regoExpiryDate;
   DateTime? _serviceDueDate;
@@ -429,7 +485,9 @@ class _VehicleDialogState extends State<VehicleDialog> {
   @override
   void initState() {
     super.initState();
-    _regNoController = TextEditingController(text: widget.vehicle?.registrationNo);
+    _regNoController = TextEditingController(
+      text: widget.vehicle?.registrationNo,
+    );
     _makeController = TextEditingController(text: widget.vehicle?.make);
     _modelController = TextEditingController(text: widget.vehicle?.model);
     _yearController = TextEditingController(
@@ -488,7 +546,8 @@ class _VehicleDialogState extends State<VehicleDialog> {
                     labelText: 'REGISTRATION NO',
                     prefixIcon: Icon(Icons.badge_outlined),
                   ),
-                  validator: (value) => (value == null || value.isEmpty) ? 'REQUIRED' : null,
+                  validator: (value) =>
+                      (value == null || value.isEmpty) ? 'REQUIRED' : null,
                 ),
                 const SizedBox(height: 16),
                 Row(
@@ -533,20 +592,26 @@ class _VehicleDialogState extends State<VehicleDialog> {
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
-                  value: _selectedStoreId,
+                  initialValue: _selectedStoreId,
                   isExpanded: true,
                   decoration: InputDecoration(
                     labelText: 'BASE HUB',
                     prefixIcon: Icon(Icons.store_outlined),
                   ),
-                  dropdownColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  dropdownColor: Theme.of(
+                    context,
+                  ).colorScheme.surfaceContainerHighest,
                   items: stores.map((store) {
                     return DropdownMenuItem(
                       value: store.id,
-                      child: Text(store.name.toUpperCase(), overflow: TextOverflow.ellipsis),
+                      child: Text(
+                        store.name.toUpperCase(),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     );
                   }).toList(),
-                  onChanged: (value) => setState(() => _selectedStoreId = value),
+                  onChanged: (value) =>
+                      setState(() => _selectedStoreId = value),
                 ),
                 const SizedBox(height: 24),
                 Text(
@@ -589,7 +654,9 @@ class _VehicleDialogState extends State<VehicleDialog> {
                 const SizedBox(height: 32),
                 ElevatedButton(
                   onPressed: _saveVehicle,
-                  child: Text(widget.vehicle == null ? 'ADD TO GARAGE' : 'SAVE TUNING'),
+                  child: Text(
+                    widget.vehicle == null ? 'ADD TO GARAGE' : 'SAVE TUNING',
+                  ),
                 ),
               ],
             ),
@@ -628,7 +695,11 @@ class _VehicleDialogState extends State<VehicleDialog> {
           children: [
             Text(
               label,
-              style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             Text(
               value != null ? format.format(value).toUpperCase() : 'SET DATE',
@@ -654,7 +725,7 @@ class _VehicleDialogState extends State<VehicleDialog> {
         : null;
 
     DateTime? odometerUpdatedAt = widget.vehicle?.odometerUpdatedAt;
-    
+
     // Update timestamp if odometer changed or is being set for the first time
     if (newOdometerReading != widget.vehicle?.odometerReading) {
       if (newOdometerReading != null) {
@@ -684,7 +755,7 @@ class _VehicleDialogState extends State<VehicleDialog> {
       await DatabaseService.updateVehicle(vehicle);
     } else {
       await DatabaseService.addVehicle(vehicle);
-      
+
       // Auto-set as default if this is the first vehicle
       final allVehicles = DatabaseService.getAllVehicles();
       if (allVehicles.length == 1) {
@@ -693,7 +764,9 @@ class _VehicleDialogState extends State<VehicleDialog> {
     }
 
     // Schedule notifications
-    final settings = DatabaseService.getOrCreateNotificationSettings(vehicle.id);
+    final settings = DatabaseService.getOrCreateNotificationSettings(
+      vehicle.id,
+    );
     await NotificationService().scheduleWofReminder(vehicle, settings);
     await NotificationService().scheduleRegoReminder(vehicle, settings);
     await NotificationService().scheduleServiceReminder(vehicle, settings);
@@ -702,7 +775,7 @@ class _VehicleDialogState extends State<VehicleDialog> {
     if (mounted) {
       widget.onSave();
       Navigator.pop(context);
-      
+
       // Show appropriate message
       final allVehicles = DatabaseService.getAllVehicles();
       String message;
@@ -713,10 +786,10 @@ class _VehicleDialogState extends State<VehicleDialog> {
       } else {
         message = 'Vehicle added';
       }
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
-      );
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
     }
   }
 

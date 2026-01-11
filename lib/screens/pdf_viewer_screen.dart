@@ -7,18 +7,14 @@ class PdfViewerScreen extends StatelessWidget {
   final File file;
   final String title;
 
-  const PdfViewerScreen({
-    super.key,
-    required this.file,
-    required this.title,
-  });
+  const PdfViewerScreen({super.key, required this.file, required this.title});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
-        backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+        backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
       ),
       body: PdfPreview(
         build: (format) => file.readAsBytes(),

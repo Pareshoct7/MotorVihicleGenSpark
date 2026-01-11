@@ -46,37 +46,52 @@ class PdfService {
                       ),
                     ),
                     pw.SizedBox(height: 12),
-                    
+
                     // Row 1: Vehicle Reg and Store
                     pw.Row(
                       children: [
                         pw.Expanded(
-                          child: _buildDetailField('Vehicle Registration No:', inspection.vehicleRegistrationNo),
+                          child: _buildDetailField(
+                            'Vehicle Registration No:',
+                            inspection.vehicleRegistrationNo,
+                          ),
                         ),
                         pw.SizedBox(width: 20),
                         pw.Expanded(
-                          child: _buildDetailField('Store:', inspection.storeName),
+                          child: _buildDetailField(
+                            'Store:',
+                            inspection.storeName,
+                          ),
                         ),
                       ],
                     ),
                     pw.SizedBox(height: 8),
-                    
+
                     // Row 2: Odometer and Date
                     pw.Row(
                       children: [
                         pw.Expanded(
-                          child: _buildDetailField('Odometer Reading:', inspection.odometerReading),
+                          child: _buildDetailField(
+                            'Odometer Reading:',
+                            inspection.odometerReading,
+                          ),
                         ),
                         pw.SizedBox(width: 20),
                         pw.Expanded(
-                          child: _buildDetailField('Date:', dateFormat.format(inspection.inspectionDate)),
+                          child: _buildDetailField(
+                            'Date:',
+                            dateFormat.format(inspection.inspectionDate),
+                          ),
                         ),
                       ],
                     ),
                     pw.SizedBox(height: 8),
-                    
+
                     // Row 3: Employee Name
-                    _buildDetailField('Employee Name:', inspection.employeeName),
+                    _buildDetailField(
+                      'Employee Name:',
+                      inspection.employeeName,
+                    ),
                   ],
                 ),
               ),
@@ -100,7 +115,7 @@ class PdfService {
                       ),
                     ),
                     pw.SizedBox(height: 12),
-                    
+
                     // Two-column layout
                     pw.Row(
                       crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -112,32 +127,53 @@ class PdfService {
                             children: [
                               // Tyres section
                               _buildChecklistCategory('Tyres', [
-                                _CheckItem('Tyres (tread depth)', inspection.tyresTreadDepth),
+                                _CheckItem(
+                                  'Tyres (tread depth)',
+                                  inspection.tyresTreadDepth,
+                                ),
                                 _CheckItem('Wheel nuts', inspection.wheelNuts),
                               ]),
                               pw.SizedBox(height: 12),
-                              
+
                               // Outside section
                               _buildChecklistCategory('Outside', [
-                                _CheckItem('Cleanliness', inspection.cleanliness),
-                                _CheckItem('Body damage: scratches/dents etc.\n(circle on diagram below)', inspection.bodyDamage),
-                                _CheckItem('Mirrors & Windows', inspection.mirrorsWindows),
-                                _CheckItem('Signage (if applicable)', inspection.signage),
+                                _CheckItem(
+                                  'Cleanliness',
+                                  inspection.cleanliness,
+                                ),
+                                _CheckItem(
+                                  'Body damage: scratches/dents etc.\n(circle on diagram below)',
+                                  inspection.bodyDamage,
+                                ),
+                                _CheckItem(
+                                  'Mirrors & Windows',
+                                  inspection.mirrorsWindows,
+                                ),
+                                _CheckItem(
+                                  'Signage (if applicable)',
+                                  inspection.signage,
+                                ),
                               ]),
                               pw.SizedBox(height: 12),
-                              
+
                               // Mechanical section
                               _buildChecklistCategory('Mechanical', [
-                                _CheckItem('Engine – oil & water', inspection.engineOilWater),
+                                _CheckItem(
+                                  'Engine – oil & water',
+                                  inspection.engineOilWater,
+                                ),
                                 _CheckItem('Brakes', inspection.brakes),
-                                _CheckItem('Transmission', inspection.transmission),
+                                _CheckItem(
+                                  'Transmission',
+                                  inspection.transmission,
+                                ),
                               ]),
                             ],
                           ),
                         ),
-                        
+
                         pw.SizedBox(width: 30),
-                        
+
                         // Right Column
                         pw.Expanded(
                           child: pw.Column(
@@ -145,30 +181,57 @@ class PdfService {
                             children: [
                               // Electrical section
                               _buildChecklistCategory('Electrical', [
-                                _CheckItem('Both tail lights', inspection.tailLights),
-                                _CheckItem('Headlights (low beam)', inspection.headlightsLowBeam),
-                                _CheckItem('Headlights (high beam)', inspection.headlightsHighBeam),
-                                _CheckItem('Reverse lights', inspection.reverseLights),
-                                _CheckItem('Brake lights', inspection.brakeLights),
+                                _CheckItem(
+                                  'Both tail lights',
+                                  inspection.tailLights,
+                                ),
+                                _CheckItem(
+                                  'Headlights (low beam)',
+                                  inspection.headlightsLowBeam,
+                                ),
+                                _CheckItem(
+                                  'Headlights (high beam)',
+                                  inspection.headlightsHighBeam,
+                                ),
+                                _CheckItem(
+                                  'Reverse lights',
+                                  inspection.reverseLights,
+                                ),
+                                _CheckItem(
+                                  'Brake lights',
+                                  inspection.brakeLights,
+                                ),
                               ]),
                               pw.SizedBox(height: 12),
-                              
+
                               // Cab section
                               _buildChecklistCategory('Cab', [
-                                _CheckItem('Windscreen & wipers', inspection.windscreenWipers),
+                                _CheckItem(
+                                  'Windscreen & wipers',
+                                  inspection.windscreenWipers,
+                                ),
                                 _CheckItem('Horn', inspection.horn),
                                 _CheckItem('Indicators', inspection.indicators),
                                 _CheckItem('Seat belts', inspection.seatBelts),
-                                _CheckItem('Cleanliness', inspection.cabCleanliness),
-                                _CheckItem('Service log book available', inspection.serviceLogBook),
-                                _CheckItem('Spare keys available in store', inspection.spareKeys),
+                                _CheckItem(
+                                  'Cleanliness',
+                                  inspection.cabCleanliness,
+                                ),
+                                _CheckItem(
+                                  'Service log book available',
+                                  inspection.serviceLogBook,
+                                ),
+                                _CheckItem(
+                                  'Spare keys available in store',
+                                  inspection.spareKeys,
+                                ),
                               ]),
                             ],
                           ),
                         ),
                       ],
                     ),
-                    
+
                     // Vehicle damage diagram placeholder
                     pw.SizedBox(height: 15),
                     pw.Container(
@@ -206,7 +269,8 @@ class PdfService {
                               ),
                             ),
                           ),
-                          if (inspection.bodyDamageNotes != null && inspection.bodyDamageNotes!.isNotEmpty) ...[
+                          if (inspection.bodyDamageNotes != null &&
+                              inspection.bodyDamageNotes!.isNotEmpty) ...[
                             pw.SizedBox(height: 8),
                             pw.Text(
                               'Body Damage Notes: ${inspection.bodyDamageNotes}',
@@ -285,7 +349,10 @@ class PdfService {
                         pw.Column(
                           crossAxisAlignment: pw.CrossAxisAlignment.start,
                           children: [
-                            pw.Text('Signature:', style: const pw.TextStyle(fontSize: 10)),
+                            pw.Text(
+                              'Signature:',
+                              style: const pw.TextStyle(fontSize: 10),
+                            ),
                             pw.SizedBox(height: 5),
                             pw.Container(
                               width: 180,
@@ -310,7 +377,10 @@ class PdfService {
                         pw.Column(
                           crossAxisAlignment: pw.CrossAxisAlignment.start,
                           children: [
-                            pw.Text('Date:', style: const pw.TextStyle(fontSize: 10)),
+                            pw.Text(
+                              'Date:',
+                              style: const pw.TextStyle(fontSize: 10),
+                            ),
                             pw.SizedBox(height: 5),
                             pw.Text(
                               dateFormat.format(inspection.inspectionDate),
@@ -337,18 +407,23 @@ class PdfService {
 
   /// Generate PDF that exactly matches the Word template layout
   /// Works offline on all platforms (Android, iOS, Desktop)
-  static Future<Uint8List> generateTemplateMatchingPdf(Inspection inspection) async {
+  static Future<Uint8List> generateTemplateMatchingPdf(
+    Inspection inspection,
+  ) async {
     final pdf = pw.Document();
 
     // Load images
     final logoImage = await imageFromAssetBundle('assets/dominos_logo.png');
-    final diagramImage = await imageFromAssetBundle('assets/vehicle_diagram.jpeg');
+    final diagramImage = await imageFromAssetBundle(
+      'assets/vehicle_diagram.jpeg',
+    );
 
     pdf.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
         margin: const pw.EdgeInsets.all(20), // Reduced margin to 20
-        build: (context) => _buildTemplateMatchingPage(inspection, logoImage, diagramImage),
+        build: (context) =>
+            _buildTemplateMatchingPage(inspection, logoImage, diagramImage),
       ),
     );
 
@@ -356,19 +431,24 @@ class PdfService {
   }
 
   /// Generate a single PDF containing multiple inspections (Clubbed Report)
-  static Future<Uint8List> generateClubbedInspectionPdf(List<Inspection> inspections) async {
+  static Future<Uint8List> generateClubbedInspectionPdf(
+    List<Inspection> inspections,
+  ) async {
     final pdf = pw.Document();
 
     // Load images once
     final logoImage = await imageFromAssetBundle('assets/dominos_logo.png');
-    final diagramImage = await imageFromAssetBundle('assets/vehicle_diagram.jpeg');
+    final diagramImage = await imageFromAssetBundle(
+      'assets/vehicle_diagram.jpeg',
+    );
 
     for (final inspection in inspections) {
       pdf.addPage(
         pw.MultiPage(
           pageFormat: PdfPageFormat.a4,
           margin: const pw.EdgeInsets.all(20),
-          build: (context) => _buildTemplateMatchingPage(inspection, logoImage, diagramImage),
+          build: (context) =>
+              _buildTemplateMatchingPage(inspection, logoImage, diagramImage),
         ),
       );
     }
@@ -383,7 +463,7 @@ class PdfService {
     pw.ImageProvider diagramImage,
   ) {
     final dateFormat = DateFormat('dd/MM/yyyy');
-    
+
     return [
       // Header with Logo
       pw.Row(
@@ -393,7 +473,10 @@ class PdfService {
             flex: 4,
             child: pw.Container(
               color: PdfColors.blue900,
-              padding: const pw.EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+              padding: const pw.EdgeInsets.symmetric(
+                vertical: 6,
+                horizontal: 10,
+              ),
               child: pw.Text(
                 'Motor Vehicle Inspection Form',
                 style: pw.TextStyle(
@@ -417,7 +500,7 @@ class PdfService {
       ),
       pw.SizedBox(height: 4),
       _buildDetailsTable(inspection, dateFormat),
-      
+
       pw.SizedBox(height: 10),
 
       // 2. Inspection Checklist
@@ -427,7 +510,7 @@ class PdfService {
       ),
       pw.SizedBox(height: 4),
       _buildChecklistTable(inspection),
-      
+
       pw.SizedBox(height: 8),
 
       // Part 3: Vehicle Diagram and Spare Keys
@@ -452,7 +535,10 @@ class PdfService {
                 decoration: pw.BoxDecoration(
                   border: pw.Border.all(color: PdfColors.black, width: 0.5),
                 ),
-                padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const pw.EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 4,
+                ),
                 child: pw.Text(
                   'Spare keys available in store',
                   style: const pw.TextStyle(fontSize: 10),
@@ -462,7 +548,7 @@ class PdfService {
           ),
         ],
       ),
-      
+
       pw.SizedBox(height: 8),
 
       // 3. Corrective Actions
@@ -492,28 +578,19 @@ class PdfService {
               bottom: 30,
               left: 0,
               right: 0,
-              child: pw.Container(
-                height: 1,
-                color: PdfColors.black,
-              ),
+              child: pw.Container(height: 1, color: PdfColors.black),
             ),
             pw.Positioned(
               bottom: 15,
               left: 0,
               right: 0,
-              child: pw.Container(
-                height: 1,
-                color: PdfColors.black,
-              ),
+              child: pw.Container(height: 1, color: PdfColors.black),
             ),
             pw.Positioned(
               bottom: 0,
               left: 0,
               right: 0,
-              child: pw.Container(
-                height: 1,
-                color: PdfColors.black,
-              ),
+              child: pw.Container(height: 1, color: PdfColors.black),
             ),
           ],
         ),
@@ -540,9 +617,15 @@ class PdfService {
             child: pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                pw.Text('Employee Signature', style: const pw.TextStyle(fontSize: 10)),
+                pw.Text(
+                  'Employee Signature',
+                  style: const pw.TextStyle(fontSize: 10),
+                ),
                 pw.Table(
-                  border: pw.TableBorder.all(color: PdfColors.black, width: 0.5),
+                  border: pw.TableBorder.all(
+                    color: PdfColors.black,
+                    width: 0.5,
+                  ),
                   children: [
                     // Signature box
                     pw.TableRow(
@@ -554,7 +637,10 @@ class PdfService {
                             alignment: pw.Alignment.centerLeft,
                             child: pw.Text(
                               inspection.signature ?? '',
-                              style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold),
+                              style: pw.TextStyle(
+                                fontSize: 12,
+                                fontWeight: pw.FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
@@ -583,15 +669,32 @@ class PdfService {
             child: pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                pw.Text('Manager Signature', style: const pw.TextStyle(fontSize: 10)),
+                pw.Text(
+                  'Manager Signature',
+                  style: const pw.TextStyle(fontSize: 10),
+                ),
                 pw.Table(
-                  border: pw.TableBorder.all(color: PdfColors.black, width: 0.5),
+                  border: pw.TableBorder.all(
+                    color: PdfColors.black,
+                    width: 0.5,
+                  ),
                   children: [
                     // Signature box
                     pw.TableRow(
                       children: [
                         pw.Container(
                           height: 40,
+                          padding: const pw.EdgeInsets.all(4),
+                          child: pw.Align(
+                            alignment: pw.Alignment.centerLeft,
+                            child: pw.Text(
+                              inspection.managerSignature ?? '',
+                              style: pw.TextStyle(
+                                fontSize: 12,
+                                fontWeight: pw.FontWeight.bold,
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -601,7 +704,9 @@ class PdfService {
                         pw.Container(
                           padding: const pw.EdgeInsets.all(4),
                           child: pw.Text(
-                            'Date',
+                            inspection.managerSignOffDate != null
+                                ? 'Date    ${dateFormat.format(inspection.managerSignOffDate!)}'
+                                : 'Date',
                             style: const pw.TextStyle(fontSize: 10),
                           ),
                         ),
@@ -618,7 +723,10 @@ class PdfService {
   }
 
   /// Build inspection details table matching Word template Table 0
-  static pw.Widget _buildDetailsTable(Inspection inspection, DateFormat dateFormat) {
+  static pw.Widget _buildDetailsTable(
+    Inspection inspection,
+    DateFormat dateFormat,
+  ) {
     return pw.Column(
       children: [
         // Row 1: Vehicle Reg & Store
@@ -629,11 +737,17 @@ class PdfService {
               width: 120,
               child: pw.Padding(
                 padding: const pw.EdgeInsets.only(bottom: 2),
-                child: pw.Text('Vehicle Registration No:', style: pw.TextStyle(fontSize: 10)),
+                child: pw.Text(
+                  'Vehicle Registration No:',
+                  style: pw.TextStyle(fontSize: 10),
+                ),
               ),
             ),
             pw.Expanded(
-              child: _buildValueBox(inspection.vehicleRegistrationNo, bottomBorder: false),
+              child: _buildValueBox(
+                inspection.vehicleRegistrationNo,
+                bottomBorder: false,
+              ),
             ),
             pw.SizedBox(width: 10),
             pw.SizedBox(
@@ -656,11 +770,17 @@ class PdfService {
               width: 120,
               child: pw.Padding(
                 padding: const pw.EdgeInsets.only(top: 4),
-                child: pw.Text('Odometer Reading:', style: pw.TextStyle(fontSize: 10)),
+                child: pw.Text(
+                  'Odometer Reading:',
+                  style: pw.TextStyle(fontSize: 10),
+                ),
               ),
             ),
             pw.Expanded(
-              child: _buildValueBox(inspection.odometerReading, bottomBorder: false),
+              child: _buildValueBox(
+                inspection.odometerReading,
+                bottomBorder: false,
+              ),
             ),
             pw.SizedBox(width: 10),
             pw.SizedBox(
@@ -671,7 +791,10 @@ class PdfService {
               ),
             ),
             pw.Expanded(
-              child: _buildValueBox(dateFormat.format(inspection.inspectionDate), bottomBorder: false),
+              child: _buildValueBox(
+                dateFormat.format(inspection.inspectionDate),
+                bottomBorder: false,
+              ),
             ),
           ],
         ),
@@ -683,12 +806,13 @@ class PdfService {
               width: 120,
               child: pw.Padding(
                 padding: const pw.EdgeInsets.only(top: 4),
-                child: pw.Text('Employee Name', style: pw.TextStyle(fontSize: 10)),
+                child: pw.Text(
+                  'Employee Name',
+                  style: pw.TextStyle(fontSize: 10),
+                ),
               ),
             ),
-            pw.Expanded(
-              child: _buildValueBox(inspection.employeeName),
-            ),
+            pw.Expanded(child: _buildValueBox(inspection.employeeName)),
           ],
         ),
       ],
@@ -704,17 +828,14 @@ class PdfService {
           top: const pw.BorderSide(color: PdfColors.black, width: 0.5),
           left: const pw.BorderSide(color: PdfColors.black, width: 0.5),
           right: const pw.BorderSide(color: PdfColors.black, width: 0.5),
-          bottom: bottomBorder 
+          bottom: bottomBorder
               ? const pw.BorderSide(color: PdfColors.black, width: 0.5)
               : pw.BorderSide.none,
         ),
       ),
       padding: const pw.EdgeInsets.symmetric(horizontal: 4, vertical: 2),
       alignment: pw.Alignment.centerLeft,
-      child: pw.Text(
-        value,
-        style: const pw.TextStyle(fontSize: 10),
-      ),
+      child: pw.Text(value, style: const pw.TextStyle(fontSize: 10)),
     );
   }
 
@@ -727,33 +848,32 @@ class PdfService {
         pw.Expanded(
           child: pw.Column(
             children: [
-              _buildChecklistSection(
-                'Tyres',
-                [
-                  _ChecklistItem('Tyres (tread depth)', inspection.tyresTreadDepth),
-                  _ChecklistItem('Wheel nuts', inspection.wheelNuts),
-                ],
-                showOk: true,
-              ),
+              _buildChecklistSection('Tyres', [
+                _ChecklistItem(
+                  'Tyres (tread depth)',
+                  inspection.tyresTreadDepth,
+                ),
+                _ChecklistItem('Wheel nuts', inspection.wheelNuts),
+              ], showOk: true),
               pw.SizedBox(height: 8),
-              _buildChecklistSection(
-                'Outside',
-                [
-                  _ChecklistItem('Cleanliness', inspection.cleanliness),
-                  _ChecklistItem('Body damage: scratches/dents\netc. (circle on diagram below)', inspection.bodyDamage),
-                  _ChecklistItem('Mirrors & Windows', inspection.mirrorsWindows),
-                  _ChecklistItem('Signage (if applicable)', inspection.signage),
-                ],
-              ),
+              _buildChecklistSection('Outside', [
+                _ChecklistItem('Cleanliness', inspection.cleanliness),
+                _ChecklistItem(
+                  'Body damage: scratches/dents\netc. (circle on diagram below)',
+                  inspection.bodyDamage,
+                ),
+                _ChecklistItem('Mirrors & Windows', inspection.mirrorsWindows),
+                _ChecklistItem('Signage (if applicable)', inspection.signage),
+              ]),
               pw.SizedBox(height: 8),
-              _buildChecklistSection(
-                'Mechanical',
-                [
-                  _ChecklistItem('Engine - oil & water', inspection.engineOilWater),
-                  _ChecklistItem('Brakes', inspection.brakes),
-                  _ChecklistItem('Transmission', inspection.transmission),
-                ],
-              ),
+              _buildChecklistSection('Mechanical', [
+                _ChecklistItem(
+                  'Engine - oil & water',
+                  inspection.engineOilWater,
+                ),
+                _ChecklistItem('Brakes', inspection.brakes),
+                _ChecklistItem('Transmission', inspection.transmission),
+              ]),
             ],
           ),
         ),
@@ -762,29 +882,34 @@ class PdfService {
         pw.Expanded(
           child: pw.Column(
             children: [
-              _buildChecklistSection(
-                'Electrical',
-                [
-                  _ChecklistItem('Both tail lights', inspection.tailLights),
-                  _ChecklistItem('Headlights (low beam)', inspection.headlightsLowBeam),
-                  _ChecklistItem('Headlights (high beam)', inspection.headlightsHighBeam),
-                  _ChecklistItem('Reverse lights', inspection.reverseLights),
-                  _ChecklistItem('Brake lights', inspection.brakeLights),
-                ],
-                showOk: true,
-              ),
+              _buildChecklistSection('Electrical', [
+                _ChecklistItem('Both tail lights', inspection.tailLights),
+                _ChecklistItem(
+                  'Headlights (low beam)',
+                  inspection.headlightsLowBeam,
+                ),
+                _ChecklistItem(
+                  'Headlights (high beam)',
+                  inspection.headlightsHighBeam,
+                ),
+                _ChecklistItem('Reverse lights', inspection.reverseLights),
+                _ChecklistItem('Brake lights', inspection.brakeLights),
+              ], showOk: true),
               pw.SizedBox(height: 8),
-              _buildChecklistSection(
-                'Cab',
-                [
-                  _ChecklistItem('Windscreen & wipers', inspection.windscreenWipers),
-                  _ChecklistItem('Horn', inspection.horn),
-                  _ChecklistItem('Indicators', inspection.indicators),
-                  _ChecklistItem('Seat belts', inspection.seatBelts),
-                  _ChecklistItem('Cleanliness', inspection.cabCleanliness),
-                  _ChecklistItem('Service log book available', inspection.serviceLogBook),
-                ],
-              ),
+              _buildChecklistSection('Cab', [
+                _ChecklistItem(
+                  'Windscreen & wipers',
+                  inspection.windscreenWipers,
+                ),
+                _ChecklistItem('Horn', inspection.horn),
+                _ChecklistItem('Indicators', inspection.indicators),
+                _ChecklistItem('Seat belts', inspection.seatBelts),
+                _ChecklistItem('Cleanliness', inspection.cabCleanliness),
+                _ChecklistItem(
+                  'Service log book available',
+                  inspection.serviceLogBook,
+                ),
+              ]),
             ],
           ),
         ),
@@ -806,10 +931,19 @@ class PdfService {
             pw.SizedBox(
               width: 25,
               child: showOk
-                  ? pw.Text('OK?', style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold))
+                  ? pw.Text(
+                      'OK?',
+                      style: pw.TextStyle(
+                        fontSize: 9,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    )
                   : null,
             ),
-            pw.Text(title, style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold)),
+            pw.Text(
+              title,
+              style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold),
+            ),
           ],
         ),
         pw.SizedBox(height: 2),
@@ -818,15 +952,18 @@ class PdfService {
           final index = entry.key;
           final item = entry.value;
           final isFirst = index == 0;
-          
+
           return pw.Row(
-            crossAxisAlignment: pw.CrossAxisAlignment.start, // Align top for multi-line text
+            crossAxisAlignment:
+                pw.CrossAxisAlignment.start, // Align top for multi-line text
             children: [
               // Checkbox
               pw.Container(
                 width: 25,
                 alignment: pw.Alignment.topLeft,
-                padding: const pw.EdgeInsets.only(top: 2), // Align with text box
+                padding: const pw.EdgeInsets.only(
+                  top: 2,
+                ), // Align with text box
                 child: _buildCheckbox(item.value),
               ),
               // Text Box
@@ -834,19 +971,39 @@ class PdfService {
                 child: pw.Container(
                   decoration: pw.BoxDecoration(
                     border: pw.Border(
-                      top: isFirst ? const pw.BorderSide(color: PdfColors.black, width: 0.5) : pw.BorderSide.none,
-                      left: const pw.BorderSide(color: PdfColors.black, width: 0.5),
-                      right: const pw.BorderSide(color: PdfColors.black, width: 0.5),
-                      bottom: const pw.BorderSide(color: PdfColors.black, width: 0.5),
+                      top: isFirst
+                          ? const pw.BorderSide(
+                              color: PdfColors.black,
+                              width: 0.5,
+                            )
+                          : pw.BorderSide.none,
+                      left: const pw.BorderSide(
+                        color: PdfColors.black,
+                        width: 0.5,
+                      ),
+                      right: const pw.BorderSide(
+                        color: PdfColors.black,
+                        width: 0.5,
+                      ),
+                      bottom: const pw.BorderSide(
+                        color: PdfColors.black,
+                        width: 0.5,
+                      ),
                     ),
                   ),
-                  padding: const pw.EdgeInsets.symmetric(vertical: 2, horizontal: 4),
-                  child: pw.Text(item.text, style: const pw.TextStyle(fontSize: 9)),
+                  padding: const pw.EdgeInsets.symmetric(
+                    vertical: 2,
+                    horizontal: 4,
+                  ),
+                  child: pw.Text(
+                    item.text,
+                    style: const pw.TextStyle(fontSize: 9),
+                  ),
                 ),
               ),
             ],
           );
-        }).toList(),
+        }),
       ],
     );
   }
@@ -861,7 +1018,8 @@ class PdfService {
       child: value == true
           ? pw.Center(
               child: pw.SvgImage(
-                svg: '<svg viewBox="0 0 10 10"><path d="M 2 5 L 4 8 L 8 2" stroke="black" stroke-width="1.5" fill="none"/></svg>',
+                svg:
+                    '<svg viewBox="0 0 10 10"><path d="M 2 5 L 4 8 L 8 2" stroke="black" stroke-width="1.5" fill="none"/></svg>',
                 width: 8,
                 height: 8,
               ),
@@ -890,14 +1048,17 @@ class PdfService {
   }
 
   /// Build signatures table matching Word template Table 3
-  static pw.Widget _buildSignaturesTable(Inspection inspection, DateFormat dateFormat) {
+  static pw.Widget _buildSignaturesTable(
+    Inspection inspection,
+    DateFormat dateFormat,
+  ) {
     final formattedDate = dateFormat.format(inspection.inspectionDate);
-    
+
     return pw.Table(
       border: pw.TableBorder.all(color: PdfColors.black, width: 1),
       columnWidths: {
         0: const pw.FlexColumnWidth(2),
-        1: const pw.FixedColumnWidth(20),  // Middle separator column
+        1: const pw.FixedColumnWidth(20), // Middle separator column
         2: const pw.FlexColumnWidth(2),
       },
       children: [
@@ -905,7 +1066,7 @@ class PdfService {
         pw.TableRow(
           children: [
             _buildTableCell('Employee Signature', bold: true, fontSize: 10),
-            _buildTableCell('', fontSize: 10),  // Middle separator
+            _buildTableCell('', fontSize: 10), // Middle separator
             _buildTableCell('Manager Signature', bold: true, fontSize: 10),
           ],
         ),
@@ -918,7 +1079,11 @@ class PdfService {
               bold: true,
               minHeight: 40,
             ),
-            _buildTableCell('', fontSize: 14, minHeight: 40),  // Middle separator
+            _buildTableCell(
+              '',
+              fontSize: 14,
+              minHeight: 40,
+            ), // Middle separator
             _buildTableCell('', fontSize: 14, minHeight: 40),
           ],
         ),
@@ -926,7 +1091,7 @@ class PdfService {
         pw.TableRow(
           children: [
             _buildTableCell('Date', fontSize: 10),
-            _buildTableCell('', fontSize: 10),  // Middle separator
+            _buildTableCell('', fontSize: 10), // Middle separator
             _buildTableCell('Date', fontSize: 10),
           ],
         ),
@@ -940,12 +1105,13 @@ class PdfService {
     bool bold = false,
     double fontSize = 8,
     bool centered = false,
-    int colspan = 1,
     double? minHeight,
   }) {
     return pw.Container(
       padding: const pw.EdgeInsets.symmetric(vertical: 2, horizontal: 4),
-      constraints: minHeight != null ? pw.BoxConstraints(minHeight: minHeight) : null,
+      constraints: minHeight != null
+          ? pw.BoxConstraints(minHeight: minHeight)
+          : null,
       child: pw.Align(
         alignment: centered ? pw.Alignment.center : pw.Alignment.centerLeft,
         child: pw.Text(
@@ -1002,23 +1168,16 @@ class PdfService {
     );
   }
 
-
   // Helper method to build detail fields
   static pw.Widget _buildDetailField(String label, String value) {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        pw.Text(
-          label,
-          style: const pw.TextStyle(fontSize: 10),
-        ),
+        pw.Text(label, style: const pw.TextStyle(fontSize: 10)),
         pw.SizedBox(height: 2),
         pw.Text(
           value,
-          style: pw.TextStyle(
-            fontSize: 11,
-            fontWeight: pw.FontWeight.bold,
-          ),
+          style: pw.TextStyle(fontSize: 11, fontWeight: pw.FontWeight.bold),
         ),
       ],
     );
@@ -1046,10 +1205,7 @@ class PdfService {
             ),
             pw.Text(
               'OK?',
-              style: pw.TextStyle(
-                fontSize: 10,
-                fontWeight: pw.FontWeight.bold,
-              ),
+              style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold),
             ),
           ],
         ),
@@ -1089,10 +1245,7 @@ class PdfService {
           pw.SizedBox(width: 6),
           // Label
           pw.Expanded(
-            child: pw.Text(
-              item.label,
-              style: const pw.TextStyle(fontSize: 9),
-            ),
+            child: pw.Text(item.label, style: const pw.TextStyle(fontSize: 9)),
           ),
         ],
       ),
@@ -1101,9 +1254,7 @@ class PdfService {
 
   static Future<void> printInspection(Inspection inspection) async {
     final pdfData = await generateInspectionPdf(inspection);
-    await Printing.layoutPdf(
-      onLayout: (format) async => pdfData,
-    );
+    await Printing.layoutPdf(onLayout: (format) async => pdfData);
   }
 
   static Future<void> shareInspection(Inspection inspection) async {
@@ -1116,18 +1267,19 @@ class PdfService {
   }
 
   /// Print inspection using template-matching PDF (offline, all platforms)
-  static Future<void> printTemplateMatchingInspection(Inspection inspection) async {
+  static Future<void> printTemplateMatchingInspection(
+    Inspection inspection,
+  ) async {
     final pdfData = await generateTemplateMatchingPdf(inspection);
-    await Printing.layoutPdf(
-      onLayout: (format) async => pdfData,
-    );
+    await Printing.layoutPdf(onLayout: (format) async => pdfData);
   }
 
-
   /// Share inspection using template-matching PDF (offline, all platforms)
-  static Future<void> shareTemplateMatchingInspection(Inspection inspection) async {
+  static Future<void> shareTemplateMatchingInspection(
+    Inspection inspection,
+  ) async {
     final pdfData = await generateTemplateMatchingPdf(inspection);
-    
+
     // Save to Offline Drive
     await OfflineDriveService.saveInspectionPdf(inspection, pdfData);
 
@@ -1139,15 +1291,19 @@ class PdfService {
   }
 
   /// Share multiple inspections as a single combined PDF (offline, all platforms)
-  static Future<void> shareClubbedInspections(List<Inspection> inspections) async {
+  static Future<void> shareClubbedInspections(
+    List<Inspection> inspections,
+  ) async {
     if (inspections.isEmpty) return;
-    
+
     final pdfData = await generateClubbedInspectionPdf(inspections);
-    
+
     // Use the date of the most recent inspection for the filename
-    final dateStr = DateFormat('yyyyMMdd').format(inspections.first.inspectionDate);
+    final dateStr = DateFormat(
+      'yyyyMMdd',
+    ).format(inspections.first.inspectionDate);
     final vehicleReg = inspections.first.vehicleRegistrationNo;
-    
+
     await Printing.sharePdf(
       bytes: pdfData,
       filename: 'bulk_inspections_${vehicleReg}_$dateStr.pdf',
