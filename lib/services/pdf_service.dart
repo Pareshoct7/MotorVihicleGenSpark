@@ -92,6 +92,9 @@ class PdfService {
                       'Employee Name:',
                       inspection.employeeName,
                     ),
+                    _buildSpacer(),
+                    _buildSignaturesTable(inspection, dateFormat),
+                    _buildSpacer(),
                   ],
                 ),
               ),
@@ -1084,7 +1087,14 @@ class PdfService {
               fontSize: 14,
               minHeight: 40,
             ), // Middle separator
-            _buildTableCell('', fontSize: 14, minHeight: 40),
+            _buildTableCell(
+              inspection.managerSignature ?? '', 
+              fontSize: 14, 
+              minHeight: 40,
+              centered: true,
+              bold: true,
+              fontStyle: pw.FontStyle.italic,
+            ),
           ],
         ),
         // Date row
@@ -1092,7 +1102,12 @@ class PdfService {
           children: [
             _buildTableCell('Date', fontSize: 10),
             _buildTableCell('', fontSize: 10), // Middle separator
-            _buildTableCell('Date', fontSize: 10),
+            _buildTableCell(
+              inspection.managerSignOffDate != null 
+                  ? 'Date: ${dateFormat.format(inspection.managerSignOffDate!)}' 
+                  : 'Date: ________________', 
+              fontSize: 10
+            ),
           ],
         ),
       ],
@@ -1106,6 +1121,7 @@ class PdfService {
     double fontSize = 8,
     bool centered = false,
     double? minHeight,
+    pw.FontStyle? fontStyle,
   }) {
     return pw.Container(
       padding: const pw.EdgeInsets.symmetric(vertical: 2, horizontal: 4),
@@ -1119,10 +1135,15 @@ class PdfService {
           style: pw.TextStyle(
             fontSize: fontSize,
             fontWeight: bold ? pw.FontWeight.bold : pw.FontWeight.normal,
+            fontStyle: fontStyle,
           ),
         ),
       ),
     );
+  }
+
+  static pw.Widget _buildSpacer() {
+    return pw.SizedBox(height: 10);
   }
 
   /// Helper: Build a checkbox cell

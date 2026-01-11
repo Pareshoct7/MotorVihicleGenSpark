@@ -50,6 +50,8 @@ class BulkInspectionService {
       spareKeys: true,
       correctiveActions: 'Routine inspection - No issues found',
       signature: driver.name,
+      managerSignature: 'Abhishek Joshi',
+      managerSignOffDate: date,
     );
   }
 

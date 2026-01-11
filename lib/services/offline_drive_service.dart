@@ -156,10 +156,7 @@ class OfflineDriveService {
 
           await DatabaseService.addInspection(inspection);
         } else {
-          // Fetch existing (we need it to save PDF)
-          // This is expensive: iterating all inspections to find one.
-          // Optimize? getAllInspections() is cached by Hive effectively, but parsing filtering is linear.
-          // For backfill script, it's okay.
+          // Fetch existing (we need it to save PDF, and ensure signature is present)
           try {
             final all = DatabaseService.getAllInspections();
             inspection = all.firstWhere(
@@ -167,6 +164,13 @@ class OfflineDriveService {
                   i.vehicleId == vehicle.id &&
                   _isSameWeek(i.inspectionDate, date),
             );
+
+            // FORCE UPDATE: Ensure "Abhishek Joshi" is signed on existing backfilled records
+            if (inspection.managerSignature != 'Abhishek Joshi') {
+              inspection.managerSignature = 'Abhishek Joshi';
+              inspection.managerSignOffDate = inspection.inspectionDate;
+              await inspection.save();
+            }
           } catch (e) {
             // Should not happen if hasInspectionInSameWeek returned true
           }

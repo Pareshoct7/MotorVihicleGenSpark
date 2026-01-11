@@ -203,6 +203,11 @@ class _InspectionFormScreenState extends State<InspectionFormScreen>
     final drivers = DatabaseService.getAllDrivers();
     final accentColor = const Color(0xFF4FC3F7);
 
+    // Validate selections against available data to prevent crashes
+    final validVehicleId = vehicles.any((v) => v.id == _selectedVehicleId) ? _selectedVehicleId : null;
+    final validStoreId = stores.any((s) => s.id == _selectedStoreId) ? _selectedStoreId : null;
+    final validDriverId = drivers.any((d) => d.id == _selectedDriverId) ? _selectedDriverId : null;
+
     return Scaffold(
       body: Form(
         key: _formKey,
@@ -278,7 +283,7 @@ class _InspectionFormScreenState extends State<InspectionFormScreen>
                   // Section 1: Telemetry
                   _buildAnimatedSection(0, 'TELEMETRY', [
                     DropdownButtonFormField<String>(
-                      initialValue: _selectedVehicleId,
+                      value: validVehicleId, // Use value instead of initialValue for better state control
                       isExpanded: true,
                       decoration: InputDecoration(
                         labelText: 'TARGET VEHICLE',
@@ -304,7 +309,7 @@ class _InspectionFormScreenState extends State<InspectionFormScreen>
                     ),
                     const SizedBox(height: 16),
                     DropdownButtonFormField<String>(
-                      initialValue: _selectedStoreId,
+                      value: validStoreId,
                       isExpanded: true,
                       decoration: InputDecoration(
                         labelText: 'STAGING HUB',
@@ -421,7 +426,7 @@ class _InspectionFormScreenState extends State<InspectionFormScreen>
                     ),
                     const SizedBox(height: 16),
                     DropdownButtonFormField<String>(
-                      initialValue: _selectedDriverId,
+                      value: validDriverId,
                       isExpanded: true,
                       decoration: InputDecoration(
                         labelText: 'OPERATOR',
@@ -1124,6 +1129,7 @@ class _InspectionFormScreenState extends State<InspectionFormScreen>
         },
       ),
     );
+}
 }
 
 class _ChecklistItem {

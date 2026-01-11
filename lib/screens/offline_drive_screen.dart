@@ -473,6 +473,43 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen>
     }
   }
 
+  Future<void> _clearOfflineDrive() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('CLEAR OFFLINE DRIVE'),
+        content: Text('This will delete ALL reports and folders. This action cannot be undone.\n\nAre you sure?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text('CANCEL')),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Color(0xFFFF5252)),
+            onPressed: () => Navigator.pop(context, true), 
+            child: Text('CLEAR EVERYTHING')
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    try {
+      final root = await OfflineDriveService.getRootDirectory();
+      if (await root.exists()) {
+        await root.delete(recursive: true);
+        await OfflineDriveService.init(); // Re-create root
+        await OfflineDriveService.syncStructure(); // Re-sync structure
+      }
+      if (mounted) {
+        _loadContents();
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Offline Drive Cleared')));
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error clearing drive: $e')));
+      }
+    }
+  }
+
   List<FileSystemEntity> get _filteredAndSortedContents {
     List<FileSystemEntity> result = _contents;
 
@@ -594,11 +631,18 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen>
                 : [
                     if (!_isSearchMode) ...[
                       if (folderName == 'DATA DRIVE' ||
-                          folderName == 'OFFLINE DRIVE')
+                          folderName == 'OFFLINE DRIVE' ||
+                          folderName == 'OFFLINEDRIVE')
                         IconButton(
                           icon: Icon(Icons.sync_outlined),
                           onPressed: _isBackfilling ? null : _runBackfill,
                           tooltip: 'Sync',
+                        ),
+                      if (folderName == 'OFFLINE DRIVE' || folderName == 'OFFLINEDRIVE')
+                        IconButton(
+                          icon: Icon(Icons.delete_forever_outlined, color: Color(0xFFFF5252)),
+                          onPressed: _clearOfflineDrive,
+                          tooltip: 'Clear Drive',
                         ),
                       IconButton(
                         icon: Icon(Icons.search_outlined),
