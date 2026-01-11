@@ -669,6 +669,11 @@ class _InspectionFormScreenState extends State<InspectionFormScreen>
                       ),
                     ),
                   ],
+
+                  if (widget.isViewOnly && widget.inspection != null) ...[
+                    const SizedBox(height: 24),
+                    _buildManagerSignOffSection(),
+                  ],
                 ]),
               ),
             ),
@@ -969,6 +974,156 @@ class _InspectionFormScreenState extends State<InspectionFormScreen>
     _entranceController.dispose();
     super.dispose();
   }
+
+  Widget _buildManagerSignOffSection() {
+    final hasManagerSigned = widget.inspection!.managerSignature != null;
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (hasManagerSigned) ...[
+          Container(
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.green.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.green.withOpacity(0.3)),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.verified, color: Colors.green),
+                    SizedBox(width: 8),
+                    Text(
+                      'MANAGER APPROVED',
+                      style: TextStyle(
+                        color: Colors.green,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 8),
+                Text(
+                  widget.inspection!.managerSignature!,
+                  style: TextStyle(
+                    fontSize: 18, 
+                    fontWeight: FontWeight.bold,
+                    fontStyle: FontStyle.italic
+                  ),
+                ),
+                Text(
+                  'Signed on ${DateFormat('dd MMM yyyy').format(widget.inspection!.managerSignOffDate!)}',
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 16),
+        ],
+        
+        ElevatedButton.icon(
+          onPressed: _showManagerSignOffDialog,
+          icon: Icon(hasManagerSigned ? Icons.edit : Icons.verified_user_outlined),
+          label: Text(hasManagerSigned ? 'EDIT SIGN-OFF' : 'MANAGER SIGN-OFF'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
+            foregroundColor: Theme.of(context).colorScheme.onTertiaryContainer,
+            minimumSize: const Size(double.infinity, 56),
+          ),
+        ),
+        SizedBox(height: 16),
+      ],
+    );
+  }
+
+  void _showManagerSignOffDialog() {
+    final nameController = TextEditingController(
+      text: widget.inspection!.managerSignature ?? ''
+    );
+    DateTime selectedDate = widget.inspection!.managerSignOffDate ?? DateTime.now();
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          return AlertDialog(
+            title: Text('Manager Sign-off'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: nameController,
+                  decoration: InputDecoration(
+                    labelText: 'Manager Name',
+                    hintText: 'Enter name',
+                    border: OutlineInputBorder(),
+                    filled: true,
+                  ),
+                  textCapitalization: TextCapitalization.words,
+                  autofocus: true,
+                ),
+                SizedBox(height: 16),
+                InkWell(
+                  onTap: () async {
+                    final date = await showDatePicker(
+                      context: context,
+                      initialDate: selectedDate,
+                      firstDate: DateTime(2020),
+                      lastDate: DateTime(2030),
+                    );
+                    if (date != null) {
+                      setDialogState(() => selectedDate = date);
+                    }
+                  },
+                  child: InputDecorator(
+                    decoration: InputDecoration(
+                      labelText: 'Sign-off Date',
+                      border: OutlineInputBorder(),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(DateFormat('dd MMM yyyy').format(selectedDate)),
+                        Icon(Icons.calendar_today, size: 16),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('Cancel'),
+              ),
+              FilledButton(
+                onPressed: () async {
+                  if (nameController.text.trim().isEmpty) return;
+                  
+                  // Update model
+                  widget.inspection!.managerSignature = nameController.text.trim();
+                  widget.inspection!.managerSignOffDate = selectedDate;
+                  await widget.inspection!.save();
+                  
+                  if (mounted) {
+                    Navigator.pop(context);
+                    setState(() {}); // Refresh UI
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Manager sign-off saved')),
+                    );
+                  }
+                },
+                child: Text('Sign & Save'),
+              ),
+            ],
+          );
+        },
+      ),
+    );
 }
 
 class _ChecklistItem {
