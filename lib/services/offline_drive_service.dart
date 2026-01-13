@@ -1,4 +1,7 @@
 import 'dart:io';
+import 'package:share_plus/share_plus.dart';
+import 'package:archive/archive_io.dart';
+import 'package:path/path.dart' as p;
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/foundation.dart';
@@ -440,6 +443,24 @@ class OfflineDriveService {
     } catch (e) {
       debugPrint('Error mapping PDF to inspection: $e');
       return null;
+    }
+  }
+  static Future<void> zipAndShareFolder(Directory dir) async {
+    try {
+      final zipEncoder = ZipFileEncoder();
+      final zipPath = '${dir.path}.zip';
+      zipEncoder.zipDirectory(dir, filename: zipPath);
+      
+      final zipFile = File(zipPath);
+      if (await zipFile.exists()) {
+        await Share.shareXFiles(
+          [XFile(zipPath)], 
+          text: 'Shared from Offline Drive: ${dir.path.split('/').last}'
+        );
+      }
+    } catch (e) {
+      debugPrint('Error zipping folder: $e');
+      rethrow;
     }
   }
 }

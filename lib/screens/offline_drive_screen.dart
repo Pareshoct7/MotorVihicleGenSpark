@@ -219,27 +219,38 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen>
   }
 
   Future<void> _shareSelected() async {
-    try {
-      final pdfPaths = _selectedPaths
-          .where((p) => p.toLowerCase().endsWith('.pdf'))
-          .toList();
+    if (_selectedPaths.isEmpty) return;
 
-      if (pdfPaths.isEmpty) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('No PDF files selected')));
-        return;
+    List<XFile> files = [];
+    for (var path in _selectedPaths) {
+      if (await File(path).exists()) {
+        files.add(XFile(path));
       }
+    }
 
-      final xFiles = pdfPaths.map((p) => XFile(p)).toList();
-      await Share.shareXFiles(xFiles, text: 'Inspection Reports');
-
+    if (files.isNotEmpty) {
+      await Share.shareXFiles(files);
       _exitSelectionMode();
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error sharing: $e')));
+    }
+  }
+
+  Future<void> _zipAndShareSelected() async {
+    if (_selectedPaths.length != 1) return;
+    final path = _selectedPaths.first;
+    final dir = Directory(path);
+
+    if (await dir.exists()) {
+      try {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Compressing folder...')),
+        );
+
+        await OfflineDriveService.zipAndShareFolder(dir);
+        _exitSelectionMode();
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error sharing folder: $e')),
+        );
       }
     }
   }
@@ -483,7 +494,7 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen>
           TextButton(onPressed: () => Navigator.pop(context, false), child: Text('CANCEL')),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Color(0xFFFF5252)),
-            onPressed: () => Navigator.pop(context, true), 
+            onPressed: () => Navigator.pop(context, true),
             child: Text('CLEAR EVERYTHING')
           ),
         ],
@@ -614,6 +625,13 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen>
                       onPressed: _shareSelected,
                       tooltip: 'Share',
                     ),
+                    if (_selectedPaths.length == 1 &&
+                        FileSystemEntity.isDirectorySync(_selectedPaths.first))
+                      IconButton(
+                        icon: Icon(Icons.folder_zip_outlined),
+                        onPressed: _zipAndShareSelected,
+                        tooltip: 'Zip & Share',
+                      ),
                     IconButton(
                       icon: Icon(Icons.picture_as_pdf_outlined),
                       onPressed: _combineSelected,
