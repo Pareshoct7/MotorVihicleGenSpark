@@ -463,4 +463,46 @@ class OfflineDriveService {
       rethrow;
     }
   }
+
+  /// Search for a specific vehicle folder across all stores for a given date (month/year)
+  static Future<Directory?> findVehicleFolder(String vehicleReg, {int? year, String? month}) async {
+    if (_rootDir == null) await init();
+    if (_rootDir == null) return null;
+
+    final targetReg = _sanitize(vehicleReg).toLowerCase();
+    
+    // Default to current date if not provided
+    final searchYear = year ?? DateTime.now().year;
+    final searchMonth = month ?? DateFormat('MMMM').format(DateTime.now());
+
+    try {
+      final stores = await _rootDir!.list().toList();
+      for (final storeEntity in stores) {
+        if (storeEntity is Directory) {
+           // Path: Store/Year/Month/Vehicle
+           final potentialPath = '${storeEntity.path}/$searchYear/$searchMonth';
+           final monthDir = Directory(potentialPath);
+           
+           if (await monthDir.exists()) {
+             final vehicles = await monthDir.list().toList();
+             for (final v in vehicles) {
+               if (v is Directory && v.path.split('/').last.toLowerCase().contains(targetReg)) {
+                 return v;
+               }
+             }
+           }
+        }
+      }
+    } catch (e) {
+      debugPrint('Error searching for vehicle folder: $e');
+    }
+    return null;
+  }
+  static Future<void> clearOfflineDrive() async {
+    if (_rootDir == null) await init();
+    if (_rootDir != null && await _rootDir!.exists()) {
+      await _rootDir!.delete(recursive: true);
+      await init(); // Re-init to create root folder
+    }
+  }
 }

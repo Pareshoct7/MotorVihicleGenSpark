@@ -275,8 +275,17 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Widget _buildDashboard(BuildContext context, int totalInspections) {
-    // Today inspections for visual effect
-    const todayInspections = 3;
+    // Calculate Today's Stats
+    final allInspections = DatabaseService.getAllInspections();
+    final now = DateTime.now();
+    final todayCount = allInspections.where((i) {
+      return i.inspectionDate.year == now.year &&
+             i.inspectionDate.month == now.month &&
+             i.inspectionDate.day == now.day;
+    }).length;
+
+    // Target for meter (e.g. 10 inspections/day is 100%)
+    final double meterValue = (todayCount / 10).clamp(0.0, 1.0);
 
     return Container(
       height: 220,
@@ -395,7 +404,7 @@ class _HomeScreenState extends State<HomeScreen>
                   flex: 2,
                   child: Center(
                     child: TweenAnimationBuilder<double>(
-                      tween: Tween<double>(begin: 0, end: 0.7),
+                      tween: Tween<double>(begin: 0, end: meterValue),
                       duration: const Duration(milliseconds: 2000),
                       curve: Curves.elasticOut,
                       builder: (context, value, child) {
@@ -407,7 +416,7 @@ class _HomeScreenState extends State<HomeScreen>
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
-                                  '$todayInspections',
+                                  '$todayCount',
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 20,
