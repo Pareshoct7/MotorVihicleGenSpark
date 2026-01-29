@@ -22,7 +22,7 @@ class BulkInspectionService {
       storeId: store.id,
       driverId: driver.id,
       inspectionDate: date,
-      odometerReading: odometer.toString(),
+      odometerReading: odometer.toString().padLeft(6, '0'),
       vehicleRegistrationNo: vehicle.registrationNo,
       storeName: store.name,
       employeeName: driver.name,
@@ -63,28 +63,60 @@ class BulkInspectionService {
     required int weeksBack,
     required int baseOdometer,
     required DateTime anchorDate,
+    required DateTime startDate,
+    int? vehicleYear,
+    int? seed,
   }) {
     final Map<DateTime, int> readings = {};
-    int currentReading = baseOdometer;
+    
+    // Estimate a floor if base is 0
+    final int currentYear = DateTime.now().year;
+    final int age = vehicleYear != null ? (currentYear - vehicleYear) : 5;
+    final int estimatedBase = (age * 10000).clamp(5000, 250000);
+    
+    int internalBaseOdo = baseOdometer;
+    if (internalBaseOdo < 100) {
+        internalBaseOdo = estimatedBase;
+    }
 
-    // We start from the most recent Monday before (or on) likely anchorDate
-    // But typically we are given a specific set of dates.
-    // Let's assume we iterate backwards week by week from now.
-    
-    DateTime currentProcessingDate = _getMostRecentMonday(anchorDate);
-    
-    // For the current week (newest), we use valid reading.
-    // Then we subtract for previous weeks.
-    
+    // 1. Generate the list of 52 Mondays (newest to oldest)
+    List<DateTime> mondays = [];
+    DateTime currentMonday = _getMostRecentMonday(startDate);
     for (int i = 0; i < weeksBack; i++) {
-      readings[currentProcessingDate] = currentReading;
-      
-      // Prep for next iteration (going back in time)
-      final subtraction = 100 + _random.nextInt(401); // 100-500 km
-      currentReading = currentReading - subtraction;
-      if (currentReading < 0) currentReading = 0;
-      
-      currentProcessingDate = currentProcessingDate.subtract(const Duration(days: 7));
+        mondays.add(currentMonday);
+        currentMonday = currentMonday.subtract(const Duration(days: 7));
+    }
+
+    // 2. Find the index of the Monday closest to the anchorDate
+    int anchorIndex = 0;
+    int minDiff = 1000000;
+    for (int i = 0; i < mondays.length; i++) {
+        int diff = mondays[i].difference(anchorDate).inDays.abs();
+        if (diff < minDiff) {
+            minDiff = diff;
+            anchorIndex = i;
+        }
+    }
+
+    // 3. Set the anchor value
+    readings[mondays[anchorIndex]] = internalBaseOdo;
+
+    // Use a seeded random if provided for consistent trends across syncs
+    final random = seed != null ? Random(seed) : Random();
+
+    // 4. Step FORWARD in time (down the indices from anchorIndex to 0)
+    int upReading = internalBaseOdo;
+    for (int i = anchorIndex - 1; i >= 0; i--) {
+        upReading += 50 + random.nextInt(101); // 50 to 150
+        readings[mondays[i]] = upReading;
+    }
+
+    // 5. Step BACKWARD in time (up the indices from anchorIndex to weeksBack - 1)
+    int downReading = internalBaseOdo;
+    for (int i = anchorIndex + 1; i < mondays.length; i++) {
+        downReading -= 50 + random.nextInt(101); // 50 to 150
+        if (downReading < 500) downReading = 500;
+        readings[mondays[i]] = downReading;
     }
 
     return readings;

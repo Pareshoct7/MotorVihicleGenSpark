@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:share_plus/share_plus.dart';
 import 'package:archive/archive_io.dart';
 import 'package:path/path.dart' as p;
@@ -11,6 +12,7 @@ import '../models/driver.dart';
 import 'database_service.dart';
 import 'pdf_service.dart';
 import 'bulk_inspection_service.dart';
+import 'prediction_service.dart';
 
 class OfflineDriveService {
   static Directory? _rootDir;
@@ -19,12 +21,31 @@ class OfflineDriveService {
     try {
       final appDocDir = await getApplicationDocumentsDirectory();
       _rootDir = Directory('${appDocDir.path}/OfflineDrive');
-      if (!await _rootDir!.exists()) {
-        await _rootDir!.create(recursive: true);
+      if (!_rootDir!.existsSync()) {
+        _rootDir!.createSync(recursive: true);
       }
+      await cleanupDemoFolders();
       debugPrint('Offline Drive Initialized at: ${_rootDir!.path}');
     } catch (e) {
       debugPrint('Error initializing Offline Drive: $e');
+    }
+  }
+
+  static Future<void> cleanupDemoFolders() async {
+    if (_rootDir == null) return;
+    try {
+        if (await _rootDir!.exists()) {
+            final entities = await _rootDir!.list().toList();
+            for (final entity in entities) {
+                // ONLY delete if it contains BOTH "Koutu" and "98683" (incorrect store name)
+                if (entity is Directory && entity.path.contains('Koutu') && entity.path.contains('98683')) {
+                    debugPrint('Cleanup: Deleting INCORRECT demo folder ${entity.path}');
+                    await entity.delete(recursive: true);
+                }
+            }
+        }
+    } catch (e) {
+        debugPrint('Cleanup error: $e');
     }
   }
 
@@ -93,6 +114,7 @@ class OfflineDriveService {
     final vehicles = DatabaseService.getAllVehicles();
     final stores = DatabaseService.getAllStores();
     final drivers = DatabaseService.getAllDrivers();
+    final random = Random();
 
     // Fallbacks if data missing
     final defaultStore = stores.isNotEmpty ? stores.first : null;
@@ -121,12 +143,17 @@ class OfflineDriveService {
             );
 
       // Get Odometers Timeline
-      // We assume vehicle.odometerReading is CURRENT.
+      // Use vehicle.odometerReading and odometerUpdatedAt as the absolute anchor
       final int baseOdometer = vehicle.odometerReading ?? 0;
+      final DateTime anchorDate = vehicle.odometerUpdatedAt ?? vehicle.createdAt;
+      
       final odometerMap = BulkInspectionService.calculateBackdatedOdometers(
         weeksBack: weeksBack,
         baseOdometer: baseOdometer,
-        anchorDate: DateTime.now(),
+        anchorDate: anchorDate,
+        startDate: DateTime.now(),
+        vehicleYear: vehicle.year,
+        seed: vehicle.id.hashCode,
       );
 
       for (final date in odometerMap.keys) {
@@ -149,10 +176,23 @@ class OfflineDriveService {
             'Generating missing report for ${vehicle.registrationNo} - ${DateFormat('dd/MM').format(date)}',
           );
 
+          // Get drivers specific to this store
+          final storeDrivers = _getDriversForStore(store.id, drivers);
+          
+          // Deterministic selection: One vehicle always gets the same driver
+          final driverIndex = (vehicle.id.hashCode).abs() % storeDrivers.length;
+          final assignedDriver = storeDrivers.isNotEmpty 
+              ? storeDrivers[driverIndex] 
+              : (drivers.isNotEmpty ? drivers[random.nextInt(drivers.length)] : driver);
+
+          // Ensure Store Name is consistent (fix for "Dominos Koutu 98683" issue)
+          // If the store object has the correct name, use it.
+          // The generator uses store.name, so this should be correct if 'store' is correct.
+
           inspection = BulkInspectionService.generateInspection(
             vehicle: vehicle,
             store: store,
-            driver: driver,
+            driver: assignedDriver,
             date: date,
             odometer: odometer,
           );
@@ -168,11 +208,73 @@ class OfflineDriveService {
                   _isSameWeek(i.inspectionDate, date),
             );
 
-            // FORCE UPDATE: Ensure "Abhishek Joshi" is signed on existing backfilled records
+            // FORCE UPDATE: Fix Zero Odometer issues for RHC34 etc.
+            // ALSO FORCE UPDATE: If current odometer differs from smart trend by more than 5km
+            final currentOdoStr = inspection.odometerReading.replaceAll(RegExp(r'[^0-9]'), '');
+            final currentOdoVal = int.tryParse(currentOdoStr) ?? 0;
+            
+            bool needsSave = false;
+            
             if (inspection.managerSignature != 'Abhishek Joshi') {
               inspection.managerSignature = 'Abhishek Joshi';
               inspection.managerSignOffDate = inspection.inspectionDate;
-              await inspection.save();
+              needsSave = true;
+            }
+
+            final diff = (currentOdoVal - odometer).abs();
+            if (diff > 5 || currentOdoVal == 0 || inspection.odometerReading.length < 6) {
+                 inspection.odometerReading = odometer.toString().padLeft(6, '0');
+                 needsSave = true;
+            }
+
+            if (needsSave) {
+                await inspection.save();
+                // If we updated the record, we should probably delete the old PDF so it regenerates
+                // But the PDF generation logic below checks `if (!await file.exists())`.
+                // So we need to force delete the old PDF file if we updated the record.
+                
+                final storeName = _sanitize(inspection.storeName);
+                final year = DateFormat('yyyy').format(inspection.inspectionDate);
+                final month = DateFormat('MMMM').format(inspection.inspectionDate);
+                final vehicleReg = _sanitize(inspection.vehicleRegistrationNo);
+                final dateStr = DateFormat('yyyyMMdd_HHmm').format(inspection.inspectionDate);
+                final fileName = 'Inspection_$dateStr.pdf';
+                final filePath = '${_rootDir!.path}/$storeName/$year/$month/$vehicleReg/$fileName';
+                
+                final oldFile = File(filePath);
+                if (await oldFile.exists()) {
+                    await oldFile.delete();
+                }
+            }
+
+            // FORCE RE-RANDOMIZE DRIVER: If driver is "Paresh Patil" or belongs to store_1
+            // we should re-assign a proper store_2 driver.
+            // ALSO FORCE FIX: If odometer is still 000000 after previous checks
+            final isZero = inspection.odometerReading.replaceAll('0', '').isEmpty;
+            
+            if (inspection.employeeName == 'Paresh Patil' || (inspection.driverId?.startsWith('driver_k') ?? false) || isZero) {
+                 final storeDrivers = _getDriversForStore(store.id, drivers);
+                 if (storeDrivers.isNotEmpty) {
+                     final driverIndex = (vehicle.id.hashCode).abs() % storeDrivers.length;
+                     final newDriver = storeDrivers[driverIndex];
+                     inspection.driverId = newDriver.id;
+                     inspection.employeeName = newDriver.name;
+                     inspection.signature = newDriver.name;
+                     await inspection.save();
+                     
+                     // Delete PDF to force regeneration with new driver
+                     final storeName = _sanitize(inspection.storeName);
+                     final year = DateFormat('yyyy').format(inspection.inspectionDate);
+                     final month = DateFormat('MMMM').format(inspection.inspectionDate);
+                     final vehicleReg = _sanitize(inspection.vehicleRegistrationNo);
+                     final dateStr = DateFormat('yyyyMMdd_HHmm').format(inspection.inspectionDate);
+                     final fileName = 'Inspection_$dateStr.pdf';
+                     final filePath = '${_rootDir!.path}/$storeName/$year/$month/$vehicleReg/$fileName';
+                     final oldFile = File(filePath);
+                     if (await oldFile.exists()) {
+                        await oldFile.delete();
+                     }
+                 }
             }
           } catch (e) {
             // Should not happen if hasInspectionInSameWeek returned true
@@ -504,5 +606,26 @@ class OfflineDriveService {
       await _rootDir!.delete(recursive: true);
       await init(); // Re-init to create root folder
     }
+  }
+
+  static List<Driver> _getDriversForStore(String storeId, List<Driver> allDrivers) {
+    // 1. Mandatory assignment based on store ID (Redwoods vs Koutu)
+    if (storeId == 'store_2') {
+        // Redwoods drivers
+        return allDrivers.where((d) => d.id.startsWith('driver_r')).toList();
+    } else if (storeId == 'store_1') {
+        // Koutu drivers
+        return allDrivers.where((d) => d.id.startsWith('driver_k')).toList();
+    }
+
+    // 2. Fallback to history if it's a dynamic store
+    final inspections = DatabaseService.getAllInspections();
+    final driverIds = inspections
+        .where((i) => i.storeId == storeId && i.driverId != null)
+        .map((i) => i.driverId)
+        .toSet();
+    
+    final storeDrivers = allDrivers.where((d) => driverIds.contains(d.id)).toList();
+    return storeDrivers;
   }
 }

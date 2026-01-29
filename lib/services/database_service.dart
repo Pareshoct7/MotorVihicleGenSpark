@@ -38,6 +38,78 @@ class DatabaseService {
     await AILearningService.init();
 
     await populateInitialData();
+    await cleanupDemoData();
+  }
+
+  static Future<void> cleanupDemoData() async {
+    // PURGE ONLY THE FALSE DEMO RECORDS (Named "Dominos Koutu 98683")
+    // Keep "Dominos Koutu 98667" (store_1)
+    
+    final inspectionsBox = Hive.box<Inspection>('inspections');
+    final inspectionsToRemove = inspectionsBox.values
+        .where((i) => i.storeId == 'store_1' && i.storeName.contains('98683'))
+        .toList();
+    
+    for (var i in inspectionsToRemove) {
+        print('Purging demo inspection: ${i.id} at 98683');
+        await i.delete();
+    }
+
+    // Force restore store_1 if it was accidentally deleted
+    final storesBox = Hive.box<Store>('stores');
+    if (!storesBox.containsKey('store_1')) {
+        print('Restoring store_1 (Dominos Koutu 98667)');
+        await storesBox.put('store_1', Store(
+            id: 'store_1',
+            name: 'Dominos Koutu 98667',
+            address: 'Koutu',
+            phone: '02108760034',
+        ));
+    }
+
+    // Force restore Koutu drivers if they were accidentally deleted
+    final driversBox = Hive.box<Driver>('drivers');
+    final kDrivers = [
+      {'id': 'driver_k1', 'name': 'Paresh Patil'},
+      {'id': 'driver_k2', 'name': 'Janmesh Patel'},
+      {'id': 'driver_k3', 'name': 'Shradhadha Joshi'},
+      {'id': 'driver_k4', 'name': 'Vijaypala Thisara'},
+      {'id': 'driver_k5', 'name': 'Rikin Patel'},
+    ];
+
+    for (var d in kDrivers) {
+      if (!driversBox.containsKey(d['id'])) {
+         print('Restoring Koutu driver: ${d['name']}');
+         await driversBox.put(d['id'], Driver(
+           id: d['id']!,
+           name: d['name']!,
+         ));
+      }
+    }
+
+    // Force restore Koutu vehicles if they were accidentally deleted
+    final vBox = Hive.box<Vehicle>(vehiclesBox);
+    final existingStore1Vehicles = vBox.values.where((v) => v.storeId == 'store_1').toList();
+    
+    if (existingStore1Vehicles.isEmpty) {
+        print('Detected missing vehicles for store_1. Re-seeding from JSON...');
+        try {
+            final jsonString = await rootBundle.loadString('assets/initial_data.json');
+            final Map<String, dynamic> data = json.decode(jsonString);
+            if (data['vehicles'] != null) {
+                final vehiclesList = (data['vehicles'] as List)
+                    .map((i) => Vehicle.fromJson(i))
+                    .where((v) => v.storeId == 'store_1')
+                    .toList();
+                for (var v in vehiclesList) {
+                    await vBox.put(v.id, v);
+                    print('Restored vehicle: ${v.registrationNo}');
+                }
+            }
+        } catch (e) {
+            print('Error restoring Koutu vehicles: $e');
+        }
+    }
   }
 
   static Future<void> populateInitialData() async {
