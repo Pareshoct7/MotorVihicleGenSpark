@@ -75,7 +75,7 @@ class _DriversScreenState extends State<DriversScreen> with SingleTickerProvider
                         ),
                         const SizedBox(height: 24),
                         Text(
-                          'ROSTER IS EMPTY',
+                          'NO DRIVERS FOUND',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w900,
@@ -211,7 +211,7 @@ class _DriversScreenState extends State<DriversScreen> with SingleTickerProvider
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Delete Driver'),
+        title: Text('Remove Driver'),
         content: Text('Are you sure you want to delete ${driver.name}?'),
         actions: [
           TextButton(
@@ -336,7 +336,7 @@ class _DriverDialogState extends State<DriverDialog> {
                 const SizedBox(height: 32),
                 ElevatedButton(
                   onPressed: _saveDriver,
-                  child: Text(widget.driver == null ? 'SAVE DRIVER' : 'UPDATE DRIVER'),
+                  child: Text(widget.driver == null ? 'SAVE DRIVER' : 'SAVE DRIVER'),
                 ),
               ],
             ),

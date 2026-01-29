@@ -75,7 +75,7 @@ class _VehiclesScreenState extends State<VehiclesScreen>
             expandedHeight: 200,
             floating: false,
             pinned: true,
-            title: Text('GARAGE'),
+            title: Text('VEHICLES'),
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(80),
               child: Padding(
@@ -141,7 +141,7 @@ class _VehiclesScreenState extends State<VehiclesScreen>
                         ),
                         const SizedBox(height: 24),
                         Text(
-                          'YOUR GARAGE IS EMPTY',
+                          'NO VEHICLES FOUND',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w900,
@@ -155,7 +155,7 @@ class _VehiclesScreenState extends State<VehiclesScreen>
                         ElevatedButton.icon(
                           onPressed: () => _showVehicleDialog(context),
                           icon: Icon(Icons.add),
-                          label: Text('ADD FIRST VEHICLE'),
+                          label: Text('ADD VEHICLE'),
                           style: ElevatedButton.styleFrom(
                             minimumSize: const Size(200, 50),
                           ),
@@ -358,16 +358,13 @@ class _VehiclesScreenState extends State<VehiclesScreen>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                TextButton.icon(
-                  onPressed: () =>
-                      _showVehicleDialog(context, vehicle: vehicle),
-                  icon: Icon(Icons.tune, size: 18),
-                  label: Text('TUNE'),
+                  icon: Icon(Icons.edit_outlined, size: 18),
+                  label: Text('EDIT'),
                 ),
                 TextButton.icon(
                   onPressed: () => _deleteVehicle(context, vehicle),
                   icon: Icon(Icons.delete_outline, size: 18),
-                  label: Text('SCRAP'),
+                  label: Text('DELETE'),
                   style: TextButton.styleFrom(
                     foregroundColor: const Color(0xFFFF5252),
                   ),
@@ -431,7 +428,7 @@ class _VehiclesScreenState extends State<VehiclesScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Delete Vehicle'),
+        title: Text('Remove Vehicle'),
         content: Text(
           'Are you sure you want to delete ${vehicle.registrationNo}?',
         ),
@@ -526,7 +523,7 @@ class _VehicleDialogState extends State<VehicleDialog> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      widget.vehicle == null ? 'NEW RIG' : 'TUNE RIG',
+                      widget.vehicle == null ? 'NEW VEHICLE' : 'EDIT VEHICLE',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 24,
@@ -597,7 +594,7 @@ class _VehicleDialogState extends State<VehicleDialog> {
                   initialValue: _selectedStoreId,
                   isExpanded: true,
                   decoration: InputDecoration(
-                    labelText: 'BASE HUB',
+                    labelText: 'ASSIGNED STORE',
                     prefixIcon: Icon(Icons.store_outlined),
                   ),
                   dropdownColor: Theme.of(
@@ -617,7 +614,7 @@ class _VehicleDialogState extends State<VehicleDialog> {
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  'MAINTENANCE LOGS',
+                  'MAINTENANCE DATES',
                   style: TextStyle(
                     color: Color(0xFF4FC3F7),
                     fontSize: 10,
@@ -657,7 +654,7 @@ class _VehicleDialogState extends State<VehicleDialog> {
                 ElevatedButton(
                   onPressed: _saveVehicle,
                   child: Text(
-                    widget.vehicle == null ? 'ADD TO GARAGE' : 'SAVE TUNING',
+                    widget.vehicle == null ? 'ADD VEHICLE' : 'SAVE VEHICLE',
                   ),
                 ),
               ],

@@ -240,7 +240,7 @@ class _InspectionFormScreenState extends State<InspectionFormScreen>
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'SYSTEM READINESS',
+                            'COMPLETION',
                             style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.w900,
@@ -280,13 +280,13 @@ class _InspectionFormScreenState extends State<InspectionFormScreen>
               padding: EdgeInsets.fromLTRB(24, 8, 24, 100),
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
-                  // Section 1: Telemetry
-                  _buildAnimatedSection(0, 'TELEMETRY', [
+                  // Section 1: Details
+                  _buildAnimatedSection(0, 'DETAILS', [
                     DropdownButtonFormField<String>(
                       value: validVehicleId, // Use value instead of initialValue for better state control
                       isExpanded: true,
                       decoration: InputDecoration(
-                        labelText: 'TARGET VEHICLE',
+                        labelText: 'VEHICLE',
                         prefixIcon: Icon(Icons.directions_car_outlined),
                       ),
                       dropdownColor: Theme.of(
@@ -312,7 +312,7 @@ class _InspectionFormScreenState extends State<InspectionFormScreen>
                       value: validStoreId,
                       isExpanded: true,
                       decoration: InputDecoration(
-                        labelText: 'STAGING HUB',
+                        labelText: 'STORE',
                         prefixIcon: Icon(Icons.store_outlined),
                       ),
                       dropdownColor: Theme.of(
@@ -367,7 +367,7 @@ class _InspectionFormScreenState extends State<InspectionFormScreen>
                                               color: Color(0xFF00E676),
                                               size: 18,
                                             ),
-                                            tooltip: 'MAGIC ESTIMATE',
+                                            tooltip: 'AUTO FILL',
                                             onPressed: _magicEstimateOdometer,
                                           ),
                                           const SizedBox(width: 6),
@@ -408,7 +408,7 @@ class _InspectionFormScreenState extends State<InspectionFormScreen>
                                   },
                             child: InputDecorator(
                               decoration: InputDecoration(
-                                labelText: 'SCAN DATE',
+                                labelText: 'INSPECTION DATE',
                               ),
                               child: FittedBox(
                                 fit: BoxFit.scaleDown,
@@ -429,7 +429,7 @@ class _InspectionFormScreenState extends State<InspectionFormScreen>
                       value: validDriverId,
                       isExpanded: true,
                       decoration: InputDecoration(
-                        labelText: 'OPERATOR',
+                        labelText: 'DRIVER',
                         prefixIcon: Icon(Icons.person_outline),
                       ),
                       dropdownColor: Theme.of(
@@ -460,38 +460,38 @@ class _InspectionFormScreenState extends State<InspectionFormScreen>
                     ),
                   ]),
 
-                  // Section 2: Diagnostics (Checklist)
-                  _buildAnimatedSection(1, 'SYSTEM DIAGNOSTICS', [
+                  // Section 2: Checklist
+                  _buildAnimatedSection(1, 'CHECKLIST', [
                     _buildThematicCheckGroup('TIRES & WHEELS', [
                       _ChecklistItem(
-                        'TREAD DEPTH SCAN',
+                        'TYRE TREADS',
                         _tyresTreadDepth,
                         (v) => setState(() => _tyresTreadDepth = v),
                       ),
                       _ChecklistItem(
-                        'WHEEL NUT TORQUE',
+                        'WHEEL NUTS',
                         _wheelNuts,
                         (v) => setState(() => _wheelNuts = v),
                       ),
                     ]),
                     _buildThematicCheckGroup('CHASSIS & EXTERIOR', [
                       _ChecklistItem(
-                        'BODY CLEANLINESS',
+                        'CLEANLINESS',
                         _cleanliness,
                         (v) => setState(() => _cleanliness = v),
                       ),
                       _ChecklistItem(
-                        'SURFACE INTEGRITY (NO DAMAGE)',
+                        'BODY DAMAGE',
                         _bodyDamage,
                         (v) => setState(() => _bodyDamage = v),
                       ),
                       _ChecklistItem(
-                        'OPTICS (MIRRORS & WINDOWS)',
+                        'MIRRORS & WINDOWS',
                         _mirrorsWindows,
                         (v) => setState(() => _mirrorsWindows = v),
                       ),
                       _ChecklistItem(
-                        'LIVERY / SIGNAGE',
+                        'SIGNAGE',
                         _signage,
                         (v) => setState(() => _signage = v),
                       ),
@@ -504,8 +504,8 @@ class _InspectionFormScreenState extends State<InspectionFormScreen>
                       child: TextFormField(
                         controller: _bodyDamageNotesController,
                         decoration: InputDecoration(
-                          labelText: 'BODY DAMAGE LOG',
-                          hintText: 'LOG ANOMALIES...',
+                          labelText: 'NOTES',
+                          hintText: 'ADD NOTES...',
                         ),
                         maxLines: 2,
                         readOnly: widget.isViewOnly,
@@ -518,19 +518,19 @@ class _InspectionFormScreenState extends State<InspectionFormScreen>
                         (v) => setState(() => _engineOilWater = v),
                       ),
                       _ChecklistItem(
-                        'BRAKE CALIBRATION',
+                        'BRAKES',
                         _brakes,
                         (v) => setState(() => _brakes = v),
                       ),
                       _ChecklistItem(
-                        'TRANSMISSION RESPONSE',
+                        'TRANSMISSION',
                         _transmission,
                         (v) => setState(() => _transmission = v),
                       ),
                     ]),
                     _buildThematicCheckGroup('ILLUMINATION', [
                       _ChecklistItem(
-                        'TAIL LIGHT ARRAYS',
+                        'TAIL LIGHTS',
                         _tailLights,
                         (v) => setState(() => _tailLights = v),
                       ),
@@ -545,12 +545,12 @@ class _InspectionFormScreenState extends State<InspectionFormScreen>
                         (v) => setState(() => _headlightsHighBeam = v),
                       ),
                       _ChecklistItem(
-                        'REVERSE THRUST LIGHTS',
+                        'REVERSE LIGHTS',
                         _reverseLights,
                         (v) => setState(() => _reverseLights = v),
                       ),
                       _ChecklistItem(
-                        'BRAKE LIGHT RESPONSE',
+                        'BRAKE LIGHTS',
                         _brakeLights,
                         (v) => setState(() => _brakeLights = v),
                       ),
@@ -562,32 +562,32 @@ class _InspectionFormScreenState extends State<InspectionFormScreen>
                         (v) => setState(() => _windscreenWipers = v),
                       ),
                       _ChecklistItem(
-                        'ACOUSTIC HORN',
+                        'HORN',
                         _horn,
                         (v) => setState(() => _horn = v),
                       ),
                       _ChecklistItem(
-                        'DIRECTIONAL INDICATORS',
+                        'INDICATORS',
                         _indicators,
                         (v) => setState(() => _indicators = v),
                       ),
                       _ChecklistItem(
-                        'SAFETY RESTRAINTS (BELTS)',
+                        'SEAT BELTS',
                         _seatBelts,
                         (v) => setState(() => _seatBelts = v),
                       ),
                       _ChecklistItem(
-                        'COCKPIT CLEANLINESS',
+                        'CAB CLEANLINESS',
                         _cabCleanliness,
                         (v) => setState(() => _cabCleanliness = v),
                       ),
                       _ChecklistItem(
-                        'SERVICE LOGS ONBOARD',
+                        'SERVICE LOG BOOK',
                         _serviceLogBook,
                         (v) => setState(() => _serviceLogBook = v),
                       ),
                       _ChecklistItem(
-                        'AUXILIARY KEYS IN STORE',
+                        'SPARE KEYS',
                         _spareKeys,
                         (v) => setState(() => _spareKeys = v),
                       ),
@@ -599,8 +599,8 @@ class _InspectionFormScreenState extends State<InspectionFormScreen>
                     TextFormField(
                       controller: _correctiveActionsController,
                       decoration: InputDecoration(
-                        labelText: 'REACTION LOG',
-                        hintText: 'LOG CORRECTIVE MEASURES...',
+                        labelText: 'CORRECTIVE ACTIONS',
+                        hintText: 'ENTER ACTIONS TAKEN...',
                       ),
                       maxLines: 4,
                       readOnly: widget.isViewOnly,
@@ -608,9 +608,9 @@ class _InspectionFormScreenState extends State<InspectionFormScreen>
                   ]),
 
                   // Section 4: Sign-off
-                  _buildAnimatedSection(3, 'SYSTEM AUTHENTICATION', [
+                  _buildAnimatedSection(3, 'SIGN OFF', [
                     Text(
-                      'I CONFIRM ALL PERFORMANCE DATA IS ACCURATE.',
+                      'I CONFIRM THIS INSPECTION IS ACCURATE.',
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
@@ -621,7 +621,7 @@ class _InspectionFormScreenState extends State<InspectionFormScreen>
                     TextFormField(
                       controller: _signatureController,
                       decoration: InputDecoration(
-                        labelText: 'DIGITAL SIGNATURE',
+                        labelText: 'DRIVER SIGNATURE',
                         prefixIcon: Icon(Icons.history_edu_outlined),
                       ),
                       readOnly: widget.isViewOnly,

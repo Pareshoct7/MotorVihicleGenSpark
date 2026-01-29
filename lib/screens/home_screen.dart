@@ -220,7 +220,7 @@ class _HomeScreenState extends State<HomeScreen>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'TRACK HISTORY',
+                          'RECENT ACTIVITY',
                           style: Theme.of(context).textTheme.titleLarge
                               ?.copyWith(
                                 fontWeight: FontWeight.bold,
@@ -235,7 +235,7 @@ class _HomeScreenState extends State<HomeScreen>
                                   const InspectionHistoryScreen(),
                             ),
                           ).then((_) => setState(() {})),
-                          child: Text('FULL LOG'),
+                          child: Text('VIEW ALL'),
                         ),
                       ],
                     ),
@@ -324,7 +324,7 @@ class _HomeScreenState extends State<HomeScreen>
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'SYSTEM POWER',
+                        'DASHBOARD',
                         style: TextStyle(
                           color: Color(0xFF4FC3F7),
                           fontSize: 10,
@@ -346,7 +346,7 @@ class _HomeScreenState extends State<HomeScreen>
                         ),
                       ),
                       Text(
-                        'TOTAL RUNS',
+                        'TOTAL INSPECTIONS',
                         style: TextStyle(
                           color: Colors.white54,
                           fontSize: 10,
@@ -386,7 +386,7 @@ class _HomeScreenState extends State<HomeScreen>
                               ),
                               SizedBox(width: 8),
                               Text(
-                                'PERFORMANCE',
+                                'ANALYTICS',
                                 style: TextStyle(
                                   color: Color(0xFF4FC3F7),
                                   fontSize: 12,
@@ -459,7 +459,7 @@ class _HomeScreenState extends State<HomeScreen>
             ),
             const SizedBox(width: 8),
             Text(
-              'ALERT HUB',
+              'REMINDERS',
               style: TextStyle(
                 color: Colors.orangeAccent,
                 fontWeight: FontWeight.w900,
@@ -782,7 +782,7 @@ class _HomeScreenState extends State<HomeScreen>
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'TURBO INSPECT',
+                  'VEHICLE INSPECTOR',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 20,
@@ -803,7 +803,7 @@ class _HomeScreenState extends State<HomeScreen>
           const Divider(color: Colors.white12),
           _buildThemedDrawerItem(
             context,
-            'Speed Check',
+            'New Inspection',
             Icons.speed,
             UsageService.featureNewInspection,
             const InspectionFormScreen(),
@@ -817,7 +817,7 @@ class _HomeScreenState extends State<HomeScreen>
           ),
           _buildThemedDrawerItem(
             context,
-            'Drive',
+            'Reports',
             Icons.drive_file_move_outlined,
             UsageService.featureOfflineDrive,
             const OfflineDriveScreen(),
@@ -832,7 +832,7 @@ class _HomeScreenState extends State<HomeScreen>
           ),
           _buildThemedDrawerItem(
             context,
-            'Performance',
+            'Analytics',
             Icons.assessment_outlined,
             UsageService.featureReportsAnalytics,
             const ReportsScreen(),
@@ -862,7 +862,7 @@ class _HomeScreenState extends State<HomeScreen>
           const Divider(color: Colors.white12),
           _buildThemedDrawerItem(
             context,
-            'Alert Hub',
+            'Reminders',
             Icons.notification_important_outlined,
             UsageService.featureReminders,
             const RemindersScreen(),
@@ -953,7 +953,7 @@ class _HomeScreenState extends State<HomeScreen>
         backgroundColor: const Color(0xFFFF9800),
         icon: Icon(Icons.speed, color: Colors.white),
         label: Text(
-          'DUE SOON: SCAN',
+          'DUE SOON: INSPECT',
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
       );
@@ -968,7 +968,7 @@ class _HomeScreenState extends State<HomeScreen>
       icon: Icon(Icons.speed, color: Colors.white),
       label: FittedBox(
         child: Text(
-          'Speed Check',
+          'New Inspection',
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
       ),

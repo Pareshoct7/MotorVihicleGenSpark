@@ -61,7 +61,7 @@ class _InspectionHistoryScreenState extends State<InspectionHistoryScreen> {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 ),
                 SizedBox(width: 16),
-                Text('Generating clubbed PDF report...'),
+                Text('Generating combined report...'),
               ],
             ),
             duration: Duration(seconds: 3),
@@ -105,7 +105,7 @@ class _InspectionHistoryScreenState extends State<InspectionHistoryScreen> {
       appBar: AppBar(
         title: Text(_isSelectionMode 
             ? '${_selectedInspectionIds.length} Selected' 
-            : 'Inspection History'),
+            : 'Past Inspections'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         leading: _isSelectionMode
             ? IconButton(
@@ -139,7 +139,7 @@ class _InspectionHistoryScreenState extends State<InspectionHistoryScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'No inspections yet',
+                    'No inspections found',
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.grey.shade600,
@@ -519,7 +519,7 @@ class _InspectionHistoryScreenState extends State<InspectionHistoryScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Delete Inspection'),
+        title: Text('Remove Inspection'),
         content: Text(
           'Are you sure you want to delete this inspection for ${inspection.vehicleRegistrationNo}?',
         ),

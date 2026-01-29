@@ -372,7 +372,7 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen>
               Icon(Icons.sync_alt, color: Color(0xFFFFD700), size: 48),
               const SizedBox(height: 24),
               Text(
-                'DRIVE SYNC',
+                'SYNC REPORTS',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w900,
@@ -381,7 +381,7 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen>
               ),
               const SizedBox(height: 16),
               Text(
-                'Initiate system-wide backfill? This will scan historical telemetry for the past year and generate missing reports.',
+                'Update report history? This will scan for missing reports and ensure everything is up to date.',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.white70, height: 1.5),
               ),
@@ -436,7 +436,7 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen>
                 const CircularProgressIndicator(color: Color(0xFFFFD700)),
                 const SizedBox(height: 24),
                 Text(
-                  'SYNCING DRIVE',
+                  'SYNCING REPORTS',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w900,
@@ -445,7 +445,7 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen>
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Reconstructing telemetry history...',
+                  'Updating report data...',
                   style: TextStyle(color: Colors.white38, fontSize: 12),
                   textAlign: TextAlign.center,
                 ),
@@ -566,7 +566,7 @@ class _OfflineDriveScreenState extends State<OfflineDriveScreen>
     }
 
     final folderName = _currentDir!.path.split('/').last.isEmpty
-        ? 'DRIVE'
+        ? 'REPORTS'
         : _currentDir!.path.split('/').last.toUpperCase();
 
     return Scaffold(

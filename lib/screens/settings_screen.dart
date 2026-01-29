@@ -67,7 +67,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Customize app appearance',
+                    'Change how the app looks',
                     style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
                   ),
                   const SizedBox(height: 24),
@@ -76,7 +76,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       return DropdownButtonFormField<ThemeMode>(
                         initialValue: themeProvider.themeMode,
                         decoration: InputDecoration(
-                          labelText: 'Theme Mode',
+                          labelText: 'Theme',
                           border: OutlineInputBorder(),
                           prefixIcon: Icon(Icons.palette),
                         ),
@@ -119,14 +119,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Default Selections',
+                    'Defaults',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Set default values for new inspections',
+                    'Automatically fill these for new inspections',
                     style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
                   ),
                   const SizedBox(height: 24),
@@ -207,7 +207,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   DropdownButtonFormField<String>(
                     initialValue: _defaultDriverId,
                     decoration: InputDecoration(
-                      labelText: 'Default Driver/Employee',
+                      labelText: 'Default Driver',
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.person),
                     ),
@@ -251,14 +251,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Data Management',
+                    'Data',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Backup and restore your data',
+                    'Export or import your data',
                     style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
                   ),
                   const SizedBox(height: 24),
@@ -286,7 +286,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         }
                       },
                       icon: Icon(Icons.upload_file),
-                      label: Text('Export Database'),
+                      label: Text('Export Data'),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -318,7 +318,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         }
                       },
                       icon: Icon(Icons.download),
-                      label: Text('Import Database'),
+                      label: Text('Import Data'),
                     ),
                   ),
                 ],

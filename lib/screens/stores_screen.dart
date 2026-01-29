@@ -75,7 +75,7 @@ class _StoresScreenState extends State<StoresScreen> with SingleTickerProviderSt
                         ),
                         const SizedBox(height: 24),
                         Text(
-                          'NO STORES REGISTERED',
+                          'NO STORES FOUND',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w900,
@@ -211,7 +211,7 @@ class _StoresScreenState extends State<StoresScreen> with SingleTickerProviderSt
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Delete Store'),
+        title: Text('Remove Store'),
         content: Text('Are you sure you want to delete ${store.name}?'),
         actions: [
           TextButton(
@@ -335,7 +335,7 @@ class _StoreDialogState extends State<StoreDialog> {
                 const SizedBox(height: 32),
                 ElevatedButton(
                   onPressed: _saveStore,
-                  child: Text(widget.store == null ? 'SAVE STORE' : 'UPDATE STORE'),
+                  child: Text(widget.store == null ? 'SAVE STORE' : 'SAVE STORE'),
                 ),
               ],
             ),
