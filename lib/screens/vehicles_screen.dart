@@ -358,6 +358,9 @@ class _VehiclesScreenState extends State<VehiclesScreen>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
+                TextButton.icon(
+                  onPressed: () =>
+                      _showVehicleDialog(context, vehicle: vehicle),
                   icon: Icon(Icons.edit_outlined, size: 18),
                   label: Text('EDIT'),
                 ),
